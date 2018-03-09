@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-navbar>
+  
+  <ion-buttons start>
+    <button ion-button icon-only menuToggle>
+      <ion-icon name='menu'></ion-icon>
+    </button>
+  </ion-buttons> 
+
+    <ion-title>
+      ParkInLot
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+<div id="map" class="map">
+</div>
+
+  <div class="bottom">
+    <ion-row>
+      <ion-col>
+        <ion-buttons end>
+          <button ion-button color='light' (click)='centerLocation()'><ion-icon name="locate"></ion-icon>
+        </button>
+      </ion-buttons>
+      </ion-col>        
+    </ion-row>
+  </div>
+
+</ion-content>

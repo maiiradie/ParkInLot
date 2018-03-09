@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>ParkInLot</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+	<form (submit)='onSignin()'>
+		<ion-grid>
+			<ion-list>
+
+			  <ion-item>
+			    <ion-label floating>Email</ion-label>
+			    <ion-input type="email" name='email' [(ngModel)]='login.email'></ion-input>
+			  </ion-item>
+
+			  <ion-item>
+			    <ion-label floating>Password</ion-label>
+			    <ion-input type="password" name='password' [(ngModel)]='login.password'></ion-input>
+			  </ion-item>
+
+			</ion-list>
+			<button ion-button block type="submit">Login</button>
+		</ion-grid>
+	</form>
+		<button ion-button clear block (click)="register()">Create an Account</button>
+</ion-content>

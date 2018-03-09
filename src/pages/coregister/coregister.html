@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>coregister</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+	<h1>Car Owner Registration</h1>
+
+	<form [formGroup]='userForm' (ngSubmit)="onSubmitCO()">
+		<ion-list>
+		  <ion-item>
+		    <ion-label floating>First Name</ion-label>
+		    <ion-input type="text" formControlName = 'fname'></ion-input>
+		  </ion-item>
+
+		  <ion-item>
+		    <ion-label floating>Last Name</ion-label>
+		    <ion-input type="text" formControlName = 'lname'></ion-input>
+		  </ion-item>
+
+		  <ion-item>
+		    <ion-label floating>Email</ion-label>
+		    <ion-input type="email" formControlName = 'email'></ion-input>
+		  </ion-item>
+
+		  <ion-item>
+		    <ion-label floating>Password</ion-label>
+		    <ion-input type="password" formControlName = 'password'></ion-input>
+		  </ion-item>
+		  
+  		  <ion-item>
+		    <ion-label floating>Mobile Number</ion-label>
+		    <ion-input type="number" formControlName = 'mobile'></ion-input>
+		  </ion-item>
+		</ion-list>
+
+		<button ion-button block type="submit" [disabled]='!userForm.valid'>Register</button>
+	</form>	
+
+</ion-content>
