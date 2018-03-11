@@ -10,6 +10,9 @@ import  MapboxDirections  from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-dire
 import { ActionSheetController } from 'ionic-angular';
 import { ComoredetailsPage } from '../Comoredetails/Comoredetails';
 
+import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireDatabase } from 'angularfire2/database';
+
 @Component({
   selector: 'page-home',
   templateUrl: 'home.html'
@@ -21,7 +24,7 @@ export class HomePage {
   public hoMarkers;
 
   //private authProvider:AuthProvider,
-  constructor(public actionSheetCtrl: ActionSheetController, private geolocation: Geolocation, public navCtrl: NavController,public loadingCtrl: LoadingController) {
+  constructor(private afs:AngularFireAuth,private afdb:AngularFireDatabase, public actionSheetCtrl: ActionSheetController, private geolocation: Geolocation, public navCtrl: NavController,public loadingCtrl: LoadingController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
 	}
 
@@ -32,14 +35,55 @@ export class HomePage {
 		 this.centerLocation(location);
 		 this.setDirections(location);
 	});
-
-		//mock marker
-		// this.marker = new mapboxgl.Marker()
-		// .setLngLat({lng:120.5960,lat:16.4023})
-		// .addTo(this.map);
+		// this.setMarkers();
+		this.test();
 	}
-	
-  setDirections(location){
+
+	test(){
+		var arr = [];
+		var map = this.map;
+
+		this.afdb.list('location').snapshotChanges().subscribe(data => {
+			for (var i = 0 ; i < data.length; i++) {
+				arr[i] = {
+					type: 'FeatureCollection',
+					features: [{
+					    type: 'Feature',
+					    geometry: {
+					      type: 'Point',
+					      coordinates: [data[i].payload.val().lat, data[i].payload.val().lng]
+					    },
+					    properties: {
+					      title: 'Mapbox',
+					      description: 'Washington, D.C.'
+					    }					
+				}]
+				};
+					// console.log(arr);
+			}
+				console.log(arr);
+				console.log(arr[0].features[0].geometry.coordinates);
+			for (var i = 0; i < arr.length; i++) {
+				 new mapboxgl.Marker()
+				.setLngLat(arr[i].features[0].geometry.coordinates[0],arr[i].features[0].geometry.coordinates[1])
+			  	.addTo(map);		
+			}
+		// foreach(function(marker) {
+		//   new mapboxgl.Marker()
+		//   .setLngLat(marker.geometry.coordinates)
+		//   .addTo(map);
+		// });
+
+
+		});
+	}
+		// arr.features.forEach(function(marker) {
+		//   new mapboxgl.Marker()
+		//   .setLngLat(marker.geometry.coordinates)
+		//   .addTo(map);
+		// });
+
+  	setDirections(location){
 	const directions = new MapboxDirections({
 		accessToken: mapboxgl.accessToken,
 		interactive:false
@@ -57,7 +101,7 @@ export class HomePage {
 	container: 'map',
 	style: 'mapbox://styles/mapbox/streets-v10',
 	center: location,
-	zoom: 17,
+	zoom: 5,
   	attributionControl: false,
 	});
 
