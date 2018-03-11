@@ -63,14 +63,50 @@ export class HomePage {
 				console.log(arr);
 				console.log(arr[0].features[0].geometry.coordinates);
 			for (var i = 0; i < arr.length; i++) {
+				const popup = new mapboxgl.Popup()
+    						 .setHTML('<h1>Loakan namba wan!</h1>');
+
 				var coords = new mapboxgl.LngLat(arr[i].features[0].geometry.coordinates[1],arr[i].features[0].geometry.coordinates[0]);
 				 new mapboxgl.Marker()
 				.setLngLat(coords)
-			  	.addTo(map);
+				.setPopup(popup)
+			  	.addTo(map);	
 			}
+			var el = document.createElement('div');
+				el.innerHTML = "You are here!";
+				el.id = 'marker';
+
+	 	el.addEventListener('click', () => { 
+		    let actionSheet = this.actionSheetCtrl.create({
+		      title: 'Name of place',
+		      buttons: [
+		        {
+		          text: 'Request',
+		          role: 'destructive',
+		          handler: () => {
+		            console.log('Destructive clicked');
+		          }
+		        },{
+		          text: 'More Details',
+		          handler: () => {
+		            this.navCtrl.push(ComoredetailsPage);
+		          }
+		        },{
+		          text: 'Cancel',
+		          role: 'cancel',
+		          handler: () => {
+		            console.log('Cancel clicked');
+		            popup.remove();
+		          }
+		        }
+		      ]
+		    });
+		    actionSheet.present();
+  		});
+  		
 		});
 	}
-	
+
   	setDirections(location){
 	const directions = new MapboxDirections({
 		accessToken: mapboxgl.accessToken,
