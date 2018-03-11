@@ -82,6 +82,7 @@ export class HomePage {
 			
 
 
+<<<<<<< HEAD
 	 	el.addEventListener('click', () => { 
 		    let actionSheet = this.actionSheetCtrl.create({
 		      title: 'Name of place',
@@ -110,6 +111,34 @@ export class HomePage {
 		    actionSheet.present();
   			});
 		}
+	 	// el.addEventListener('click', () => { 
+		 //    let actionSheet = this.actionSheetCtrl.create({
+		 //      title: 'Name of place',
+		 //      buttons: [
+		 //        {
+		 //          text: 'Request',
+		 //          role: 'destructive',
+		 //          handler: () => {
+		 //            console.log('Destructive clicked');
+		 //          }
+		 //        },{
+		 //          text: 'More Details',
+		 //          handler: () => {
+		 //            this.navCtrl.push(ComoredetailsPage);
+		 //          }
+		 //        },{
+		 //          text: 'Cancel',
+		 //          role: 'cancel',
+		 //          handler: () => {
+		 //            console.log('Cancel clicked');
+		 //            popup.remove();
+		 //          }
+		 //        }
+		 //      ]
+		 //    });
+		 //    actionSheet.present();
+  	  	// });
+
 		});
 		
 	}
