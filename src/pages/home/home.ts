@@ -35,11 +35,10 @@ export class HomePage {
 		 this.centerLocation(location);
 		 this.setDirections(location);
 	});
-		// this.setMarkers();
-		this.test();
+		this.setMarkers();
 	}
 
-	test(){
+	setMarkers(){
 		var arr = [];
 		var map = this.map;
 
@@ -51,7 +50,7 @@ export class HomePage {
 					    type: 'Feature',
 					    geometry: {
 					      type: 'Point',
-					      coordinates: [data[i].payload.val().lat, data[i].payload.val().lng]
+					      coordinates: [data[i].payload.val().location.lat, data[i].payload.val().location.lng]
 					    },
 					    properties: {
 					      title: 'Mapbox',
@@ -60,10 +59,6 @@ export class HomePage {
 				}]
 				};
 			}
-				// console.log(arr);
-				// console.log(arr[0].features[0].geometry.coordinates);
-
-			
 
 			const popup = new mapboxgl.Popup();	
 
@@ -78,69 +73,38 @@ export class HomePage {
 				 new mapboxgl.Marker(el,{offset:[-25,-25]})
 				.setLngLat(coords)
 				.setPopup(popup)
-			  	.addTo(map);	
+				.addTo(map);
+				  	
+			el.addEventListener('click', () => { 
+				let actionSheet = this.actionSheetCtrl.create({
+				title: 'Name of place',
+				buttons: [
+					{
+					text: 'Request',
+					role: 'destructive',
+					handler: () => {
+						console.log('Destructive clicked');
+					}
+					},{
+					text: 'More Details',
+					handler: () => {
+						this.navCtrl.push(ComoredetailsPage);
+					}
+					},{
+					text: 'Cancel',
+					role: 'cancel',
+					handler: () => {
+						console.log('Cancel clicked');
+						popup.remove();
+					}
+					}
+				]
+				});
+				actionSheet.present();
+				});
+			}
+			});
 			
-
-
-<<<<<<< HEAD
-	 	el.addEventListener('click', () => { 
-		    let actionSheet = this.actionSheetCtrl.create({
-		      title: 'Name of place',
-		      buttons: [
-		        {
-		          text: 'Request',
-		          role: 'destructive',
-		          handler: () => {
-		            console.log('Destructive clicked');
-		          }
-		        },{
-		          text: 'More Details',
-		          handler: () => {
-		            this.navCtrl.push(ComoredetailsPage);
-		          }
-		        },{
-		          text: 'Cancel',
-		          role: 'cancel',
-		          handler: () => {
-		            console.log('Cancel clicked');
-		            popup.remove();
-		          }
-		        }
-		      ]
-		    });
-		    actionSheet.present();
-  			});
-		}
-	 	// el.addEventListener('click', () => { 
-		 //    let actionSheet = this.actionSheetCtrl.create({
-		 //      title: 'Name of place',
-		 //      buttons: [
-		 //        {
-		 //          text: 'Request',
-		 //          role: 'destructive',
-		 //          handler: () => {
-		 //            console.log('Destructive clicked');
-		 //          }
-		 //        },{
-		 //          text: 'More Details',
-		 //          handler: () => {
-		 //            this.navCtrl.push(ComoredetailsPage);
-		 //          }
-		 //        },{
-		 //          text: 'Cancel',
-		 //          role: 'cancel',
-		 //          handler: () => {
-		 //            console.log('Cancel clicked');
-		 //            popup.remove();
-		 //          }
-		 //        }
-		 //      ]
-		 //    });
-		 //    actionSheet.present();
-  	  	// });
-
-		});
-		
 	}
 
   	setDirections(location){

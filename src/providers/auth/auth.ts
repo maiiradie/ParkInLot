@@ -116,18 +116,21 @@ export class AuthProvider {
          lname:form.lname,
          email:form.email,
          mobile:form.mobile,
-         location:{
-           lat:location.lat,
-           lng:location.lng
-         },
          homeowner:true,
          created_at:Date.now()
+       })
+       .then( () => {
+        this.afdb.object(`location/${user.uid}`).set({
+          location:{
+            lat:location.lat,
+            lng:location.lng
+          },
        });
     })
     .catch((err) => {
        console.log(err);
     });
-  }
-
+  });
+}
 
 }
