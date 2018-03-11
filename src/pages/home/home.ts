@@ -60,8 +60,7 @@ export class HomePage {
 				}]
 				};
 			}
-				console.log(arr);
-				console.log(arr[0].features[0].geometry.coordinates);
+
 			for (var i = 0; i < arr.length; i++) {
 				const popup = new mapboxgl.Popup()
     						 .setHTML('<h1>Loakan namba wan!</h1>');
@@ -76,34 +75,34 @@ export class HomePage {
 				el.innerHTML = "You are here!";
 				el.id = 'marker';
 
-	 	el.addEventListener('click', () => { 
-		    let actionSheet = this.actionSheetCtrl.create({
-		      title: 'Name of place',
-		      buttons: [
-		        {
-		          text: 'Request',
-		          role: 'destructive',
-		          handler: () => {
-		            console.log('Destructive clicked');
-		          }
-		        },{
-		          text: 'More Details',
-		          handler: () => {
-		            this.navCtrl.push(ComoredetailsPage);
-		          }
-		        },{
-		          text: 'Cancel',
-		          role: 'cancel',
-		          handler: () => {
-		            console.log('Cancel clicked');
-		            popup.remove();
-		          }
-		        }
-		      ]
-		    });
-		    actionSheet.present();
-  		});
-  		
+	 	// el.addEventListener('click', () => { 
+		 //    let actionSheet = this.actionSheetCtrl.create({
+		 //      title: 'Name of place',
+		 //      buttons: [
+		 //        {
+		 //          text: 'Request',
+		 //          role: 'destructive',
+		 //          handler: () => {
+		 //            console.log('Destructive clicked');
+		 //          }
+		 //        },{
+		 //          text: 'More Details',
+		 //          handler: () => {
+		 //            this.navCtrl.push(ComoredetailsPage);
+		 //          }
+		 //        },{
+		 //          text: 'Cancel',
+		 //          role: 'cancel',
+		 //          handler: () => {
+		 //            console.log('Cancel clicked');
+		 //            popup.remove();
+		 //          }
+		 //        }
+		 //      ]
+		 //    });
+		 //    actionSheet.present();
+  	  	// });
+
 		});
 	}
 
