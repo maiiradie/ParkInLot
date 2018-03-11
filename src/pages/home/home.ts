@@ -59,30 +59,18 @@ export class HomePage {
 					    }					
 				}]
 				};
-					// console.log(arr);
 			}
 				console.log(arr);
 				console.log(arr[0].features[0].geometry.coordinates);
 			for (var i = 0; i < arr.length; i++) {
+				var coords = new mapboxgl.LngLat(arr[i].features[0].geometry.coordinates[1],arr[i].features[0].geometry.coordinates[0]);
 				 new mapboxgl.Marker()
-				.setLngLat(arr[i].features[0].geometry.coordinates[0],arr[i].features[0].geometry.coordinates[1])
-			  	.addTo(map);		
+				.setLngLat(coords)
+			  	.addTo(map);
 			}
-		// foreach(function(marker) {
-		//   new mapboxgl.Marker()
-		//   .setLngLat(marker.geometry.coordinates)
-		//   .addTo(map);
-		// });
-
-
 		});
 	}
-		// arr.features.forEach(function(marker) {
-		//   new mapboxgl.Marker()
-		//   .setLngLat(marker.geometry.coordinates)
-		//   .addTo(map);
-		// });
-
+	
   	setDirections(location){
 	const directions = new MapboxDirections({
 		accessToken: mapboxgl.accessToken,
@@ -101,7 +89,7 @@ export class HomePage {
 	container: 'map',
 	style: 'mapbox://styles/mapbox/streets-v10',
 	center: location,
-	zoom: 5,
+	zoom: 15,
   	attributionControl: false,
 	});
 
