@@ -60,21 +60,27 @@ export class HomePage {
 				}]
 				};
 			}
-				console.log(arr);
-				console.log(arr[0].features[0].geometry.coordinates);
-			for (var i = 0; i < arr.length; i++) {
-				const popup = new mapboxgl.Popup()
-    						 .setHTML('<h1>Loakan namba wan!</h1>');
+				// console.log(arr);
+				// console.log(arr[0].features[0].geometry.coordinates);
 
+			
+
+			const popup = new mapboxgl.Popup();	
+
+			for (var i = 0; i < arr.length; i++) {
+				popup.setHTML('<h1>Loakan namba wan!</h1>');
+				var el = document.createElement('div');
+				el.innerHTML = "You are here!";
+				
+				el.id = 'marker' +i;
+				console.log(el.id);
 				var coords = new mapboxgl.LngLat(arr[i].features[0].geometry.coordinates[1],arr[i].features[0].geometry.coordinates[0]);
-				 new mapboxgl.Marker()
+				 new mapboxgl.Marker(el,{offset:[-25,-25]})
 				.setLngLat(coords)
 				.setPopup(popup)
 			  	.addTo(map);	
-			}
-			var el = document.createElement('div');
-				el.innerHTML = "You are here!";
-				el.id = 'marker';
+			
+
 
 	 	el.addEventListener('click', () => { 
 		    let actionSheet = this.actionSheetCtrl.create({
@@ -102,9 +108,10 @@ export class HomePage {
 		      ]
 		    });
 		    actionSheet.present();
-  		});
-  		
+  			});
+		}
 		});
+		
 	}
 
   	setDirections(location){
@@ -125,7 +132,7 @@ export class HomePage {
 	container: 'map',
 	style: 'mapbox://styles/mapbox/streets-v10',
 	center: location,
-	zoom: 15,
+	zoom: 5,
   	attributionControl: false,
 	});
 
