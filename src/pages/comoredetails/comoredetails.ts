@@ -15,13 +15,14 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class ComoredetailsPage {
 
+    public id;
+
   constructor(public navCtrl: NavController, public navParams: NavParams) {
-    this.navParams.get("tmp");
-    console.log(this.navParams.get("tmp"));
+    this.id = this.navParams.get('key');
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad ComoredetailsPage');
+    console.log(this.id);
   }
 
 }

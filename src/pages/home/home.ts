@@ -51,14 +51,9 @@ export class HomePage {
 
 		this.afdb.list('location').snapshotChanges().subscribe(data => {
 			for (var i = 0; i < data.length; i++) {
-				// console.log()
 				arr.push(data[i]);
-				//  console.log(data[i]);
-				console.log(data[i].payload.val());
 			}
-
-
-			//gumawa ng array ng di
+			
 			const popup = new mapboxgl.Popup();
 
 			for (var i = 0; i < arr.length; i++) {
@@ -66,17 +61,15 @@ export class HomePage {
 				var el = document.createElement('div');
 				el.innerHTML = "You are here!";
 
-				el.id = 'marker' +i;
-				console.log(el.id);
+				el.id = data[i].key;
 				var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
-				console.log(coords);
 				new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)
 					.setPopup(popup)
 					.addTo(map);
-
+				
 				el.addEventListener('click', (e) => {
-					console.log(e);
+					var tmp = e.srcElement.id;
 					let actionSheet = this.actionSheetCtrl.create({
 						title: 'Name of place',
 						buttons: [
@@ -85,13 +78,14 @@ export class HomePage {
 								text: 'Request',
 								role: 'destructive',
 								handler: () => {
-									console.log('Destructive clicked');
+								console.log('Destructive clicked');
+									
 								}
 							}, {
 								text: 'More Details',
 								handler: () => {
-									// var tmp = data[i].key;
-									this.navCtrl.push(ComoredetailsPage);
+									this.navCtrl.push(ComoredetailsPage,{key: tmp});
+										
 								}
 							}, {
 								text: 'Cancel',
