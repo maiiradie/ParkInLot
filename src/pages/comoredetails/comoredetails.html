@@ -14,5 +14,9 @@
 
 
 <ion-content padding>
-<H1>THIS IS HOMEOWNER MORE DETAILS</H1>
+<H1>More Details</H1>
+<p>{{profileData?.fname}}</p>
+<p>{{profileData?.lname}}</p>
+<p>{{profileData?.mobile}}</p>
+<button ion-button block (click)='sendRequest()'>Request</button>  
 </ion-content>

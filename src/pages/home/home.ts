@@ -50,8 +50,8 @@ export class HomePage {
 		// });	
 
 		this.afdb.list('location').snapshotChanges().subscribe(data => {
-			for (var i = 0; i < data.length; i++) {
-				arr.push(data[i]);
+			for (var a = 0; a < data.length; a++) {
+				arr.push(data[a]);
 			}
 			
 			const popup = new mapboxgl.Popup();
