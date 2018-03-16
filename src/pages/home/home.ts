@@ -36,40 +36,39 @@ export class HomePage {
 		 this.setDirections(location);
 	});
 		this.setMarkers();
+
 	}
 
 	setMarkers(){
 		var arr = [];
 		var map = this.map;
 
+		// this.afdb.list('location').snapshotChanges().subscribe(data => {
+		// 	for (var i = 0 ; i < data.length; i++) {
+		// 		console.log(data[i].payload.val());
+		// 	}
+		// });	
+
 		this.afdb.list('location').snapshotChanges().subscribe(data => {
 			for (var i = 0 ; i < data.length; i++) {
-				arr[i] = {
-					type: 'FeatureCollection',
-					features: [{
-					    type: 'Feature',
-					    geometry: {
-					      type: 'Point',
-					      coordinates: [data[i].payload.val().location.lat, data[i].payload.val().location.lng]
-					    },
-					    properties: {
-					      title: 'Mapbox',
-					      description: 'Washington, D.C.'
-					    }					
-				}]
-				};
+				// console.log()
+				// arr.push(data[i]);
+				//  console.log(data[i]);
+				// console.log(data[i].key);
 			}
 
+		
+//gumawa ng array ng di
 			const popup = new mapboxgl.Popup();	
 
 			for (var i = 0; i < arr.length; i++) {
 				popup.setHTML('<h1>Loakan namba wan!</h1>');
 				var el = document.createElement('div');
 				el.innerHTML = "You are here!";
-				
-				el.id = 'marker' +i;
+				//console.log(arr[i].payload.val());
+				el.id = arr[i].key;
 				console.log(el.id);
-				var coords = new mapboxgl.LngLat(arr[i].features[0].geometry.coordinates[1],arr[i].features[0].geometry.coordinates[0]);
+				var coords = new mapboxgl.LngLat(122.009,20.457);
 				 new mapboxgl.Marker(el,{offset:[-25,-25]})
 				.setLngLat(coords)
 				.setPopup(popup)
@@ -79,6 +78,7 @@ export class HomePage {
 				let actionSheet = this.actionSheetCtrl.create({
 				title: 'Name of place',
 				buttons: [
+
 					{
 					text: 'Request',
 					role: 'destructive',
@@ -88,7 +88,8 @@ export class HomePage {
 					},{
 					text: 'More Details',
 					handler: () => {
-						this.navCtrl.push(ComoredetailsPage);
+						var tmp = data[i].key;
+						this.navCtrl.push(ComoredetailsPage, tmp);
 					}
 					},{
 					text: 'Cancel',

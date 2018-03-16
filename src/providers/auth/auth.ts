@@ -121,10 +121,8 @@ export class AuthProvider {
        })
        .then( () => {
         this.afdb.object(`location/${user.uid}`).set({
-          location:{
             lat:location.lat,
             lng:location.lng
-          },
        });
     })
     .catch((err) => {

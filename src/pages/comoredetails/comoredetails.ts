@@ -16,6 +16,8 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 export class ComoredetailsPage {
 
   constructor(public navCtrl: NavController, public navParams: NavParams) {
+    this.navParams.get("tmp");
+    console.log(this.navParams.get("tmp"));
   }
 
   ionViewDidLoad() {
