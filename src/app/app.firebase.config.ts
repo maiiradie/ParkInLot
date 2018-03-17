@@ -1,8 +1,8 @@
 export const FIREBASE_CONFIG={
-    apiKey: "AIzaSyBd9xCVr56K7B-8QXMLE3YoXf0AUIYuEIQ",
-    authDomain: "parkinlot-6969.firebaseapp.com",
-    databaseURL: "https://parkinlot-6969.firebaseio.com",
-    projectId: "parkinlot-6969",
-    storageBucket: "parkinlot-6969.appspot.com",
-    messagingSenderId: "326469971389"
+  apiKey: "AIzaSyCDv52QOTK58dVA4x_RFq3Os6IaBHsOowI",
+  authDomain: "parkinlotph-0001.firebaseapp.com",
+  databaseURL: "https://parkinlotph-0001.firebaseio.com",
+  projectId: "parkinlotph-0001",
+  storageBucket: "parkinlotph-0001.appspot.com",
+  messagingSenderId: "276938997674"
   };
