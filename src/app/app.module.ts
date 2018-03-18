@@ -15,7 +15,7 @@ import { ProfilePage } from '../pages/profile/profile';
 import { CoregisterPage } from '../pages/coregister/coregister';
 import { HoregisterPage } from '../pages/horegister/horegister';
 import { HomehoPage } from '../pages/homeho/homeho';
-import { ComoredetailsPage } from '../pages/Comoredetails/Comoredetails';
+import { ComoredetailsPage } from '../pages/comoredetails/comoredetails';
 
 import { FIREBASE_CONFIG } from './app.firebase.config';
 import { AngularFireModule } from 'angularfire2';

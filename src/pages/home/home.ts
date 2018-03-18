@@ -1,17 +1,13 @@
 import { Component } from '@angular/core';
-import { NavController, LoadingController } from 'ionic-angular';
+import { NavController, LoadingController, ActionSheetController } from 'ionic-angular';
 import * as mapboxgl from 'mapbox-gl';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Observable } from 'rxjs/Observable';
 
-// import { AuthProvider } from '../../providers/auth/auth';
-import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
-
-import { ActionSheetController } from 'ionic-angular';
-import { ComoredetailsPage } from '../Comoredetails/Comoredetails';
-
-// import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
+import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
+import { ComoredetailsPage } from '../comoredetails/comoredetails';
+// import { AuthProvider } from '../../providers/auth/auth';
 
 @Component({
 	selector: 'page-home',
@@ -30,24 +26,16 @@ export class HomePage {
 
 	ionViewDidLoad() {
 		this.map = this.initMap();
-
 		this.getCurrentLocation().subscribe(location => {
 			this.centerLocation(location);
 			this.setDirections(location);
+			this.setMarkers();
 		});
-		this.setMarkers();
-
 	}
 
 	setMarkers() {
 		var arr = [];
 		var map = this.map;
-
-		// this.afdb.list('location').snapshotChanges().subscribe(data => {
-		// 	for (var i = 0 ; i < data.length; i++) {
-		// 		console.log(data[i].payload.val());
-		// 	}
-		// });	
 
 		this.afdb.list('location').snapshotChanges().subscribe(data => {
 			for (var a = 0; a < data.length; a++) {
@@ -84,8 +72,11 @@ export class HomePage {
 							}, {
 								text: 'More Details',
 								handler: () => {
-									this.navCtrl.push(ComoredetailsPage,{key: tmp});
-										
+									this.navCtrl.push(ComoredetailsPage,{key: tmp})
+									.then( () => {
+										popup.remove();		
+									})
+									
 								}
 							}, {
 								text: 'Cancel',
@@ -107,7 +98,12 @@ export class HomePage {
 	setDirections(location) {
 		const directions = new MapboxDirections({
 			accessToken: mapboxgl.accessToken,
-			interactive: false
+			interactive: false,
+			controls: {
+				inputs: true,
+				profileSwitcher:false,
+				instructions: false
+			}
 		});
 
 		this.map.addControl(directions, 'top-left');
@@ -139,7 +135,7 @@ export class HomePage {
 		loading.present(loading);
 
 		let options = {
-			timeout: 10000,
+			// timeout: 100000,
 			enableHighAccuracy: true
 		};
 
@@ -179,51 +175,11 @@ export class HomePage {
 
 	addMarker(location) {
 		if (location) {
-			//1 this.marker = new mapboxgl.Marker(el, {offset:[-25, -25]})
 			this.marker = new mapboxgl.Marker()
 				.setLngLat(location)
-				//2 .setPopup(popup)
 				.addTo(this.map);
 		} else {
 			console.log('No coordinates!');
 		}
-
-		//3MARKER POPUP / MORE DETAILS
-		// const popup = new mapboxgl.Popup()
-		//    .setHTML('<h1>Loakan namba wan!</h1>');
-
-		// var el = document.createElement('div');
-		// el.innerHTML = "You are here!";
-		// el.id = 'marker';
-
-		//  	el.addEventListener('click', () => { 
-
-		//     let actionSheet = this.actionSheetCtrl.create({
-		//       title: 'Name of place',
-		//       buttons: [
-		//         {
-		//           text: 'Request',
-		//           role: 'destructive',
-		//           handler: () => {
-		//             console.log('Destructive clicked');
-		//           }
-		//         },{
-		//           text: 'More Details',
-		//           handler: () => {
-		//             this.navCtrl.push(ComoredetailsPage);
-		//           }
-		//         },{
-		//           text: 'Cancel',
-		//           role: 'cancel',
-		//           handler: () => {
-		//             console.log('Cancel clicked');
-		//             popup.remove();
-		//           }
-		//         }
-		//       ]
-		//     });
-		//     actionSheet.present();
-
-		//  	}); 
 	}
 }

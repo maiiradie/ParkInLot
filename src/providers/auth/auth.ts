@@ -90,7 +90,7 @@ export class AuthProvider {
 
   locateHO(){
       let options = {
-        timeout: 10000, 
+        // timeout: 10000, 
         enableHighAccuracy: true
       };
 
