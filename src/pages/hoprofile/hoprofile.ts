@@ -20,7 +20,8 @@ import 'rxjs/add/operator/take';
 })
 export class HoprofilePage {
   profileData:any;
-  public imgUrl;
+  public imgName;
+  private userId;
 
   constructor(private afdb:AngularFireDatabase,
     private afs:AngularFireAuth,
@@ -33,6 +34,8 @@ export class HoprofilePage {
     this.afs.authState.take(1).subscribe( auth => {
       this.afdb.object(`/profile/${auth.uid}`).valueChanges().subscribe( data => {
         this.profileData = data;
+
+        this.retrieveImg();
       });
     });
   }
@@ -42,10 +45,10 @@ export class HoprofilePage {
   }
 
   retrieveImg() {
-    let userId = this.authProvider.setID();
+    this.userId = this.authProvider.setID();
     try{
-      firebase.storage().ref().child("images/" + userId + "/prof-").getDownloadURL().then(d=>{
-        this.imgUrl = d;
+      firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d=>{
+        this.imgName = d;
       });
     }
     catch(e){

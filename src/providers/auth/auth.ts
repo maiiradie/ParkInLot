@@ -108,7 +108,7 @@ export class AuthProvider {
       return locationsObs;
   }
 
-  registerHomeOwner(uForm,gForm,location){
+  registerHomeOwner(uForm,gForm,img,location){
    return this.afs.auth.createUserWithEmailAndPassword(uForm.email,uForm.password)
     .then((user) => {
        this.afdb.object(`profile/${user.uid}`).set({
@@ -125,6 +125,8 @@ export class AuthProvider {
           capacity:gForm.capacity,
           details:gForm.details,
          homeowner:true,
+         garagePic:img,
+         profPic:null,
          created_at:Date.now()
        });
       //  this.afdb.object(`garage/${user.uid}`).set({

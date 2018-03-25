@@ -113,7 +113,7 @@ export class HoregisterPage {
   loading.present(loading);
 
   	this.authProvider.locateHO().subscribe( location => {
-		  this.authProvider.registerHomeOwner(this.userForm.value,this.garageForm.value,location).then((d)=>{
+		  this.authProvider.registerHomeOwner(this.userForm.value,this.garageForm.value,this.imgUrl.name,location).then((d)=>{
         this.userId = this.authProvider.setID();
 
         this.file.readAsArrayBuffer(this.imgPath, this.imgUrl.name).then(async (buffer)=>{

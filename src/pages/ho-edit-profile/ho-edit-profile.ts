@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -29,8 +29,10 @@ export class HoEditProfilePage {
   userForm:FormGroup;
   public imgName;
   public imgUrl;
+  public gender;
   private imgPath;
   private userId;
+  profile$: AngularFireObject<any>;
 
   constructor(private afdb:AngularFireDatabase,
     private afs:AngularFireAuth,
@@ -46,8 +48,9 @@ export class HoEditProfilePage {
         'fname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
         'lname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
         'email':[null,Validators.compose([Validators.required, Validators.email])],
-        'password':[null,Validators.compose([Validators.required, Validators.minLength(6), Validators.maxLength(30)])],
-       'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])]
+        // 'password':[null,Validators.compose([Validators.required, Validators.minLength(6), Validators.maxLength(30)])],
+       'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])],
+       'gender':[this.gender, Validators.required],
        // 'gender':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(11)])],
      });
   }
@@ -56,6 +59,9 @@ export class HoEditProfilePage {
     this.afs.authState.take(1).subscribe( auth => {
       this.afdb.object(`/profile/${auth.uid}`).valueChanges().subscribe( data => {
         this.profileData = data;
+        this.gender = this.profileData.gender;
+
+        this.retrieveImg();
       });
     });
   }
@@ -63,8 +69,8 @@ export class HoEditProfilePage {
   retrieveImg() {
     this.userId = this.authProvider.setID();
     try{
-      firebase.storage().ref().child("images/" + this.userId + "/prof-").getDownloadURL().then(d=>{
-        this.imgUrl = d;
+      firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d=>{
+        this.imgName = d;
       });
     }
     catch(e){
@@ -98,8 +104,20 @@ export class HoEditProfilePage {
 
     let storageHere = firebase.storage();
 
-    storageHere.ref('images/' + this.userId + "/prof-" + name).put(blob).catch((error)=>{
+    storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
       alert("error" + JSON.stringify(error));
     })
+  }
+
+  editProfile() {
+    this.afs.authState.take(1).subscribe( auth => {
+      this.afdb.object(`/profile/${auth.uid}`).update(this.userForm.value).then(d => {
+        this.afdb.object(`/profile/${auth.uid}`).update({profPic: this.imgUrl.name})
+        this.file.readAsArrayBuffer(this.imgPath, this.imgUrl.name).then(async (buffer)=>{
+          await this.upload(buffer, this.imgUrl.name);
+        })
+      })
+    });
+    this.navCtrl.pop();
   }
 }
