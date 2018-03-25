@@ -27,11 +27,10 @@ export class CoHomePage {
 
 	ionViewDidLoad() {
 		this.map = this.initMap();
-		this.getCurrentLocation().subscribe(location => {
-			this.centerLocation(location);
-			//this.setDirections(location);		
-			
-		});
+		// this.getCurrentLocation().subscribe(location => {
+		// 	this.centerLocation(location);
+		// 	//this.setDirections(location);		
+		// });
 		this.setMarkers();
 	}
 
@@ -42,17 +41,14 @@ export class CoHomePage {
 		this.afdb.list('location').snapshotChanges().subscribe(data => {
 			for (var a = 0; a < data.length; a++) {
 				arr.push(data[a]);
-				console.log(data[a].payload.val());
 			}
 			
 			const popup = new mapboxgl.Popup();
 
 			for (var i = 0; i < arr.length; i++) {
-				console.log("set Markers");
 				popup.setHTML('<h1>Loakan namba wan!</h1>');
 				var el = document.createElement('div');
 				el.innerHTML = "You are here!";
-				console.log("entered this ");
 				el.id = data[i].key;
 				var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
 				new mapboxgl.Marker(el, { offset: [-25, -25] })

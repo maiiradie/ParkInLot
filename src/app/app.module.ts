@@ -6,7 +6,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Geolocation } from '@ionic-native/geolocation';
-
+import { ComoredetailsPage } from '../pages/comoredetails/comoredetails';
 import { MyApp } from './app.component';
 // import { LoginPage } from '../pages/login/login';
 // import { CoregisterPage } from '../pages/coregister/coregister';
@@ -29,6 +29,7 @@ import { AuthProvider } from '../providers/auth/auth';
 @NgModule({
   declarations: [
     MyApp,
+    ComoredetailsPage
     // LoginPage,
     // CoregisterPage,
     // HoregisterPage
@@ -54,6 +55,7 @@ import { AuthProvider } from '../providers/auth/auth';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
+    ComoredetailsPage
     // LoginPage,
     // CoregisterPage,
     // HoregisterPage
