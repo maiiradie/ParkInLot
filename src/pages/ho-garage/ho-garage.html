@@ -17,6 +17,25 @@
 
 
 <ion-content padding>
+  <img [src]="imgName">
+  
+  <ion-list no-lines>
+      <ion-item>
+          <p>Address</p>
+          <span>{{userData?.address}}</span>
+      </ion-item>
+      <ion-item>
+        <p>Capacity</p>
+        <span>{{userData?.capacity}}</span>
+      </ion-item>
+      <ion-item>
+          <p>Details</p>
+          <span>{{userData?.details}}</span>
+      </ion-item>
+  </ion-list>
 
+  <button ion-button block color="secondary" (click)="editGarage()">
+      Edit Garage
+    </button>
 </ion-content>
 

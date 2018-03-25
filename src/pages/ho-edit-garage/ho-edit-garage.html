@@ -1,0 +1,47 @@
+<!--
+  Generated template for the HoEditProfilePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+
+<ion-header>
+    <ion-navbar>
+      <ion-title>Edit Garage</ion-title>
+    </ion-navbar>
+  </ion-header>
+  
+  <ion-content padding>
+  
+  
+    <!-- <div class="content"> -->
+      <!-- <div class="top"> -->
+        <img [src]="imgName" *ngIf="imgName">
+        <!-- <div class="circular" id="default" *ngIf="!imgUrl"></div> -->
+        <!-- <div class="circular" *ngIf="imgUrl" [ngStyle]="{'background-image': 'url(' + imgUrl + ')'}"></div> -->
+  
+        <button type="button" ion-button block clear (click)="changeImg()">Change Photo</button>
+      <!-- </div> -->
+  
+      <!-- <div class="info"> -->
+          <form [formGroup]='garageForm' (ngSubmit)="updateGarage()">
+              <ion-list>
+                <ion-item>
+                  <ion-label stacked>Address</ion-label>  
+                  <ion-input type="text" formControlName = 'address' value="{{userData?.address}}"></ion-input>
+                </ion-item>
+                <ion-item>
+                    <ion-label stacked>Capacity</ion-label> 
+                  <ion-input type="number" formControlName = 'capacity' value="{{userData?.capacity}}"></ion-input>
+                </ion-item>		
+                <ion-item>
+                    <ion-label stacked>Details</ion-label> 
+                    <ion-textarea formControlName = "details" value="{{userData?.details}}"></ion-textarea>
+                  </ion-item>
+              </ion-list>
+              <button ion-button block type="submit" [disabled]='!garageForm.valid'>Save Changes</button>
+          </form>
+      <!-- </div> -->
+    <!-- </div> -->
+  </ion-content>
+  

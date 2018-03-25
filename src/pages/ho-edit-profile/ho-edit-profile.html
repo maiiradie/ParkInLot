@@ -11,20 +11,10 @@
     </ion-navbar>
   </ion-header>
   
-  <ion-content padding class="transparent-header">
-  
-  
-    <!-- <div class="content"> -->
-      <!-- <div class="top"> -->
+  <ion-content padding>
         <img [src]="imgName" *ngIf="imgName">
         <img src="./assets/imgs/avatar.jpg" *ngIf="!imgName">
-        <!-- <div class="circular" id="default" *ngIf="!imgUrl"></div> -->
-        <!-- <div class="circular" *ngIf="imgUrl" [ngStyle]="{'background-image': 'url(' + imgUrl + ')'}"></div> -->
-  
         <button type="button" ion-button block clear (click)="changeImg()">Change Photo</button>
-      <!-- </div> -->
-  
-      <!-- <div class="info"> -->
           <form [formGroup]='userForm' (ngSubmit)="editProfile()">
               <ion-list>
                 <ion-item>
@@ -50,14 +40,8 @@
                     <ion-label stacked>Email</ion-label>
                     <ion-input type="email" formControlName = 'email' value="{{profileData?.email}}"></ion-input>
                 </ion-item>	
-                <!-- <ion-item>
-                    <ion-label stacked>Password</ion-label>
-                  <ion-input type="password" formControlName = 'password' value="johndoe"></ion-input>
-                </ion-item> -->
               </ion-list>
               <button ion-button block type="submit" [disabled]='!userForm.valid'>Save Changes</button>
           </form>
-      <!-- </div> -->
-    <!-- </div> -->
   </ion-content>
   

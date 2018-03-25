@@ -8,6 +8,7 @@ import { RegisterPage } from '../register/register';
 import { AuthProvider } from '../../providers/auth/auth';
 
 import { Profile } from '../../models/profile';
+// import { Garage } from '../../models/garage';
 
 @IonicPage()
 @Component({
@@ -37,7 +38,7 @@ export class LoginPage {
         //      this.navCtrl.setRoot("HoHomePage");
         //    }
         //  });
-        this.navCtrl.setRoot("HoprofilePage");
+        this.navCtrl.setRoot("HoGaragePage");
       }
 
    })
