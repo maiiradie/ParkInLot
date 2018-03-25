@@ -29,9 +29,8 @@ export class CoHomePage {
 		this.map = this.initMap();
 		this.getCurrentLocation().subscribe(location => {
 			this.centerLocation(location);
-			//this.setDirections(location);
+			//this.setDirections(location);		
 			
-			console.log("entered view did load of CHOMe")
 		});
 		this.setMarkers();
 	}
