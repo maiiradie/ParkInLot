@@ -1,27 +1,43 @@
-<ion-header>
-  <ion-navbar>
-    <ion-title>ParkInLot</ion-title>
-  </ion-navbar>
-</ion-header>
+<ion-content padding class="transparent-header">
+	<ion-header>
+		<ion-navbar>
+		</ion-navbar>
+	</ion-header>
 
-<ion-content padding>
-	<form (submit)='onSignin()'>
-		<ion-grid>
-			<ion-list>
+	<div padding>
+		<ion-row>
+			<ion-col>
+				<img class="logo" src="./assets/imgs/logo.png"/>
+			</ion-col>
+		</ion-row>
 
-			  <ion-item>
-			    <ion-label floating>Email</ion-label>
-			    <ion-input type="email" name='email' [(ngModel)]='login.email'></ion-input>
-			  </ion-item>
-
-			  <ion-item>
-			    <ion-label floating>Password</ion-label>
-			    <ion-input type="password" name='password' [(ngModel)]='login.password'></ion-input>
-			  </ion-item>
-
-			</ion-list>
-			<button ion-button block type="submit">Login</button>
-		</ion-grid>
-	</form>
-		<button ion-button clear block (click)="register()">Create an Account</button>
+		<form (submit)='onSignin()'>
+			<ion-row>
+				<ion-col>
+					<ion-list inset class="no-border">
+						<ion-item>
+							<ion-input type="email" name="email" [(ngModel)]='login.email' placeholder="Email"></ion-input>
+						</ion-item>
+						<ion-item>
+							<ion-input type="password" name='password' [(ngModel)]='login.password' placeholder="Password"></ion-input>
+						</ion-item>
+					</ion-list>
+				</ion-col>
+			</ion-row>
+		
+			<ion-row>
+				<ion-col> 
+					<button ion-button class="login-button" type="submit">Login</button>
+				</ion-col>
+			</ion-row>
+		</form>
+		
+		<ion-row>
+			<ion-col>
+				<div (click)="register()">
+					<span class="new-account">Or create a new account</span>
+				</div>
+			</ion-col>
+		</ion-row>
+	</div>
 </ion-content>

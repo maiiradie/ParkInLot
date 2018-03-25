@@ -8,39 +8,43 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Geolocation } from '@ionic-native/geolocation';
 
 import { MyApp } from './app.component';
-import { HomePage } from '../pages/home/home';
-import { LoginPage } from '../pages/login/login';
-import { RegisterPage } from '../pages/register/register';
-import { ProfilePage } from '../pages/profile/profile';
-import { CoregisterPage } from '../pages/coregister/coregister';
-import { HoregisterPage } from '../pages/horegister/horegister';
-import { HomehoPage } from '../pages/homeho/homeho';
-import { ComoredetailsPage } from '../pages/comoredetails/comoredetails';
+// import { LoginPage } from '../pages/login/login';
+// import { CoregisterPage } from '../pages/coregister/coregister';
+// import { HoregisterPage } from '../pages/horegister/horegister';
+
+
+// import { EditProfilePage } from '../pages/edit-profile/edit-profile';
+// import { GaragePage } from '../pages/garage/garage';
+// import { TransacHistoryPage } from '../pages/transac-history/transac-history';
 
 import { FIREBASE_CONFIG } from './app.firebase.config';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { AngularFireDatabaseModule } from 'angularfire2/database';
+import { File } from '@ionic-native/file';
+import { FileChooser } from '@ionic-native/file-chooser';
+import { FilePath } from '@ionic-native/file-path';
 
 import { AuthProvider } from '../providers/auth/auth'; 
-
 @NgModule({
   declarations: [
     MyApp,
-    HomePage,
-    LoginPage,
-    RegisterPage,
-    ProfilePage,
-    CoregisterPage,
-    HoregisterPage,
-    HomehoPage,
-    ComoredetailsPage
+    // LoginPage,
+    // CoregisterPage,
+    // HoregisterPage
+
+    // EditProfilePage,
+    // GaragePage,
+    // TransacHistoryPage
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     FormsModule,
-    IonicModule.forRoot(MyApp),
+    IonicModule.forRoot(MyApp, {
+      scrollPadding: false,
+      scrollAssist: true,
+      autoFocusAssist: false}),
     AngularFireModule.initializeApp(FIREBASE_CONFIG),
     AngularFireModule,
     AngularFireAuthModule,
@@ -50,21 +54,23 @@ import { AuthProvider } from '../providers/auth/auth';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HomePage,
-    LoginPage,
-    RegisterPage,
-    ProfilePage,
-    CoregisterPage,
-    HoregisterPage,
-    HomehoPage,
-    ComoredetailsPage
+    // LoginPage,
+    // CoregisterPage,
+    // HoregisterPage
+    // EditProfilePage,
+    // GaragePage,
+    // TransacHistoryPage
   ],
   providers: [
     StatusBar,
     SplashScreen,
+  File,
+    FileChooser,
+    FilePath,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-    AuthProvider,
-    Geolocation
+  AuthProvider,
+    Geolocation,
+    AuthProvider
   ]
 })
 export class AppModule {}

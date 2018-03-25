@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
+// import { RegisterPage } from '../register/register';
+
 import { RegisterPage } from '../register/register';
-import { HomePage } from '../home/home';
-import { HomehoPage } from '../homeho/homeho';
 
 import { AuthProvider } from '../../providers/auth/auth';
 
@@ -29,14 +29,15 @@ export class LoginPage {
    .then(() => {
       this.authProvider.setID();
       if (this.authProvider.setID().length != 0) {
-         this.authProvider.getUser()
-         .subscribe(role => {
-           if (role.carowner) {
-             this.navCtrl.setRoot(HomePage);
-           }else{
-             this.navCtrl.setRoot(HomehoPage);
-           }
-         });
+        //  this.authProvider.getUser()
+        //  .subscribe(role => {
+        //    if (role.carowner) {
+        //      this.navCtrl.setRoot("CoHomePage");
+        //    }else{
+        //      this.navCtrl.setRoot("HoHomePage");
+        //    }
+        //  });
+        this.navCtrl.setRoot("MenuPage");
       }
 
    })
@@ -45,6 +46,6 @@ export class LoginPage {
   }
   
   register(){
-  	this.navCtrl.push(RegisterPage);
+  	this.navCtrl.push("RegisterPage");
   }  
 }

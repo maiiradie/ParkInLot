@@ -90,7 +90,7 @@ export class AuthProvider {
 
   locateHO(){
       let options = {
-        // timeout: 10000, 
+        timeout: 10000, 
         enableHighAccuracy: true
       };
 
@@ -108,27 +108,35 @@ export class AuthProvider {
       return locationsObs;
   }
 
-  registerHomeOwner(form,location){
-   return this.afs.auth.createUserWithEmailAndPassword(form.email,form.password)
+  registerHomeOwner(uForm,gForm,location){
+   return this.afs.auth.createUserWithEmailAndPassword(uForm.email,uForm.password)
     .then((user) => {
        this.afdb.object(`profile/${user.uid}`).set({
-         fname:form.fname,
-         lname:form.lname,
-         email:form.email,
-         mobile:form.mobile,
+         fname:uForm.fname,
+         lname:uForm.lname,
+         gender:uForm.gender,
+         email:uForm.email,
+         mobile:uForm.mobile,
+         location:{
+           lat:location.lat,
+           lng:location.lng
+         },
+         address:gForm.address,
+          capacity:gForm.capacity,
+          details:gForm.details,
          homeowner:true,
          created_at:Date.now()
-       })
-       .then( () => {
-        this.afdb.object(`location/${user.uid}`).set({
-            lat:location.lat,
-            lng:location.lng
        });
+      //  this.afdb.object(`garage/${user.uid}`).set({
+      //   address:gForm.address,
+      //   capacity:gForm.capacity,
+      //   details:gForm.details
+      // });
     })
     .catch((err) => {
        console.log(err);
     });
-  });
-}
+  }
+
 
 }

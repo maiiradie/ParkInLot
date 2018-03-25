@@ -1,6 +1,6 @@
 {
-  "name": "ParkInLot",
-  "app_id": "a575c479",
+  "name": "parkInLot",
+  "app_id": "",
   "type": "ionic-angular",
   "integrations": {
     "cordova": {}

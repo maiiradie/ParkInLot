@@ -1,5 +1,6 @@
 export interface Roles {
 	admin?:boolean;
+	establishment?:boolean;
 	homeowner?:boolean;
 	carowner?:boolean;
 }
@@ -10,5 +11,6 @@ export interface Profile {
 	fname: string,
 	lname: string,
 	mobile: number,
+	gender: string,
 	roles:Roles
 }

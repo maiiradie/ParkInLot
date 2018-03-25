@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { HomePage } from '../home/home';
+// import { LoginPage } from '../login/login';
 
 import { AuthProvider } from '../../providers/auth/auth';
 
@@ -28,7 +28,7 @@ export class CoregisterPage {
   ionViewDidLoad() {
   }
 
- onSubmitCO(){
+register(){
 	const loading = this.loadingCtrl.create({
 		content:'Logging in...'
 	});
@@ -38,7 +38,7 @@ export class CoregisterPage {
 	this.authProvider.registerCarOwner(this.userForm.value)
 	.then(() => {
 	        this.authProvider.setID();
-			this.navCtrl.setRoot(HomePage);
+			this.navCtrl.setRoot("MenuCoPage");
 			loading.dismiss();
 	});
  }

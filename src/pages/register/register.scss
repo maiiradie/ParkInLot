@@ -1,3 +1,27 @@
 page-register {
-
+    ion-content {
+        background-image: url('../assets/imgs/RegistrationBck.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-color: transparent;
+    }
+    h1 {
+        text-align: center;
+        color: #404040;
+    }
+    .logo {
+        width: 50%;
+    }
+    // .option-button {
+        
+    // }
+    .buttons {
+        margin-top: 2em;
+        width: 100%;
+        font-size: 0.9em;
+    }
+    .co-button {
+        margin-bottom: 1em;
+    }
 }

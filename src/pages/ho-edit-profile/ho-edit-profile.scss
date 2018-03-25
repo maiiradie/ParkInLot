@@ -1,0 +1,30 @@
+page-ho-edit-profile {
+    #default {
+        background: url("../assets/imgs/avatar.jpg") no-repeat;
+    }
+    .content {
+        position: relative;
+        margin-top: -20px;
+    }
+    .circular {
+        width: 100px;
+        height: 100px;
+        position: inherit;
+        border-radius: 50%;
+        -webkit-border-radius: 150px;
+        -moz-border-radius: 150px;
+        border: solid white;
+        background-size: 100%;
+        margin-top: -70px;
+        margin-left: auto;
+        margin-right: auto;
+        // margin-bottom: 50px;
+    }
+    .top {
+        background-image: url("../assets/imgs/TopBck2.png");
+        height: 30vh;
+        background-size: cover;
+        background-position: center center;
+        position: relative;
+    }
+}

@@ -1,4 +1,4 @@
-<ion-header>
+<!-- <ion-header>
   <ion-navbar>
     <ion-title>coregister</ion-title>
   </ion-navbar>
@@ -38,4 +38,140 @@
 		<button ion-button block type="submit" [disabled]='!userForm.valid'>Register</button>
 	</form>	
 
+</ion-content> -->
+
+<ion-content class="transparent-header">
+	<ion-header>
+		<ion-navbar>
+		</ion-navbar>
+	</ion-header>
+	<ion-slides #slider class="content-slider" direction="vertical">
+		<!-- Options -->
+		<!-- <ion-slide class="swiper-no-swiping">
+			<div padding>
+				<img class="logo" src="../assets/imgs/logo.png" />
+				<h1>Register as:</h1>
+				<ion-row>
+					<ion-col col-6>
+						<button ion-button class="login-button" (click)="goToRegHo()">Homeowner</button>
+					</ion-col>
+					<ion-col col-6>
+						<button ion-button class="login-button" (click)="goToRegCo()">Car Owner</button>
+					</ion-col>
+				</ion-row>
+			</div>
+		</ion-slide> -->
+		<!-- Personal Details -->
+		<ion-slide class="swiper-no-swiping">
+				<!-- <button ion-button clear (click)="goToOptions()" class="slide-button">
+						Back
+						<ion-icon name="arrow-up"></ion-icon>
+					</button> -->
+			<ion-slides #innerSlider class="content-slider">
+				<ion-slide class="swiper-no-swiping">
+					<!-- <h1>Personal Details</h1> -->
+					<div style="padding: 0 32px 32px 32px">
+						<form [formGroup]='userForm' (ngSubmit)="register()">
+							<ion-list>
+								<ion-item>
+										<!-- <ion-label floating>First Name</ion-label> -->
+										<ion-input type="text" formControlName = 'fname' placeholder="First Name"></ion-input>
+									</ion-item>
+						
+									<ion-item>
+										<!-- <ion-label floating>Last Name</ion-label> -->
+										<ion-input type="text" formControlName = 'lname' placeholder="Last Name"></ion-input>
+									</ion-item>
+						
+						<ion-item>
+							<!-- <ion-label>Gender</ion-label> -->
+							<ion-select placeholder="Gender">
+								<ion-option value="f">Female</ion-option>
+								<ion-option value="m">Male</ion-option>
+							</ion-select>
+						</ion-item>
+						
+						<ion-item>
+							<!-- <ion-label floating>Email</ion-label> -->
+							<ion-input type="email" formControlName = 'email' placeholder="Email"></ion-input>
+						</ion-item>
+								
+						<ion-item>
+							<!-- <ion-label floating>Mobile Number</ion-label> -->
+							<ion-input type="number" formControlName = 'mobile' placeholder="Mobile Number"></ion-input>
+						</ion-item>
+					
+						<ion-item>
+							<!-- <ion-label floating>Password</ion-label> -->
+							<ion-input type="password" formControlName = 'password' placeholder="Password"></ion-input>
+						</ion-item>
+							</ion-list>
+						<button ion-button block type="submit" [disabled]='!userForm.valid'>Register</button>
+						<!-- <button ion-button clear (click)="goToGarage()" class="slide-button position-bottom" [disabled]='!userForm.valid'>Next<ion-icon name="arrow-down"></ion-icon></button> -->
+						</form>
+						<!-- <button ion-button block round (click)="login()" color="light" class="login-button">Login</button> -->
+						<!-- <button ion-button clear (click)="slideNext()" color="light" class="forgot-button">FORGOT PASSWORD?</button> -->
+					</div>
+					<!-- <button ion-button clear (click)="goToSignup()" class="slide-button position-bottom">GO TO SIGNUP<ion-icon name="arrow-down"></ion-icon></button> -->
+				</ion-slide>
+				<!-- <ion-slide class="swiper-no-swiping">
+					<div style="padding: 20% 32px 32px 32px">
+						<ion-item>	
+							<ion-label floating>E-mail</ion-label>
+							<ion-input type="email"></ion-input>
+						</ion-item>
+						<button ion-button block round (click)="resetPassword()" color="light" class="login-button">RESET PASSWORD</button>
+						<button ion-button clear (click)="slidePrevious()" color="light" class="goback-button"><ion-icon name="arrow-back"></ion-icon> GO BACK</button>
+					</div>
+				</ion-slide> -->
+			</ion-slides>
+		</ion-slide>
+		<!-- <ion-slide class="zoom swiper-no-swiping">
+			<button ion-button clear (click)="goToRegHo()" class="slide-button">
+				Back
+				<ion-icon name="arrow-up"></ion-icon>
+			</button>
+			<div style="padding: 32px">
+				<ion-item>
+					<ion-label floating>Username</ion-label>
+					<ion-input type="text"></ion-input>
+				</ion-item>
+				<ion-item>
+					<ion-label floating>Password</ion-label>
+					<ion-input type="password"></ion-input>
+				</ion-item>
+				<ion-item class="margin-bottom">
+					<ion-label floating>Confirm Password</ion-label>
+					<ion-input type="password"></ion-input>
+				</ion-item>
+				<button ion-button block round (click)="signup()" color="light" class="login-button">SIGN UP</button>
+			</div>
+		</ion-slide> -->
+		<!-- Garage Details -->
+		<!-- <ion-slide class="zoom swiper-no-swiping">
+				<button ion-button clear (click)="goToRegHo()" class="slide-button">
+					Back
+					<ion-icon name="arrow-up"></ion-icon>
+				</button>
+				<div style="padding: 32px">
+						<form [formGroup]='garageForm' (ngSubmit)="register()">
+					<ion-item>
+						<ion-input type="text" formControlName="address" placeholder="Address"></ion-input>
+					</ion-item>
+					<ion-item>
+						<ion-input type="number" formControlName="capacity" placeholder="Capacity"></ion-input>
+					</ion-item>
+					<ion-item>
+						<ion-textarea formControlName="details" placeholder="Details"></ion-textarea>
+					</ion-item>
+					<ion-item>
+						<button ion-button block (click)="choose()">{{caption}}</button>
+						<img [src]="imgName" *ngIf="imgName" id="selImg"/> -->
+							<!-- <button ion-button block (click)='readyUpload()' *ngIf="imgName">Upload photo</button> -->
+					<!-- </ion-item>
+					<button ion-button block type="submit" [disabled]='!garageForm.valid'>Next</button>
+					</form>
+				</div>
+			</ion-slide> -->
+	</ion-slides>
 </ion-content>

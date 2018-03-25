@@ -1,12 +1,20 @@
-<ion-header>
-  <ion-navbar>
-    <ion-title>Register</ion-title>
-  </ion-navbar>
-</ion-header>
+<ion-content padding class="transparent-header">
+  <ion-header>
+    <ion-navbar>
+    </ion-navbar>
+  </ion-header>
 
-
-<ion-content padding>
-	<button ion-button block (click)='coregister()'>I'm a Carowner</button>
-	
-	<button ion-button block (click)='horegister()'>I'm a Homeowner</button>
-</ion-content>
+  <div>
+    <div text-center>
+      <img src="./assets/imgs/logo.png" class="logo">
+    </div>
+      
+    <h1>Register as</h1>
+  
+    <div class="buttons">
+	    <button class="co-button" ion-button block (click)='coregister()'>Carowner</button>
+	    <button ion-button block (click)='horegister()'>Homeowner</button>
+    </div>
+  </div>
+</ion-content> 
+  
