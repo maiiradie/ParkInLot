@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams,  LoadingController, Slides, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams,  LoadingController, Slides, AlertController, ToastController } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import firebase from 'firebase';
 
@@ -41,7 +41,8 @@ export class HoregisterPage {
 		private fileChooser: FileChooser,
 		private file: File,
     private filePath: FilePath,
-    private transfer: FileTransfer) {
+    private transfer: FileTransfer,
+    private toastCtrl: ToastController) {
 		  this.userForm = this.fb.group({
 	 		  'fname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
 	 		  'lname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
@@ -163,6 +164,14 @@ export class HoregisterPage {
     alert.present();
   }
 
+  showToast() {
+    let toast = this.toastCtrl.create({
+      message: 'Account was created successfully. Account is pending for approval from admin.',
+      duration: 8000
+    })
+    toast.present();
+  }
+
   register(){
 	const loading = this.loadingCtrl.create({
 		content:'Getting your location...'
@@ -194,6 +203,7 @@ export class HoregisterPage {
         // this.authProvider.setID();
 				
         loading.dismiss();
+        this.showToast();
         this.navCtrl.setRoot("LoginPage");
  }
 

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, ToastController } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 // import { LoginPage } from '../login/login';
@@ -15,7 +15,12 @@ export class CoregisterPage {
   
   userForm:FormGroup;
  
-  constructor(public loadingCtrl: LoadingController,private fb: FormBuilder, private authProvider:AuthProvider, public navCtrl: NavController, public navParams: NavParams) {
+	constructor(public loadingCtrl: LoadingController,
+		private fb: FormBuilder, 
+		private authProvider:AuthProvider, 
+		public navCtrl: NavController, 
+		public navParams: NavParams,
+		private toastCtrl: ToastController) {
   	this.userForm = this.fb.group({
 	 	'fname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30)])],
 	 	'lname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30)])],
@@ -26,6 +31,14 @@ export class CoregisterPage {
   }
 
   ionViewDidLoad() {
+	}
+	
+	showToast() {
+    let toast = this.toastCtrl.create({
+      message: 'Account was created successfully.',
+			duration: 8000
+    })
+    toast.present();
   }
 
 register(){
@@ -40,6 +53,7 @@ register(){
 	        this.authProvider.setID();
 			this.navCtrl.setRoot("MenuCoPage");
 			loading.dismiss();
+			this.showToast();
 	});
  }
 

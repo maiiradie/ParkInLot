@@ -127,6 +127,7 @@ export class AuthProvider {
          homeowner:true,
          garagePic:img,
          profPic:null,
+         reg_status:"pending",
          created_at:Date.now()
        });
       //  this.afdb.object(`garage/${user.uid}`).set({
