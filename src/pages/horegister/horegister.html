@@ -3,13 +3,13 @@
 		<ion-navbar>
 		</ion-navbar>
 	</ion-header>
-	<ion-slides #slider class="content-slider" direction="vertical">
+	<ion-slides #slider class="content-slider">
 		<!-- Personal Details -->
-		<ion-slide class="swiper-no-swiping">
+		
 			<ion-slide class="swiper-no-swiping">
 				<!-- <h1>Personal Details</h1> -->
 				<div style="padding: 0 32px 32px 32px">
-					<form [formGroup]='userForm' (ngSubmit)="goToGarage()">
+					<form [formGroup]='userForm' (ngSubmit)="next()">
 						<ion-list>
 							<ion-item>
 								<ion-input type="text" formControlName = 'fname' placeholder="First Name"></ion-input>
@@ -37,16 +37,16 @@
 					</form>
 				</div>
 			</ion-slide>
-		</ion-slide>
+		
 
 		<!-- Garage Details -->
 		<ion-slide class="zoom swiper-no-swiping">
-			<button ion-button clear (click)="goToRegHo()" class="slide-button">
-				Back
-				<ion-icon name="arrow-up"></ion-icon>
+			<button ion-button clear (click)="back()" class="slide-button">
+				<ion-icon name="arrow-back"></ion-icon>
+				<span class="arrow">Back</span>
 			</button>
 			<div style="padding: 32px">
-				<form [formGroup]='garageForm' (ngSubmit)="register()">
+				<form [formGroup]='garageForm' (ngSubmit)="next()">
 					<ion-item>
 						<ion-input type="text" formControlName="address" placeholder="Address"></ion-input>
 					</ion-item>
@@ -56,12 +56,38 @@
 					<ion-item>
 						<ion-textarea formControlName="details" placeholder="Details"></ion-textarea>
 					</ion-item>
+					<!-- <ion-item>
+						<button ion-button block type="button" (click)="chooseFile()">{{captionFile}}</button>
+						<img [src]="imgName" *ngIf="imgName" id="selImg"/>
+					</ion-item> -->
 					<ion-item>
 						<button ion-button block type="button" (click)="choose()">{{caption}}</button>
 						<img [src]="imgName" *ngIf="imgName" id="selImg"/>
 					</ion-item>
-					<button ion-button block type="submit" [disabled]='!garageForm.valid'>Register</button>
+					<button ion-button block type="submit" [disabled]='!garageForm.valid && !imgName'>Next</button>
 				</form>
+			</div>
+		</ion-slide>
+
+		<!-- File Upload -->
+		<ion-slide class="zoom swiper-no-swiping">
+			<button ion-button clear (click)="back()" class="slide-button">
+				<ion-icon name="arrow-back"></ion-icon>
+				<span class="arrow">Back</span>
+			</button>
+			<div style="padding: 32px" class="fileUp">
+				<!-- <form [formGroup]='garageForm' (ngSubmit)="register()"> -->
+					<p>Upload Barangay Clearance and a valid ID for verification of your registration.</p>
+						<button ion-button block type="button" (click)="chooseFile()">Add File</button>
+					<ion-list>
+						<ion-item *ngFor="let file of files">{{file.name}}</ion-item>
+					</ion-list>
+					<!-- <ion-item>
+						<button ion-button block type="button" (click)="choose()">{{caption}}</button>
+						<img [src]="imgName" *ngIf="imgName" id="selImg"/>
+					</ion-item> -->
+					<button ion-button block type="submit" (click)="register()">Register</button>
+				<!-- </form> -->
 			</div>
 		</ion-slide>
 	</ion-slides>

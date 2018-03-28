@@ -47,14 +47,11 @@ export class HoprofilePage {
 
   retrieveImg() {
     this.userId = this.authProvider.setID();
-    try{
       firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d=>{
         this.imgName = d;
-      });
-    }
-    catch(e){
-      console.log(e);
-    }   
+      }).catch((e)=>{
+        alert(JSON.stringify(e));
+    })   
   }
 
 }

@@ -38,7 +38,7 @@ export class LoginPage {
         //      this.navCtrl.setRoot("HoHomePage");
         //    }
         //  });
-        this.navCtrl.setRoot("HoGaragePage");
+        this.navCtrl.setRoot("HoprofilePage");
       }
 
    })

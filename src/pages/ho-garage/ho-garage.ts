@@ -35,7 +35,6 @@ export class HoGaragePage {
     this.afs.authState.take(1).subscribe( auth => {
       this.afdb.object(`/profile/${auth.uid}`).valueChanges().subscribe( data => {
         this.userData = data;
-
         this.retrieveImg();
       });
     });
@@ -47,14 +46,11 @@ export class HoGaragePage {
 
   retrieveImg() {
     this.userId = this.authProvider.setID();
-    try{
       firebase.storage().ref().child("images/" + this.userId + "/" + this.userData.garagePic).getDownloadURL().then(d=>{
         this.imgName = d;
-      });
-    }
-    catch(e){
-      console.log(e);
-    }   
+      }).catch((error)=>{
+        alert(JSON.stringify(error));
+      })  
   }
 
 }

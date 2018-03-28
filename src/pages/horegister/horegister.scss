@@ -54,6 +54,10 @@ page-horegister {
     h1 {
         color: #0066aa;
     }
+    .arrow {
+      display: inline-block;
+      margin-left: 0.5em;
+    }
     // Input items
     ion-label,
     .input-has-focus {
@@ -69,6 +73,13 @@ page-horegister {
     }
     ion-input {
         color: #404040;
+    }
+    .fileUp {
+      background-color: rgba(255, 255, 255, .6) !important;
+      p {
+        color: #404040 !important;
+        font-size: 0.9em;
+      }
     }
     .margin-bottom {
       margin-bottom: 15px !important;

@@ -93,25 +93,30 @@ export class HoEditGaragePage {
   })
   }
 
-  async upload(buffer, name) {
-    let blob = new Blob([buffer], { type: 'image/jpeg' });
+  upload(path, name) {
+    this.file.readAsArrayBuffer(path, name).then((buffer)=>{
+      let blob = new Blob([buffer], { type: 'image/jpeg' });
+      let storageHere = firebase.storage();
 
-    let storageHere = firebase.storage();
-
-    storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
-      alert("error" + JSON.stringify(error));
+      storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
+        alert("error: " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      })
     })
+    
   }
 
   updateGarage() {
     this.afs.authState.take(1).subscribe( auth => {
       this.afdb.object(`/profile/${auth.uid}`).update(this.garageForm.value).then(d => {
         this.afdb.object(`/profile/${auth.uid}`).update({garagePic: this.imgUrl.name})
-        this.file.readAsArrayBuffer(this.imgPath, this.imgUrl.name).then(async (buffer)=>{
-          await this.upload(buffer, this.imgUrl.name);
-        })
+        this.upload(this.imgPath, this.imgUrl.name);
+        // this.file.readAsArrayBuffer(this.imgPath, this.imgUrl.name).then(async (buffer)=>{
+        //   await this.upload(buffer, this.imgUrl.name);
+        // }).catch((error)=>{
+        //   alert("error: " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        // })
       })
-    });
+    })
     this.navCtrl.pop();
   }
 }

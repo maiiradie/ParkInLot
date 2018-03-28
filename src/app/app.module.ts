@@ -24,6 +24,7 @@ import { AngularFireDatabaseModule } from 'angularfire2/database';
 import { File } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
+import { FileTransfer } from '@ionic-native/file-transfer';
 
 import { AuthProvider } from '../providers/auth/auth'; 
 @NgModule({
@@ -69,6 +70,7 @@ import { AuthProvider } from '../providers/auth/auth';
   File,
     FileChooser,
     FilePath,
+    FileTransfer,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
   AuthProvider,
     Geolocation,
