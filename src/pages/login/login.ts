@@ -33,6 +33,10 @@ export class LoginPage {
   ionViewDidLoad() {
   }
 
+  forgotPassword() {
+    this.navCtrl.push("ForgotPasswordPage");
+  }
+
   showToastReject() {
     let toast = this.toastCtrl.create({
       message: 'Cannot login to application. Account request has been rejected by admin.',
