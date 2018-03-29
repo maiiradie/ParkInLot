@@ -112,7 +112,7 @@ export class LoginPage {
         // });
         this.authProvider.getUser().subscribe((data)=>{
           if (data.reg_status === "approved") {
-            this.navCtrl.setRoot("HoprofilePage");
+            this.navCtrl.setRoot("MenuPage");
           } else if (data.reg_status === "rejected") {
             this.showToastReject();
           } else {

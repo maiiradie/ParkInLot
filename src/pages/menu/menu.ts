@@ -61,8 +61,8 @@ export class MenuPage {
             {title: 'Garage', pageName: 'HoGaragePage', icon: 'wine'},
             {title: 'Transactions', pageName: 'HoTransacHistoryPage', icon: 'cash'}
           ];
-        } else{
-          this.nav.setRoot("CoHomePage");
+        } else if(role.homeowner){
+          this.nav.setRoot("EstablishmentPage");
         }
       })
 
