@@ -49,52 +49,81 @@
 
 
 <ion-header>
-  <ion-navbar>
-        <ion-buttons start>
-          <button menuToggle="left">
-            <ion-icon name="menu"></ion-icon>
-          </button>
-        </ion-buttons>
-      <ion-title>Home Owner</ion-title>
-  </ion-navbar>
-
-  <ion-toolbar no-border-top>
-    <ion-segment [(ngModel)]="carStatus">
-      <ion-segment-button value="Arriving">
-        Arriving
-      </ion-segment-button>
-      <ion-segment-button value="Parked">
-        Parked
-      </ion-segment-button>
-    </ion-segment>
-  </ion-toolbar>
-<!-- 
-
-  <div [ngSwitch]="carStatus">
+    <ion-navbar>
+          <ion-buttons start>
+            <button ion-button menuToggle>
+              <ion-icon name="menu"></ion-icon>
+            </button>
+          </ion-buttons>
+        <ion-title>Home Owner</ion-title>
+    </ion-navbar>
   
-    </div>
-      <ion-list *ngSwitchCase="'Arriving'">
-        <ion-item *ngFor="let arrival of arrivals">
-          <ion-thumbnail item-start>
-            <img src="img/thumbnail-puppy-1.jpg">
-          </ion-thumbnail>
-          <h2>Ruby</h2>
-        </ion-item>
-      </ion-list>
-    
-      <ion-list *ngSwitchCase="'Parked'">
-        <ion-item *ngFor="let park of parkeds">
-          <ion-thumbnail item-start>
-            <img src="img/thumbnail-kitten-1.jpg">
-          </ion-thumbnail>
-          <h2>Luna</h2>
-        </ion-item>
-      </ion-list>
-    </div> -->
-
-                                
-</ion-header>
-
-<ion-content padding>
-
-</ion-content>
+    <ion-toolbar no-border-top>
+      <ion-segment [(ngModel)]="carStatus">
+        <ion-segment-button value="Arriving">
+          Arriving
+        </ion-segment-button>
+        <ion-segment-button value="Parked">
+          Parked
+        </ion-segment-button>
+      </ion-segment>
+    </ion-toolbar>
+  
+                         
+  </ion-header>
+  
+  <ion-content>
+    <div [ngSwitch]="carStatus">  
+      <div *ngFor="let transac of transacData">
+            <!-- <div *ngIf="transacs.parkStatus == 'parked'">
+                <ion-list>
+                    <button ion-item>
+                      {{transacs.co}}
+                    </button>
+                  </ion-list>
+            </div>
+             -->
+           
+           
+          <ion-list *ngSwitchCase="'Arriving'" class="margin-bottom-0">
+            <ion-item-sliding  *ngIf="transac.parkStatus == 'arriving'"> 
+              <ion-item >
+                      <!-- <ion-thumbnail item-start>
+                        <img src="img/thumbnail-puppy-1.jpg">
+                      </ion-thumbnail> -->
+                      <h2 ion-start>
+                          {{transac?.co}}
+                      </h2>
+                        <p>{{transac?.timeStarted}} : {{transac?.$key}}</p>
+                    </ion-item>
+                    <ion-item-options side="right">
+                        <button ion-button color="secondary" (click)="toParked(transac)">
+                        <ion-icon name="car"></ion-icon>
+                          arrived
+                        </button>
+                      </ion-item-options> 
+                    </ion-item-sliding> 
+                  </ion-list>
+                  <!-- <ng-template #parking> -->
+  
+                <ion-list *ngSwitchCase="'Parked'" class="margin-bottom-0">
+                 
+                    <div  *ngIf="transac.parkStatus == 'parked'">
+                      <!-- {{showAlert()}} -->
+                      <ion-item>
+                            <!-- <ion-thumbnail item-start>
+                              <img src="img/thumbnail-kitten-1.jpg">
+                            </ion-thumbnail> -->
+                            <h2 ion-start>
+                                {{transac?.co}}
+                            </h2>
+                              <p>{{transac?.timeStarted}} : {{transac?.$key}}</p>
+                      </ion-item>
+                      </div>
+                          
+                        </ion-list>
+                      <!-- </ng-template> -->
+            
+          </div>
+          </div>
+  </ion-content>
