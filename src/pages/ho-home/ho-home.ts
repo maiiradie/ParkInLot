@@ -110,7 +110,8 @@ export class HoHomePage {
 
   toParked(transacId: string){
     this.afdb.object(`/transac/${transacId}`).update({parkStatus: 'parked'});
-    ///console.log(this.transacData);
+    this.transacData = [];
+    
   }
 
 }
