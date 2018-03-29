@@ -73,31 +73,26 @@
   </ion-header>
   
   <ion-content>
+    
     <div [ngSwitch]="carStatus">  
       <div *ngFor="let transac of transacData">
-            <!-- <div *ngIf="transacs.parkStatus == 'parked'">
-                <ion-list>
-                    <button ion-item>
-                      {{transacs.co}}
-                    </button>
-                  </ion-list>
-            </div>
-             -->
-           
-           
+           <!-- arriving -->
           <ion-list *ngSwitchCase="'Arriving'" class="margin-bottom-0">
-            <ion-item-sliding  *ngIf="transac.parkStatus == 'arriving'"> 
+            <ion-item-sliding *ngIf="transac.payload.val().parkStatus == 'arriving'"> 
               <ion-item >
                       <!-- <ion-thumbnail item-start>
                         <img src="img/thumbnail-puppy-1.jpg">
                       </ion-thumbnail> -->
                       <h2 ion-start>
-                          {{transac?.co}}
+                          {{transac?.payload.val().co}}
                       </h2>
-                        <p>{{transac?.timeStarted}} : {{transac?.$key}}</p>
+                        <p>{{transac?.payload.val().timeStarted}} : {{transac?.key}}</p>
                     </ion-item>
                     <ion-item-options side="right">
-                        <button ion-button color="secondary" (click)="toParked(transac)">
+
+                        <!--parked button-->
+
+                        <button ion-button color="secondary" (click)="toParked(transac?.key)">
                         <ion-icon name="car"></ion-icon>
                           arrived
                         </button>
@@ -105,10 +100,10 @@
                     </ion-item-sliding> 
                   </ion-list>
                   <!-- <ng-template #parking> -->
-  
+          <!-- parked -->
                 <ion-list *ngSwitchCase="'Parked'" class="margin-bottom-0">
                  
-                    <div  *ngIf="transac.parkStatus == 'parked'">
+                    <div  *ngIf="transac.payload.val().parkStatus == 'parked'">
                       <!-- {{showAlert()}} -->
                       <ion-item>
                             <!-- <ion-thumbnail item-start>

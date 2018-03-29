@@ -31,6 +31,7 @@ export class HoHomePage {
   filtered: any;
   private userId;
   arr: any;
+  myId = this.authProvider.setID();
 
   public items: Array<any> = [];
   public itemRef: firebase.database.Reference = firebase.database().ref('/transac');
@@ -39,6 +40,7 @@ export class HoHomePage {
   constructor(public navCtrl: NavController, public navParams: NavParams,
     private platform: Platform, private afdb: AngularFireDatabase, private authProvider: AuthProvider, private alertCtrl: AlertController) {
     this.isAndroid = platform.is('android');
+    
 
   //  this.unfiltered = JSON.parse(JSON.stringify(this.afdb.list("transac").valueChanges().subscribe(data => {this.transacData = data;})));
   //  this.userId = this.authProvider.setID();
@@ -49,7 +51,13 @@ export class HoHomePage {
   //  this.afdb.list('/transac/').snapshotChanges().subscribe(data => {this.transacData = data[0].payload.val()});
     this.afdb.list(`/transac/`).snapshotChanges().subscribe(data => { 
     for(var i = 0; i < data.length; i++){
-      this.transacData.push(data[i].payload.val());
+      
+      if(data[i].payload.val().ho == this.myId ){
+//        if(data[i].payload.val().parkStatus == "arriving" && data[i].payload.val().ho == this.myId ){
+     
+        this.transacData.push(data[i]);
+      }
+
       // this.transacData.map( item => {
         
       //    data[i].key;
@@ -69,6 +77,7 @@ export class HoHomePage {
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad HoHomePage');
+    
 
     // this.itemRef.on('value', itemSnapshot => {
     //   this.items = [];
@@ -99,9 +108,9 @@ export class HoHomePage {
     alert.present();
   }
 
-  toParked(transacId: Transaction){
-    // this.afdb.object(`/profile/${transacId.$key}`).update({parkStatus: 'parked'});
-    console.log(this.transacData);
+  toParked(transacId: string){
+    this.afdb.object(`/transac/${transacId}`).update({parkStatus: 'parked'});
+    ///console.log(this.transacData);
   }
 
 }
