@@ -50,22 +50,21 @@ export class HoHomePage {
 
   //  this.afdb.list('/transac/').snapshotChanges().subscribe(data => {this.transacData = data[0].payload.val()});
     this.afdb.list(`/transac/`).snapshotChanges().subscribe(data => { 
-    for(var i = 0; i < data.length; i++){
+//     for(var i = 0; i < data.length; i++){
       
-      if(data[i].payload.val().ho == this.myId ){
-//        if(data[i].payload.val().parkStatus == "arriving" && data[i].payload.val().ho == this.myId ){
+//       if(data[i].payload.val().ho == this.myId ){
+// //        if(data[i].payload.val().parkStatus == "arriving" && data[i].payload.val().ho == this.myId ){
      
-        this.transacData.push(data[i]);
+//         this.transacData.push(data[i]);
+      // }
+
+    // }
+
+    data.forEach(element => {
+      if(element.payload.val().ho == this.myId){
+        this.transacData.push(element);
       }
-
-      // this.transacData.map( item => {
-        
-      //    data[i].key;
-      // });
-
-      // console.log(data[i].key);
-
-    }
+    })
       
      });
 
@@ -77,18 +76,6 @@ export class HoHomePage {
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad HoHomePage');
-    
-
-    // this.itemRef.on('value', itemSnapshot => {
-    //   this.items = [];
-    //   itemSnapshot.forEach( itemSnap => {
-    //     this.items.push(itemSnap.key);
-    //     this.items.push(itemSnap.val());
-    //     return false;
-    //   });
-    //   console.log(itemSnapshot);
-      
-    // });
 
 
   }

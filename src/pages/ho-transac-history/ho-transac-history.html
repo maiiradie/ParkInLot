@@ -6,18 +6,27 @@
 -->
 <ion-header>
 
-  <ion-navbar>
-      <ion-buttons start>
-        <button ion-button menuToggle>
-          <ion-icon name="menu"></ion-icon>
-        </button>
-      </ion-buttons>
-    <ion-title>Transaction</ion-title>
-  </ion-navbar>
+    <ion-navbar>
+        <ion-buttons start>
+          <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+          </button>
+        </ion-buttons>
+      <ion-title>Transaction</ion-title>
+    </ion-navbar>
+  
+  </ion-header>
+  
 
-</ion-header>
+  <ion-content padding>
+  
+      <ion-list>
+        <ion-item ion-item *ngFor="let data of profData">
+          <h2>
+              {{data?.lname}}
 
-
-<ion-content padding>
-
-</ion-content>
+          </h2>
+        </ion-item>
+      </ion-list>
+  
+  </ion-content>
