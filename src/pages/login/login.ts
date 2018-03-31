@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController,LoadingController } from 'ionic-angular';
 
 // import { RegisterPage } from '../register/register';
 
@@ -27,7 +27,9 @@ export class LoginPage {
     public navParams: NavParams, 
     private afdb:AngularFireDatabase,
     private afs:AngularFireAuth,
-    private toastCtrl:ToastController) {
+    private toastCtrl:ToastController,
+    public loadingCtrl: LoadingController
+  ) {
   }
 
   ionViewDidLoad() {
@@ -82,8 +84,14 @@ export class LoginPage {
     })
     toast.present();
   }
-
   onSignin(){
+    
+    let loading = this.loadingCtrl.create({
+      content: 'Loging In',   
+      dismissOnPageChange: true
+		});
+
+    loading.present();    
    this.authProvider.loginUser(this.login)
    .then(() => {
       this.authProvider.setID();
@@ -107,7 +115,6 @@ export class LoginPage {
         //     } else if (this.profileData.reg_status === 'pending') {
         //       this.showToastPending();
         //     }
-
         //   });
         // });
         this.authProvider.getUser().subscribe((data)=>{
@@ -115,8 +122,10 @@ export class LoginPage {
             this.navCtrl.setRoot("MenuPage");
           } else if (data.reg_status === "rejected") {
             this.showToastReject();
+            loading.dismiss();
           } else {
             this.showToastPending();
+            loading.dismiss();
           }
         })
 
@@ -125,15 +134,20 @@ export class LoginPage {
 
    }).catch((error)=>{
      if (error.code === "auth/arguement-error") {
-       this.showToastFields();
+       this.showToastFields();       
+       loading.dismiss();
      } else if (error.code === "auth/invalid-email") {
       this.showToastFormat();
+      loading.dismiss();
      } else if (error.code === "auth/user-not-found") {
       this.showToastEmail();
+      loading.dismiss();
      } else if (error.code === "auth/wrong-password") {
        this.showToastPassword();
+       loading.dismiss();
      }
    })
+   return
   }
   
   register(){
