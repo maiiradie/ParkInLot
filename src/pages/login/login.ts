@@ -86,12 +86,12 @@ export class LoginPage {
   }
   onSignin(){
     
-    let loading = this.loadingCtrl.create({
-      content: 'Logging in...',   
-      dismissOnPageChange: true
-		});
+    // let loading = this.loadingCtrl.create({
+    //   content: 'Logging in...',   
+    //   dismissOnPageChange: true
+		// });
 
-    loading.present();    
+    // loading.present();    
    this.authProvider.loginUser(this.login)
    .then(() => {
       this.authProvider.setID();
@@ -122,10 +122,10 @@ export class LoginPage {
             this.navCtrl.setRoot("MenuPage");
           } else if (data.reg_status === "rejected") {
             this.showToastReject();
-            loading.dismiss();
+            // loading.dismiss();
           } else {
             this.showToastPending();
-            loading.dismiss();
+            // loading.dismiss();
           }
         })
 
@@ -135,16 +135,16 @@ export class LoginPage {
    }).catch((error)=>{
      if (error.code === "auth/arguement-error") {
        this.showToastFields();       
-       loading.dismiss();
+      //  loading.dismiss();
      } else if (error.code === "auth/invalid-email") {
       this.showToastFormat();
-      loading.dismiss();
+      // loading.dismiss();
      } else if (error.code === "auth/user-not-found") {
       this.showToastEmail();
-      loading.dismiss();
+      // loading.dismiss();
      } else if (error.code === "auth/wrong-password") {
        this.showToastPassword();
-       loading.dismiss();
+      //  loading.dismiss();
      }
    })
    return

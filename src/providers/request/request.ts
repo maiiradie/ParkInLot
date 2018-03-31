@@ -6,6 +6,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import * as firebase from 'firebase/app';
 import * as mapboxgl from 'mapbox-gl';
 import { ToastController } from 'ionic-angular';
+import { ValidationPath } from '@firebase/database/dist/esm/src/core/util/Path';
 
 
 @Injectable()
@@ -30,37 +31,51 @@ export class RequestProvider {
     });
   }
 
+
+
   sendRequest(token, coID, hoID) {
-    this.afdb.object('/requests/' + hoID).set({
-      coID: coID,
-      status: "ongoing",
-      reqStatus: "pending"      
-      });
-      alert('request senters');
+    alert('request sent');
+    var x = this.afdb.object<any>('requests/' + hoID).valueChanges().subscribe(data => {
 
-    let body = {
-      "notification": {
-        "title": "You have a parking request!",
-        "body": "text",
-        "sound": "default",
-        "click_action": "FCM_PLUGIN_ACTIVITY",
-        "icon": "fcm_push_icon"
-      },
-      "data": {
-        "coID": coID,
-        "hoToken": token,
-        "hoID": hoID
-      },
-      "to": token,
-      "priority": "high",
-      "restricted_package_name": ""
-    };
+      if (data.reqStatus == 'occupied' || data.reqStatus == 'Accepted') {
+        alert(data.reqStatus);
+      } else {
 
-    let options = new HttpHeaders().set('Content-Type', 'application/json');
-    this.http.post("https://fcm.googleapis.com/fcm/send", body, {
-      headers: options.set('Authorization', 'key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM'),
-    }).subscribe();
-    this.showToastRequest;
+        x.unsubscribe();
+        this.afdb.object('requests/' + hoID).set({
+          coID: coID,
+          status: "ongoing",
+          reqStatus: "occupied"
+        });
+
+        let body = {
+          "notification": {
+            "title": "You have a parking request!",
+            "body": "text",
+            "sound": "default",
+            "click_action": "FCM_PLUGIN_ACTIVITY",
+            "icon": "fcm_push_icon"
+          },
+          "data": {
+            "coID": coID,
+            "hoToken": token,
+            "hoID": hoID
+          },
+          "to": token,
+          "priority": "high",
+          "restricted_package_name": ""
+        };
+
+        this.showToastRequest;
+        let options = new HttpHeaders().set('Content-Type', 'application/json');
+        this.http.post("https://fcm.googleapis.com/fcm/send", body, {
+          headers: options.set('Authorization', 'key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM'),
+        }).subscribe();
+
+      }
+    });
+
+
   }
 
   showToastRequest() {
@@ -72,6 +87,18 @@ export class RequestProvider {
   }
 
   declineRequest(coID, hoID) {
+
+    this.afdb.object('/requests/' + hoID).set({
+      coID: "",
+      status: "",
+      reqStatus: ""
+    });
+
+    this.afdb.list('/transactions/' + hoID).push({
+      coID: coID,
+      status: "rejected"
+    });
+
 
     this.afdb.object<any>('profile/' + coID).valueChanges()
       .subscribe(data => {
@@ -94,6 +121,7 @@ export class RequestProvider {
         this.http.post("https://fcm.googleapis.com/fcm/send", body, {
           headers: options.set('Authorization', 'key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM'),
         }).subscribe();
+
       });
 
     this.afdb.list('transactions/declined').push({
@@ -102,12 +130,13 @@ export class RequestProvider {
       createdAt: Date.now()
     });
 
+
   }
 
   acceptRequest(coID, hoID) {
     this.afdb.object<any>('/location/' + hoID).valueChanges()
       .subscribe(data => {
-        this.afdb.object('requests/' +hoID).update({
+        this.afdb.object('requests/' + hoID).update({
           reqStatus: "Accepted",
           motionStatus: "Arriving",
           createdAt: Date.now()
