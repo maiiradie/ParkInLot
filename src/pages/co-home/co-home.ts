@@ -68,6 +68,8 @@ export class CoHomePage {
 					  alert('Your request has been accepted.');
 					  this.navCtrl.pop()
 					  .then( () => {
+						  alert('lang' +data.lang);
+						  alert('latt' +data.latt);
 						  this.setDest(data.lang, data.latt);
 					  });
 				  } else {
@@ -151,9 +153,10 @@ export class CoHomePage {
 		});
 
 	}
+	
 
 	setDirections(location) {
-		const directions = new MapboxDirections({
+		this.directions = new MapboxDirections({
 			accessToken: mapboxgl.accessToken,
 			interactive: false,
 			controls: {
@@ -163,13 +166,14 @@ export class CoHomePage {
 			}
 		});
 
-		this.map.addControl(directions, 'top-left');
+		this.map.addControl(this.directions, 'top-left');
 
-		directions.setOrigin(location.lng + ',' + location.lat);
+		this.directions.setOrigin(location.lng + ',' + location.lat);
 
 	}
 
 	setDest(lang, latt){
+		alert('setDestination gumana ako heheheh:' +lang +',' +latt)
 		this.directions.setDestination(lang + ',' +latt);
 	}
 
