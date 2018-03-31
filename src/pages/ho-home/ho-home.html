@@ -34,7 +34,7 @@
                         <img src="img/thumbnail-puppy-1.jpg">
                       </ion-thumbnail> -->
             <h2 ion-start>
-              {{transac?.payload.val().coID}}
+                {{transac?.payload.val().fname}} {{transac?.payload.val().lname}} 
             </h2>
             <!-- <p>{{transac?.payload.val().timeStarted}} : {{transac?.key}}</p> -->
           </ion-item>
@@ -45,18 +45,18 @@
             <button ion-button color="secondary" (click)="toParked(transac?.key)">
               <ion-icon name="car"></ion-icon>
               arrived
+              <!-- <ng-template #parking> -->
             </button>
           </ion-item-options>
         </ion-item-sliding>
       </ion-list>
-      <!-- <ng-template #parking> -->
 
       <ion-list *ngSwitchCase="'Parked'" class="margin-bottom-0">
 
-        <div *ngIf="transac.payload.val().motionStatus == 'parked'">
+        <div *ngIf="transac?.payload.val().motionStatus == 'parked'">
           <ion-item>
             <h2 ion-start>
-              {{transac?.payload.val().coID}}
+              {{transac?.payload.val().fname}} {{transac?.payload.val().lname}} 
             </h2>
           </ion-item>
         </div>
