@@ -42,6 +42,7 @@ export class RequestProvider {
         x.unsubscribe();
         this.afdb.object('requests/' + hoID).set({
           coID: coID,
+          
           status: "ongoing",
           reqStatus: "occupied"
         });

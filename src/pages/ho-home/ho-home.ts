@@ -83,13 +83,19 @@ export class HoHomePage {
       });
     });
 
+    
+
     this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
       this.transacData.push(data);      
+      this.afdb.object('profile/' + data.payload.val().coID).valueChanges()
+      .subscribe( profileData => {
+          this.hoProfile = profileData;
+      });
     });
 
   }
 
-
+  hoProfile;
   ionViewDidLoad() {
     console.log('ionViewDidLoad HoHomePage');
   }
