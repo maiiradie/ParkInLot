@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, ToastController } from 'ionic-angular';
 import firebase from 'firebase';
 
 /**
@@ -16,15 +16,59 @@ import firebase from 'firebase';
 })
 export class ForgotPasswordPage {
   reset = {} as any;
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  constructor(public navCtrl: NavController, public navParams: NavParams, public alertCtrl: AlertController, public toastCtrl: ToastController) {
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad ForgotPasswordPage');
   }
-
-  resetPassword() {
-    return firebase.auth().sendPasswordResetEmail(this.reset.email);
+  
+  showAlert() {
+    let alert = this.alertCtrl.create({
+      title: 'Password Reset Email Sent',
+      subTitle: 'A password reset email has been sent in your email account.',
+      buttons: ['OK']
+    });
+    alert.present();
   }
 
+  showToastEmail() {
+    let toast = this.toastCtrl.create({
+      message: 'No user registered with the email.',
+      duration: 3000
+    })
+    toast.present();
+  }
+
+  showToastFields() {
+    let toast = this.toastCtrl.create({
+      message: 'Please input an email.',
+      duration: 3000
+    })
+    toast.present();
+  }
+  showToastFormat() {
+    let toast = this.toastCtrl.create({
+      message: 'Invalid email address.',
+      duration: 3000
+    })
+    toast.present();
+  }
+
+  resetPassword() {
+    if (this.reset.email != null) {
+      firebase.auth().sendPasswordResetEmail(this.reset.email).then(() => {
+        this.showAlert();
+        this.navCtrl.pop();
+      }).catch((error) => {
+        if (error.code === "auth/invalid-email") {
+          this.showToastFormat();
+        } else if(error.code === "auth/user-not-found") {
+          this.showToastEmail();
+        }
+      })
+    } else {
+      this.showToastFields();
+    }
+  }
 }
