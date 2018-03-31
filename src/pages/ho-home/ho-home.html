@@ -28,7 +28,7 @@
     <div *ngFor="let transac of transacData">
       <!-- arriving -->
       <ion-list *ngSwitchCase="'Arriving'" class="margin-bottom-0">
-        <ion-item-sliding *ngIf="transac.payload.val().parkStatus == 'arriving'">
+        <ion-item-sliding *ngIf="transac.payload.val().motionStatus == 'Arriving'">
           <ion-item>
             <!-- <ion-thumbnail item-start>
                         <img src="img/thumbnail-puppy-1.jpg">
@@ -53,7 +53,7 @@
 
       <ion-list *ngSwitchCase="'Parked'" class="margin-bottom-0">
 
-        <div *ngIf="transac.payload.val().parkStatus == 'parked'">
+        <div *ngIf="transac.payload.val().motionStatus == 'parked'">
           <ion-item>
             <h2 ion-start>
               {{transac?.payload.val().coID}}
