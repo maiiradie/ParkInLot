@@ -23,10 +23,10 @@ import { FCM } from '@ionic-native/fcm';
 })
 export class HoHomePage {
 
-  carStatus: string = "Parked";
+  carStatus: string = "parked";
   isAndroid: boolean = false;
 
-  carStatuses = ['Arriving', 'Parked'];
+  carStatuses = ['arriving', 'parked'];
 
   transacData: Array<any> = [];
   userData: any;
@@ -84,7 +84,7 @@ export class HoHomePage {
 
     
 
-    this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
+    var x = this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
       this.transacData.push(data);      
       this.afdb.object('profile/' + data.payload.val().coID).valueChanges()
       .subscribe( profileData => {
@@ -94,10 +94,8 @@ export class HoHomePage {
 
 
   }
+
   hoProfile;
-  
-
-
 
 
   ionViewDidLoad() {
@@ -107,7 +105,7 @@ export class HoHomePage {
   getUser(userId: string) {
     this.afdb.object(`/profile/userId`).valueChanges().take(1).subscribe(data => {
       this.userData = data;
-    });
+    }).unsubscribe();
   }
 
   showAlert() {
@@ -131,6 +129,7 @@ export class HoHomePage {
     this.afdb.object('requests/' + this.myId).update({
       startTime: Date.now()
     });
+    
   }
 
   stopTimer() {
@@ -173,15 +172,13 @@ export class HoHomePage {
     });
 
   }
-  transfer(){
+  transfer(hoID){
     var temp ;
     var x = this.afdb.object<any>('requests/' + this.myId).valueChanges().subscribe(data => {
       temp = data;
       console.log(data);
       x.unsubscribe();
-      this.afdb.list('Transactions/').push({
-        "HoId": data
-      });
+      this.afdb.list('transactions/' +hoID).push(temp);
       this.afdb.object<any>('requests/' + this.myId).set({
         coId: "",
         reqStatus: "",

@@ -116,7 +116,7 @@ export class CoHomePage {
 				el.addEventListener('click', (e) => {
 					var tmp = e.srcElement.id;
 					let actionSheet = this.actionSheetCtrl.create({
-						title: 'insert name of place here',
+						title: data[a].payload.val().address,
 						buttons: [
 
 							{
@@ -148,7 +148,7 @@ export class CoHomePage {
 					actionSheet.present();
 				});
 			}
-		});
+		}).unsubscribe();
 
 	}
 	

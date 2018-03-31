@@ -34,15 +34,15 @@ export class RequestProvider {
 
 
   sendRequest(token, coID, hoID) {
-    alert('request sent');
+    // alert('request sent');
     var x = this.afdb.object<any>('requests/' + hoID).valueChanges().subscribe(data => {
-      if (data.reqStatus == 'occupied' || data.reqStatus == 'Accepted') {
+      if (data.reqStatus == 'occupied' || data.reqStatus == 'accepted') {
         alert(data.reqStatus);
+        x.unsubscribe();
       } else {
         x.unsubscribe();
         this.afdb.object('requests/' + hoID).set({
           coID: coID,
-          
           status: "ongoing",
           reqStatus: "occupied"
         });
@@ -65,7 +65,7 @@ export class RequestProvider {
           "restricted_package_name": ""
         };
 
-        this.showToastRequest;
+        this.showToastRequest();
         let options = new HttpHeaders().set('Content-Type', 'application/json');
         this.http.post("https://fcm.googleapis.com/fcm/send", body, {
           headers: options.set('Authorization', 'key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM'),
@@ -80,7 +80,7 @@ export class RequestProvider {
   showToastRequest() {
     let toast = this.toastCtrl.create({
       message: 'Request sent!',
-      duration: 3000
+      duration: 5000
     })
     toast.present();
   }
@@ -95,7 +95,8 @@ export class RequestProvider {
 
     this.afdb.list('/transactions/' + hoID).push({
       coID: coID,
-      status: "rejected"
+      status: "rejected",
+      createdAt: Date.now()
     });
 
 
@@ -123,21 +124,14 @@ export class RequestProvider {
 
       });
 
-    this.afdb.list('transactions/declined').push({
-      hoID: hoID,
-      coID: coID,
-      createdAt: Date.now()
-    });
-
-
   }
 
   acceptRequest(coID, hoID) {
     this.afdb.object<any>('/location/' + hoID).valueChanges()
       .subscribe(data => {
         this.afdb.object('requests/' + hoID).update({
-          reqStatus: "Accepted",
-          motionStatus: "Arriving",
+          reqStatus: "accepted",
+          motionStatus: "arriving",
           createdAt: Date.now()
         }).then(() => {
           this.afdb.object<any>('profile/' + coID).valueChanges()

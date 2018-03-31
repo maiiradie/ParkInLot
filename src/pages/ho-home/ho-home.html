@@ -10,7 +10,7 @@
 
   <ion-toolbar no-border-top>
     <ion-segment [(ngModel)]="carStatus">
-      <ion-segment-button value="Arriving">
+      <ion-segment-button value="arriving">
         Arriving
       </ion-segment-button>
       <ion-segment-button value="Parked">
@@ -27,8 +27,8 @@
   <div [ngSwitch]="carStatus">
     <div *ngFor="let transac of transacData">
       <!-- arriving -->
-      <ion-list *ngSwitchCase="'Arriving'" class="margin-bottom-0">
-        <ion-item-sliding *ngIf="transac.payload.val().motionStatus == 'Arriving'">
+      <ion-list *ngSwitchCase="'arriving'" class="margin-bottom-0">
+        <ion-item-sliding *ngIf="transac.payload.val().motionStatus == 'arriving'">
           <ion-item>
             <!-- <ion-thumbnail item-start>
                         <img src="img/thumbnail-puppy-1.jpg">
@@ -62,7 +62,7 @@
             </h2>
             <button ion-button (click)="startTimer()">Start Timer</button>
             <button ion-button (click)="stopTimer()">Stop Timer</button>
-            <button ion-button (click)="transfer()">Transfer</button>
+            <button ion-button (click)="transfer(transac?.key)">Transfer</button>
           </ion-item>
         </div>
 
