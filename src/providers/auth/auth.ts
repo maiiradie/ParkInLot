@@ -114,7 +114,7 @@ export class AuthProvider {
        this.afdb.object(`profile/${user.uid}`).set({
          fname:uForm.fname,
          lname:uForm.lname,
-         gender:uForm.gender,
+        //  gender:uForm.gender,
          email:uForm.email,
          mobile:uForm.mobile,
          location:{

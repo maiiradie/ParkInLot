@@ -11,7 +11,7 @@ import { MyApp } from './app.component';
 // import { LoginPage } from '../pages/login/login';
 // import { CoregisterPage } from '../pages/coregister/coregister';
 // import { HoregisterPage } from '../pages/horegister/horegister';
-
+import { FCM } from '@ionic-native/fcm';
 
 // import { EditProfilePage } from '../pages/edit-profile/edit-profile';
 // import { GaragePage } from '../pages/garage/garage';
@@ -27,6 +27,7 @@ import { FilePath } from '@ionic-native/file-path';
 import { FileTransfer } from '@ionic-native/file-transfer';
 
 import { AuthProvider } from '../providers/auth/auth'; 
+import { RequestProvider } from '../providers/request/request'; 
 @NgModule({
   declarations: [
     MyApp,
@@ -71,10 +72,12 @@ import { AuthProvider } from '../providers/auth/auth';
     FileChooser,
     FilePath,
     FileTransfer,
+    FCM,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-  AuthProvider,
+AuthProvider,
     Geolocation,
-    AuthProvider
+    AuthProvider,
+    RequestProvider,
   ]
 })
 export class AppModule {}

@@ -1,13 +1,23 @@
 import { Component } from '@angular/core';
-import { NavController, LoadingController, ActionSheetController,IonicPage } from 'ionic-angular';
+import { NavController, LoadingController, ActionSheetController,IonicPage, Platform, AlertController } from 'ionic-angular';
 import * as mapboxgl from 'mapbox-gl';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Observable } from 'rxjs/Observable';
+import { StatusBar } from '@ionic-native/status-bar';
+import { SplashScreen } from '@ionic-native/splash-screen';
 
 import { AngularFireDatabase } from 'angularfire2/database';
-//import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
+import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
+
 import { ComoredetailsPage } from '../comoredetails/comoredetails';
-// import { AuthProvider } from '../../providers/auth/auth';
+import { FCM } from '@ionic-native/fcm';
+import { RequestProvider } from '../../providers/request/request';
+import { AngularFireAuth } from 'angularfire2/auth';
+	
+declare var FCMPlugin;
+	
+
+
 @IonicPage()
 @Component({
 	selector: 'page-co-home',
@@ -18,25 +28,72 @@ export class CoHomePage {
 
 	public map;
 	public marker;
+	public directions;
 	public hoMarkers;
 
 	//private authProvider:AuthProvider,
-	constructor(private afdb: AngularFireDatabase, public actionSheetCtrl: ActionSheetController, private geolocation: Geolocation, public navCtrl: NavController, public loadingCtrl: LoadingController) {
+	constructor(private afAuth:AngularFireAuth,
+		private afdb: AngularFireDatabase, 
+		statusBar: StatusBar, 
+		splashScreen: SplashScreen,
+		private requestProvider: RequestProvider,
+		private alertCtrl: AlertController, 
+		private fcm: FCM, 
+		platform: Platform,
+		public actionSheetCtrl: ActionSheetController, 
+		private geolocation: Geolocation, 
+		public navCtrl: NavController, 
+		public loadingCtrl: LoadingController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
+		platform.ready().then(() => {
+			this.requestProvider.saveToken();	
+			this.fcm.onNotification().subscribe(data => {
+  
+			  if (data.wasTapped) {
+				  if (data.status == 'declined') {
+					  alert('Your request has been declined.');
+				  } else if (data.status == 'accepted') {
+					  alert('Your request has been accepted.');
+					  this.navCtrl.pop()
+					  .then( () => {
+						  this.setDest(data.lang, data.latt);
+					  });
+				  } else {
+					  alert('Something went wrong with the request.')
+				  }
+			  } else {
+				  if (data.status == 'declined') {
+					  alert('Your request has been declined.');
+				  } else if (data.status == 'accepted') {
+					  alert('Your request has been accepted.');
+					  this.navCtrl.pop()
+					  .then( () => {
+						  this.setDest(data.lang, data.latt);
+					  });
+				  } else {
+					  alert('Something went wrong with the request.')
+				  }
+  
+			  };
+			});
+  
+			statusBar.styleDefault();
+			splashScreen.hide();
+		  });
 	}
 
 	ionViewDidLoad() {
 		this.map = this.initMap();
-		// this.getCurrentLocation().subscribe(location => {
-		// 	this.centerLocation(location);
-		// 	//this.setDirections(location);		
-		// });
+		this.getCurrentLocation().subscribe(location => {
+			this.centerLocation(location);
+			this.setDirections(location);		
+		});
 		this.setMarkers();
 	}
 
 	setMarkers() {
 		
-		var arr = [];
+		const arr = [];
 		var map = this.map;
 		this.afdb.list('location').snapshotChanges().subscribe(data => {
 			for (var a = 0; a < data.length; a++) {
@@ -48,7 +105,7 @@ export class CoHomePage {
 			for (var i = 0; i < arr.length; i++) {
 				popup.setHTML('<h1>Loakan namba wan!</h1>');
 				var el = document.createElement('div');
-				el.innerHTML = "You are here!";
+				el.innerHTML = "mapmarker";
 				el.id = data[i].key;
 				var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
 				new mapboxgl.Marker(el, { offset: [-25, -25] })
@@ -59,7 +116,7 @@ export class CoHomePage {
 				el.addEventListener('click', (e) => {
 					var tmp = e.srcElement.id;
 					let actionSheet = this.actionSheetCtrl.create({
-						title: 'Name of place',
+						title: 'insert name of place here',
 						buttons: [
 
 							{
@@ -95,22 +152,26 @@ export class CoHomePage {
 
 	}
 
-	// setDirections(location) {
-	// 	const directions = new MapboxDirections({
-	// 		accessToken: mapboxgl.accessToken,
-	// 		interactive: false,
-	// 		controls: {
-	// 			inputs: true,
-	// 			profileSwitcher:false,
-	// 			instructions: false
-	// 		}
-	// 	});
+	setDirections(location) {
+		const directions = new MapboxDirections({
+			accessToken: mapboxgl.accessToken,
+			interactive: false,
+			controls: {
+				inputs: true,
+				profileSwitcher:false,
+				instructions: false
+			}
+		});
 
-	// 	this.map.addControl(directions, 'top-left');
+		this.map.addControl(directions, 'top-left');
 
-	// 	directions.setOrigin(location.lng + ',' + location.lat);
+		directions.setOrigin(location.lng + ',' + location.lat);
 
-	// }
+	}
+
+	setDest(lang, latt){
+		this.directions.setDestination(lang + ',' +latt);
+	}
 
 	initMap(location = new mapboxgl.LngLat(120.5960, 16.4023)) {
 
@@ -175,7 +236,10 @@ export class CoHomePage {
 
 	addMarker(location) {
 		if (location) {
-			this.marker = new mapboxgl.Marker()
+			var el = document.createElement('div');
+			el.className = "carmarker";
+
+			this.marker = new mapboxgl.Marker(el)
 				.setLngLat(location)
 				.addTo(this.map);
 		} else {

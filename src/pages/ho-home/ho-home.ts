@@ -6,6 +6,9 @@ import firebase from 'firebase';
 import { Transaction } from '../../models/transac/transaction.interface';
 import { User } from '../../models/user/user.interface';
 import { AuthProvider } from '../../providers/auth/auth';
+
+import { RequestProvider } from '../../providers/request/request';
+import { FCM } from '@ionic-native/fcm';
 /**
  * Generated class for the HoHomePage page.
  *
@@ -22,7 +25,7 @@ export class HoHomePage {
 
   carStatus: string = "Parked";
   isAndroid: boolean = false;
-  
+
   carStatuses = ['Arriving', 'Parked'];
 
   transacData: Array<any> = [];
@@ -37,51 +40,68 @@ export class HoHomePage {
   public itemRef: firebase.database.Reference = firebase.database().ref('/transac');
 
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,
+  constructor(private requestProvider: RequestProvider, private fcm: FCM, public navCtrl: NavController, public navParams: NavParams,
     private platform: Platform, private afdb: AngularFireDatabase, private authProvider: AuthProvider, private alertCtrl: AlertController) {
     this.isAndroid = platform.is('android');
-    
 
-  //  this.unfiltered = JSON.parse(JSON.stringify(this.afdb.list("transac").valueChanges().subscribe(data => {this.transacData = data;})));
-  //  this.userId = this.authProvider.setID();
-  //  this.afdb.list("/transac/").valueChanges().subscribe(data => {this.transacData = data.filter(item =>{ 
+    platform.ready().then(() => {
+      this.requestProvider.saveToken();
 
-  //  });});
+      this.fcm.onNotification().subscribe(data => {
 
-  //  this.afdb.list('/transac/').snapshotChanges().subscribe(data => {this.transacData = data[0].payload.val()});
-    this.afdb.list(`/transac/`).snapshotChanges().subscribe(data => { 
-//     for(var i = 0; i < data.length; i++){
-      
-//       if(data[i].payload.val().ho == this.myId ){
-// //        if(data[i].payload.val().parkStatus == "arriving" && data[i].payload.val().ho == this.myId ){
-     
-//         this.transacData.push(data[i]);
-      // }
+        this.afdb.object<any>('profile/' + data.coID).valueChanges().subscribe(codata => {
 
-    // }
+          var fname, lname, platenumber: any;
+          fname = codata.fname;
+          lname = codata.lname;
+          platenumber = 'ABC-169';
+          if (data.wasTapped) {
 
-    data.forEach(element => {
-      if(element.payload.val().ho == this.myId){
-        this.transacData.push(element);
-      }
-    })
-      
-     });
+          } else {
 
+            let confirm = this.alertCtrl.create({
+              // add platenumber here
+              title: 'You have a parking space request from ' + fname + ' ' + lname,
+              buttons: [
+                {
+                  text: 'Decline',
+                  handler: () => {
+                    this.requestProvider.declineRequest(data.coID, data.hoID);
+                  }
+                },
+                {
+                  text: 'Accept',
+                  handler: () => {
+                    this.requestProvider.acceptRequest(data.coID, data.hoID);
+                  }
+                }
+              ]
+            });
+            confirm.present();
+          };
+        });
+      });
+    });
 
+    this.afdb.list(`/transac/`).snapshotChanges().subscribe(data => {
 
+      data.forEach(element => {
+        if (element.payload.val().ho == this.myId) {
+          this.transacData.push(element);
+        }
+      })
+
+    });
 
   }
 
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad HoHomePage');
-
-
   }
 
-  getUser(userId: string){
-    this.afdb.object(`/profile/userId`).valueChanges().take(1).subscribe( data => {
+  getUser(userId: string) {
+    this.afdb.object(`/profile/userId`).valueChanges().take(1).subscribe(data => {
       this.userData = data;
     });
   }
@@ -95,10 +115,10 @@ export class HoHomePage {
     alert.present();
   }
 
-  toParked(transacId: string){
-    this.afdb.object(`/transac/${transacId}`).update({parkStatus: 'parked'});
+  toParked(transacId: string) {
+    this.afdb.object(`/transac/${transacId}`).update({ parkStatus: 'parked' });
     this.transacData = [];
-    
+
   }
 
 }
