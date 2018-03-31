@@ -84,9 +84,7 @@ export class HoHomePage {
     });
 
     this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
-
       this.transacData.push(data);      
-
     });
 
   }
@@ -112,10 +110,11 @@ export class HoHomePage {
   }
 
   toParked(transacId: string) {
+    
     this.afdb.object('requests/' +this.myId).update({ 
       motionStatus: "parked"
     });
-    
+    this.transacData = [];
 
   }
 
