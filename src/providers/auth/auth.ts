@@ -11,134 +11,130 @@ import * as firebase from 'firebase/app';
 export class AuthProvider {
 
   //Current ID
-  userId:any;
+  userId: any;
 
-  constructor(private geolocation: Geolocation,public http:HttpClient,private afs:AngularFireAuth,private afdb:AngularFireDatabase){
+  constructor(private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
     this.afs.auth.onAuthStateChanged(user => {
       if (user) {
         this.updateOnConnect();
         this.updateOnDisconnect();
-      }else{
+      } else {
         //debug
         console.log('currently logged out');
-      }     
+      }
     });
 
     this.afdb.list('/location');
   }
 
-  setID(){
+  setID() {
     return this.userId = this.afs.auth.currentUser.uid;
   }
 
-  getUser(){
-     return this.afdb.object<any>('profile/' + this.userId).valueChanges();       
+  getUser() {
+    return this.afdb.object<any>('profile/' + this.userId).valueChanges();
   }
 
   updateOnDisconnect() {
-    firebase.database().ref().child('profile/'+ this.userId)
-    .onDisconnect()
-    .update({status:'offline'})
+    firebase.database().ref().child('profile/' + this.userId)
+      .onDisconnect()
+      .update({ status: 'offline' })
   }
 
-  updateOnConnect(){
+  updateOnConnect() {
     return this.afdb.object('.info/connected').valueChanges()
-    .subscribe( connected => {
-      if (connected) {
-        status = 'online';
-        this.updateStatus(status);
-      }
-    });
+      .subscribe(connected => {
+        if (connected) {
+          status = 'online';
+          this.updateStatus(status);
+        }
+      });
   }
   //Status helper
   updateStatus(status) {
     return this.afdb.object('profile/' + this.userId)
-        .update({ status: status });
+      .update({ status: status });
   }
 
   //location helper / for markers
-  getHO(){
+  getHO() {
   }
 
-  loginUser(login){
-    return this.afs.auth.signInWithEmailAndPassword(login.email,login.password);
+  loginUser(login) {
+    return this.afs.auth.signInWithEmailAndPassword(login.email, login.password);
   }
 
-  logoutUser(){
+  logoutUser() {
     return this.afs.auth.signOut()
-    .then( () => {
-      this.updateStatus('offline');
-    });
+      .then(() => {
+        this.updateStatus('offline');
+      });
   }
 
-  registerCarOwner(form){
-   return this.afs.auth.createUserWithEmailAndPassword(form.email,form.password)
-    .then((user) => {
-       this.afdb.object(`profile/${user.uid}`).set({
-         fname:form.fname,
-         lname:form.lname,
-         email:form.email,
-         mobile:form.mobile,
-         carowner:true,
-         created_at:Date.now()
-       });
-    })
-    .catch((err) => {
-       console.log(err);
-    });
+  registerCarOwner(form) {
+    return this.afs.auth.createUserWithEmailAndPassword(form.email, form.password)
+      .then((user) => {
+        this.afdb.object(`profile/${user.uid}`).set({
+          fname: form.fname,
+          lname: form.lname,
+          email: form.email,
+          mobile: form.mobile,
+          carowner: true,
+          created_at: Date.now()
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
-  locateHO(){
-      let options = {
-        timeout: 10000, 
-        enableHighAccuracy: true
-      };
+  locateHO() {
+    let options = {
+      timeout: 10000,
+      enableHighAccuracy: true
+    };
 
-      let locationsObs = Observable.create(observable =>{
-        this.geolocation.getCurrentPosition(options)
+    let locationsObs = Observable.create(observable => {
+      this.geolocation.getCurrentPosition(options)
         .then(resp => {
           let lat = resp.coords.latitude;
           let lng = resp.coords.longitude;
-          let location = {lat,lng};
+          let location = { lat, lng };
           observable.next(location);
         }).catch(error => {
           console.log('Error getting location', error);
         });
-      });
-      return locationsObs;
+    });
+    return locationsObs;
   }
 
-  registerHomeOwner(uForm,gForm,img,location){
-   return this.afs.auth.createUserWithEmailAndPassword(uForm.email,uForm.password)
-    .then((user) => {
-       this.afdb.object(`profile/${user.uid}`).set({
-         fname:uForm.fname,
-         lname:uForm.lname,
-        //  gender:uForm.gender,
-         email:uForm.email,
-         mobile:uForm.mobile,
-         location:{
-           lat:location.lat,
-           lng:location.lng
-         },
-         address:gForm.address,
-          capacity:gForm.capacity,
-          details:gForm.details,
-         homeowner:true,
-         garagePic:img,
-         profPic:null,
-         reg_status:"pending",
-         created_at:Date.now()
-       });
-      //  this.afdb.object(`garage/${user.uid}`).set({
-      //   address:gForm.address,
-      //   capacity:gForm.capacity,
-      //   details:gForm.details
-      // });
-    })
-    .catch((err) => {
-       console.log(err);
-    });
+  registerHomeOwner(uForm, gForm, img, location) {
+    return this.afs.auth.createUserWithEmailAndPassword(uForm.email, uForm.password)
+      .then((user) => {
+        this.afdb.object(`profile/${user.uid}`).set({
+          fname: uForm.fname,
+          lname: uForm.lname,
+          gender: uForm.gender,
+          email: uForm.email,
+          mobile: uForm.mobile,
+          capacity: gForm.capacity,
+          details: gForm.details,
+          homeowner: true,
+          garagePic: img,
+          profPic: null,
+          reg_status: "pending",
+          created_at: Date.now()
+        }).then( () => {
+          this.afdb.object(`location/${user.uid}`).set({
+            lat: location.lat,
+            lng: location.lng,
+            address: gForm.address,
+          });
+        });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
 
 

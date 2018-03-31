@@ -68,8 +68,6 @@ export class CoHomePage {
 					  alert('Your request has been accepted.');
 					  this.navCtrl.pop()
 					  .then( () => {
-						  alert('lang' +data.lang);
-						  alert('latt' +data.latt);
 						  this.setDest(data.lang, data.latt);
 					  });
 				  } else {
@@ -173,7 +171,6 @@ export class CoHomePage {
 	}
 
 	setDest(lang, latt){
-		alert('setDestination gumana ako heheheh:' +lang +',' +latt)
 		this.directions.setDestination(lang + ',' +latt);
 	}
 

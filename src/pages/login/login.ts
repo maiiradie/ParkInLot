@@ -87,7 +87,7 @@ export class LoginPage {
   onSignin(){
     
     let loading = this.loadingCtrl.create({
-      content: 'Loging In',   
+      content: 'Logging in...',   
       dismissOnPageChange: true
 		});
 
