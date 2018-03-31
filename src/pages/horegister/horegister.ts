@@ -1,12 +1,11 @@
 import { Component, ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams,  LoadingController, Slides, AlertController, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams,  LoadingController, Slides, AlertController, ToastController, ActionSheetController } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import firebase from 'firebase';
 
 import { File } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
-import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
 
 // import { HomehoPage } from '../homeho/homeho';
 // import { LoginPage } from '../login/login';
@@ -38,18 +37,17 @@ export class HoregisterPage {
 		public navCtrl: NavController, 
     public navParams: NavParams,
     public alertCtrl: AlertController,
+    public actionSheetCtrl: ActionSheetController,
 		private fileChooser: FileChooser,
 		private file: File,
     private filePath: FilePath,
-    private transfer: FileTransfer,
     private toastCtrl: ToastController) {
 		  this.userForm = this.fb.group({
 	 		  'fname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
 	 		  'lname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
 	 		  'email':[null,Validators.compose([Validators.required, Validators.email])],
 	 		  'password':[null,Validators.compose([Validators.required, Validators.minLength(6), Validators.maxLength(30)])],
-			  'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])],
-			  'gender':[null,Validators.compose([Validators.required])],
+			  'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])]
       });
 
       this.garageForm = this.fb.group({
@@ -74,36 +72,73 @@ export class HoregisterPage {
   back() {
     this.slider.slidePrev();
   }
+
+  presentActionSheet(file) {
+    const actionSheet = this.actionSheetCtrl.create({
+      title: file.name,
+      buttons: [
+        {
+          text: 'Remove',
+          role: 'destrutive',
+          handler: () => {
+            var index = this.files.indexOf(file);
+            this.files.splice(index, 1);
+            // console.log('Remove clicked');
+          }
+        },
+        // {
+        //   text: 'Change',
+        //   handler: () => {
+        //     var arrLength = this.files.length;
+        //     this.chooseFile();
+        //     alert(this.files.length);
+
+        //     if (arrLength != this.files.length) {
+        //       var index = this.files.indexOf(file);
+        //       this.files.splice(index, 1);
+        //     }
+          
+        //     actionSheet.dismiss();
+        //     // console.log('Change clicked');
+        //   }
+        // },  
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          // handler: () => {
+          //   console.log('Cancel clicked');
+          // }
+        }
+      ]
+    });
+    actionSheet.present();
+  }
 	
 	choose() {
     this.fileChooser.open().then((url)=>{
       this.filePath.resolveNativePath(url).then((path)=>{
-      
-      this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
-        this.imgUrl = newUrl;
+        this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
+          this.imgUrl = newUrl;
 
-        let dirPath = newUrl.nativeURL;
-        this.imgName = dirPath;
-        let dirPathSegments = dirPath.split('/'); //break string to array
-        dirPathSegments.pop();  //remove last element
-        dirPath = dirPathSegments.join('/');
-        this.imgPath = dirPath;
+          let dirPath = newUrl.nativeURL;
+          this.imgName = dirPath;
+          let dirPathSegments = dirPath.split('/'); //break string to array
+          dirPathSegments.pop();  //remove last element
+          dirPath = dirPathSegments.join('/');
+          this.imgPath = dirPath;
         
-        this.caption = "Change Photo";
-          
-        
-      }).catch((e)=>{
-        alert("error " + JSON.stringify(e));
+          this.caption = "Change Photo";
+        }).catch((e)=>{
+          alert("error " + JSON.stringify(e));
+        })
       })
     })
-  })
   }
 
   chooseFile() {
     this.fileChooser.open().then((url)=>{
       this.filePath.resolveNativePath(url).then((path)=>{
         this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
-          // const fileTransfer: FileTransferObject = this.transfer.create();
           this.fileUrl = newUrl;
           alert(this.fileUrl);
   
@@ -120,14 +155,6 @@ export class HoregisterPage {
             path: this.fileDir,
             name: this.fileUrl.name
           });
-
-          alert(JSON.stringify(this.files));
-          // let metadata = {
-          //   fileKey: this.userId,
-          //   fileName: this.imgName,
-          // }
-
-          // this.caption = "Change Photo";
         })
       })
     })

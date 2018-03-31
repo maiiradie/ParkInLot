@@ -33,7 +33,6 @@
     "@ionic/storage": "2.1.3",
     "@mapbox/mapbox-gl-directions": "^3.1.2",
     "angularfire2": "^5.0.0-rc.6",
-    "com.cesidiodibenedetto.filechooser": "~1.0.4",
     "cordova-android": "6.4.0",
     "cordova-browser": "5.0.3",
     "cordova-ios": "4.5.4",

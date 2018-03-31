@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController,LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
 
 // import { RegisterPage } from '../register/register';
 
@@ -19,20 +19,25 @@ import { Profile } from '../../models/profile';
 })
 export class LoginPage {
 
-  login = {} as Profile;
+  login = {} as any;
   profileData:any;
+  x:any;
 
   constructor(public authProvider:AuthProvider, 
     public navCtrl: NavController, 
     public navParams: NavParams, 
     private afdb:AngularFireDatabase,
     private afs:AngularFireAuth,
-    private toastCtrl:ToastController,
-    public loadingCtrl: LoadingController
-  ) {
+    private toastCtrl:ToastController) {
   }
 
   ionViewDidLoad() {
+  }
+
+  ionViewDidLeave() {
+    if (this.x != undefined) {
+      this.x.unsubscribe();
+    }
   }
 
   forgotPassword() {
@@ -84,70 +89,40 @@ export class LoginPage {
     })
     toast.present();
   }
+
   onSignin(){
-    
-    // let loading = this.loadingCtrl.create({
-    //   content: 'Logging in...',   
-    //   dismissOnPageChange: true
-		// });
-
-    // loading.present();    
-   this.authProvider.loginUser(this.login)
-   .then(() => {
-      this.authProvider.setID();
-      if (this.authProvider.setID().length != 0) {
-        //  this.authProvider.getUser()
-        //  .subscribe(role => {
-        //    if (role.carowner) {
-        //      this.navCtrl.setRoot("CoHomePage");
-        //    }else{
-        //      this.navCtrl.setRoot("HoHomePage");
-        //    }
-        //  });
-        // this.afs.authState.take(1).subscribe( auth => {
-        //   this.afdb.object(`/profile/${auth.uid}`).valueChanges().subscribe( data => {
-        //     this.profileData = data;
-        //     console.log(this.profileData);
-        //     if (this.profileData.reg_status === 'approved') {
-        //       this.navCtrl.setRoot("HoprofilePage");
-        //     } else if (this.profileData.reg_status === 'rejected') {
-        //       this.showToastReject();
-        //     } else if (this.profileData.reg_status === 'pending') {
-        //       this.showToastPending();
-        //     }
-        //   });
-        // });
-        this.authProvider.getUser().subscribe((data)=>{
-          if (data.reg_status === "approved") {
-            this.navCtrl.setRoot("MenuPage");
-          } else if (data.reg_status === "rejected") {
-            this.showToastReject();
-            // loading.dismiss();
-          } else {
-            this.showToastPending();
-            // loading.dismiss();
-          }
-        })
-
-        // this.navCtrl.setRoot("HoprofilePage");
-      }
-
-   }).catch((error)=>{
-     if (error.code === "auth/arguement-error") {
-       this.showToastFields();       
-      //  loading.dismiss();
-     } else if (error.code === "auth/invalid-email") {
-      this.showToastFormat();
-      // loading.dismiss();
-     } else if (error.code === "auth/user-not-found") {
-      this.showToastEmail();
-      // loading.dismiss();
-     } else if (error.code === "auth/wrong-password") {
-       this.showToastPassword();
-      //  loading.dismiss();
-     }
-   })
-   return
+    if((this.login.email != null) && (this.login.password != null)) {
+      this.authProvider.loginUser(this.login).then(() => {
+        this.authProvider.setID();
+        if (this.authProvider.setID().length != 0) {
+          this.x =  this.authProvider.getUser().subscribe((data)=>{
+            if (data.reg_status === "approved") {
+              if (data.carowner) {
+                this.navCtrl.setRoot("CoHomePage");
+              } else if(data.homeowner){
+                this.navCtrl.setRoot("HoHomePage");
+              }
+            } else if (data.reg_status === "rejected") {
+              this.showToastReject();
+            } else {
+              this.showToastPending();
+            }
+         })
+       }
+      }).catch((error)=>{
+        if (error.code === "auth/arguement-error") {
+          this.showToastFields();
+        } else if (error.code === "auth/invalid-email") {
+          this.showToastFormat();
+        } else if (error.code === "auth/user-not-found") {
+          this.showToastEmail();
+        } else if (error.code === "auth/wrong-password") {
+          this.showToastPassword();
+        }
+      })
+    } else {
+      this.showToastFields();
+    }
   }
   
   register(){

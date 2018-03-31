@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, LoadingController, ActionSheetController,IonicPage, Platform, AlertController } from 'ionic-angular';
+import { NavController, LoadingController, ActionSheetController,IonicPage, Platform, AlertController, MenuController } from 'ionic-angular';
 import * as mapboxgl from 'mapbox-gl';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Observable } from 'rxjs/Observable';
@@ -43,7 +43,8 @@ export class CoHomePage {
 		public actionSheetCtrl: ActionSheetController, 
 		private geolocation: Geolocation, 
 		public navCtrl: NavController, 
-		public loadingCtrl: LoadingController) {
+		public loadingCtrl: LoadingController,
+		private menuCtrl: MenuController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
 		platform.ready().then(() => {
 			this.requestProvider.saveToken();	
@@ -80,6 +81,9 @@ export class CoHomePage {
 			statusBar.styleDefault();
 			splashScreen.hide();
 		  });
+
+		  menuCtrl.enable(true);
+
 	}
 
 	ionViewDidLoad() {
@@ -89,6 +93,17 @@ export class CoHomePage {
 			this.setDirections(location);		
 		});
 		this.setMarkers();
+	}
+
+	openMenu(evt) {
+		if(evt === "Ho-Menu"){
+		   this.menuCtrl.enable(true, 'Ho-Menu');
+		   this.menuCtrl.enable(false, 'Co-Menu');
+		}else if(evt === "Co-Menu"){
+		   this.menuCtrl.enable(false, 'Ho-Menu');
+		   this.menuCtrl.enable(true, 'Co-Menu');
+		}
+		this.menuCtrl.toggle();
 	}
 
 	setMarkers() {

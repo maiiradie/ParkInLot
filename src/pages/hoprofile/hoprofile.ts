@@ -31,27 +31,24 @@ export class HoprofilePage {
     public navParams: NavParams) {
   }
 
-  ionViewDidLoad() {
-    this.afs.authState.take(1).subscribe( auth => {
-      this.afdb.object(`/profile/${auth.uid}`).valueChanges().subscribe( data => {
-        this.profileData = data;
+  ionViewWillEnter() {
+    this.userId = this.authProvider.setID();
 
-        this.retrieveImg();
-      });
+    this.afdb.object(`/profile/` + this.userId).valueChanges().subscribe( data => {
+      this.profileData = data;
+      firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d=>{
+        this.imgName = d;
+      }).catch((e)=>{
+        this.imgName = "./assets/imgs/avatar.jpg";
+      }) 
     });
+  }
+
+  ionViewDidLoad() {
+    console.log("This is Ho profile page");
   }
 
   editProfile() {
     this.navCtrl.push("HoEditProfilePage");
   }
-
-  retrieveImg() {
-    this.userId = this.authProvider.setID();
-      firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d=>{
-        this.imgName = d;
-      }).catch((e)=>{
-        alert(JSON.stringify(e));
-    })   
-  }
-
 }

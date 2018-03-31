@@ -1,13 +1,12 @@
 page-ho-edit-profile {
-    #default {
-        background: url("../assets/imgs/avatar.jpg") no-repeat;
+    ion-label {
+        color: #808080;
     }
-    .content {
-        position: relative;
-        margin-top: -20px;
+    .save {
+        color: white !important;
     }
     .circular {
-        width: 100px;
+        width: auto;
         height: 100px;
         position: inherit;
         border-radius: 50%;
@@ -15,16 +14,25 @@ page-ho-edit-profile {
         -moz-border-radius: 150px;
         border: solid white;
         background-size: 100%;
-        margin-top: -70px;
-        margin-left: auto;
-        margin-right: auto;
-        // margin-bottom: 50px;
+        margin: auto;
+        display: block;
     }
-    .top {
+    .bg {
         background-image: url("../assets/imgs/TopBck2.png");
-        height: 30vh;
+        height: 35vh;
         background-size: cover;
         background-position: center center;
         position: relative;
+        z-index: -1;
+    }
+    .info {
+        margin-top: -28vh;
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 20px;
+        position: relative !important;
+        button {
+            color: #404040;
+        }
     }
 }

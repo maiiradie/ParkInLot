@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Platform, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Platform, AlertController, MenuController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import firebase from 'firebase';
 
@@ -41,7 +41,8 @@ export class HoHomePage {
   public fname;
   public lname;
   constructor(private requestProvider: RequestProvider, private fcm: FCM, public navCtrl: NavController, public navParams: NavParams,
-    private platform: Platform, private afdb: AngularFireDatabase, private authProvider: AuthProvider, private alertCtrl: AlertController) {
+    private platform: Platform, private afdb: AngularFireDatabase, private authProvider: AuthProvider, private alertCtrl: AlertController,
+    private menuCtrl: MenuController) {
     this.isAndroid = platform.is('android');
 
     platform.ready().then(() => {
@@ -92,6 +93,7 @@ export class HoHomePage {
       });
     });
 
+    menuCtrl.enable(true);
 
   }
 
@@ -115,6 +117,17 @@ export class HoHomePage {
       buttons: ['OK']
     });
     alert.present();
+  }
+
+  openMenu(evt) {
+    if(evt === "Ho-Menu"){
+       this.menuCtrl.enable(true, 'Ho-Menu');
+       this.menuCtrl.enable(false, 'Co-Menu');
+    }else if(evt === "Co-Menu"){
+       this.menuCtrl.enable(false, 'Ho-Menu');
+       this.menuCtrl.enable(true, 'Co-Menu');
+    }
+    this.menuCtrl.toggle();
   }
 
   toParked(transacId: string) {
