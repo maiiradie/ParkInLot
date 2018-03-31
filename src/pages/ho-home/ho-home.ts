@@ -83,13 +83,9 @@ export class HoHomePage {
       });
     });
 
-    this.afdb.list(`/transac/`).snapshotChanges().subscribe(data => {
+    this.afdb.list(`/requests/` +this.myId).snapshotChanges().subscribe(data => {
 
-      data.forEach(element => {
-        if (element.payload.val().ho == this.myId) {
-          this.transacData.push(element);
-        }
-      })
+      this.transacData = data;      
 
     });
 

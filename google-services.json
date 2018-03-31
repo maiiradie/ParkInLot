@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "276938997674",
+    "firebase_url": "https://parkinlotph-0001.firebaseio.com",
+    "project_id": "parkinlotph-0001",
+    "storage_bucket": "parkinlotph-0001.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:276938997674:android:2eaffb298d2c7f9d",
+        "android_client_info": {
+          "package_name": "com.parkinlot.ph"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "276938997674-qbqdu5n1ua51aj3vkse0aaoujfa76g7j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAStnprr79kC5S5qJD6Di1jFhmEKS9qtE4"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
