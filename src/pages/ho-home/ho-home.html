@@ -28,13 +28,14 @@
     <div *ngFor="let transac of transacData">
       <!-- arriving -->
       <ion-list *ngSwitchCase="'Arriving'" class="margin-bottom-0">
-        <ion-item-sliding *ngIf="transac.payload.val().motionStatus == 'arriving'">
+        <ion-item-sliding *ngIf="transac.payload.val().motionStatus == 'Arriving'">
           <ion-item>
             <!-- <ion-thumbnail item-start>
                         <img src="img/thumbnail-puppy-1.jpg">
                       </ion-thumbnail> -->
             <h2 ion-start>
-                {{transac?.payload.val().fname}} {{transac?.payload.val().lname}} 
+              {{hoProfile?.fname}}
+              {{hoProfile?.lname}}
             </h2>
             <!-- <p>{{transac?.payload.val().timeStarted}} : {{transac?.key}}</p> -->
           </ion-item>
@@ -59,6 +60,9 @@
               {{hoProfile?.fname}}
               {{hoProfile?.lname}}
             </h2>
+            <button ion-button (click)="startTimer()">Start Timer</button>
+            <button ion-button (click)="stopTimer()">Stop Timer</button>
+            <button ion-button (click)="transfer()">Transfer</button>
           </ion-item>
         </div>
 

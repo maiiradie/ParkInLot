@@ -71,12 +71,7 @@ export class HoHomePage {
                 {
                   text: 'Accept',
                   handler: () => {
-                    this.requestProvider.acceptRequest(data.coID, data.hoID);
-                    this.afdb.object('requests/' + this.myId).update({
-                      fname: codata.fname,
-                      lname: codata.lname
-                    })
-
+                    this.requestProvider.acceptRequest(data.coID, data.hoID);                    
                   }
                 }
               ]
@@ -87,13 +82,9 @@ export class HoHomePage {
       });
     });
 
-<<<<<<< HEAD
     
 
     this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
-=======
-    var a = this.afdb.object('requests/'+this.myId).snapshotChanges().subscribe(data => {   
->>>>>>> 72081ae692680f7e9a5c8062e925eb4ba5a4567d
       this.transacData.push(data);      
       this.afdb.object('profile/' + data.payload.val().coID).valueChanges()
       .subscribe( profileData => {
@@ -103,13 +94,12 @@ export class HoHomePage {
 
 
   }
-
-<<<<<<< HEAD
   hoProfile;
-=======
+  
 
 
->>>>>>> 72081ae692680f7e9a5c8062e925eb4ba5a4567d
+
+
   ionViewDidLoad() {
     console.log('ionViewDidLoad HoHomePage');
   }
@@ -136,6 +126,68 @@ export class HoHomePage {
     });
     this.transacData = [];
 
+  }
+  startTimer() {
+    this.afdb.object('requests/' + this.myId).update({
+      startTime: Date.now()
+    });
+  }
+
+  stopTimer() {
+    //kunin si stopTime
+    var endDate = Date.now();
+    var endDateH = new Date(endDate);
+    var endHour = endDateH.getHours();
+    var startDate;
+    var computedHours;
+    var payment;
+    //query to database
+    var x = this.afdb.object<any>('requests/' + this.myId).valueChanges().subscribe(data => {
+      startDate = data.startTime;
+      //to date of start date
+      var startDateH = new Date(startDate);
+      //get the hours of the start date
+      var startHour = startDateH.getHours();
+      //compute for time
+      computedHours = endHour - startHour;
+      // start time minutes
+      var startMin = startDateH.getMinutes();
+      //end time minutes
+      var endMin = endDateH.getMinutes();
+      //compute for payment
+      if (computedHours < 2) {
+        payment = 20;
+      } else {
+        if (startMin > endMin) {
+          payment = (computedHours - 1) * 20;
+        } else {
+          payment = computedHours * 20;
+        }
+      }
+      // push database
+      x.unsubscribe();
+      this.afdb.object('requests/' + this.myId).update({
+        endTime: endDate,
+        payment: payment
+      });
+    });
+
+  }
+  transfer(){
+    var temp ;
+    var x = this.afdb.object<any>('requests/' + this.myId).valueChanges().subscribe(data => {
+      temp = data;
+      console.log(data);
+      x.unsubscribe();
+      this.afdb.list('Transactions/').push({
+        "HoId": data
+      });
+      this.afdb.object<any>('requests/' + this.myId).set({
+        coId: "",
+        reqStatus: "",
+        status: ""
+      })
+    })
   }
 
 }
