@@ -35,11 +35,11 @@ export class HoHomePage {
   private userId;
   arr: any;
   myId = this.authProvider.setID();
-
   public items: Array<any> = [];
   public itemRef: firebase.database.Reference = firebase.database().ref('/transac');
 
-
+  public fname;
+  public lname;
   constructor(private requestProvider: RequestProvider, private fcm: FCM, public navCtrl: NavController, public navParams: NavParams,
     private platform: Platform, private afdb: AngularFireDatabase, private authProvider: AuthProvider, private alertCtrl: AlertController) {
     this.isAndroid = platform.is('android');
@@ -49,8 +49,7 @@ export class HoHomePage {
 
       this.fcm.onNotification().subscribe(data => {
 
-        this.afdb.object<any>('profile/' + data.coID).valueChanges().subscribe(codata => {
-
+        this.afdb.object<any>('profile/' + data.coID).valueChanges().subscribe(codata => {          
           var fname, lname, platenumber: any;
           fname = codata.fname;
           lname = codata.lname;
@@ -73,6 +72,11 @@ export class HoHomePage {
                   text: 'Accept',
                   handler: () => {
                     this.requestProvider.acceptRequest(data.coID, data.hoID);
+                    this.afdb.object('requests/' + this.myId).update({
+                      fname: codata.fname,
+                      lname: codata.lname
+                    })
+
                   }
                 }
               ]
@@ -83,9 +87,13 @@ export class HoHomePage {
       });
     });
 
+<<<<<<< HEAD
     
 
     this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
+=======
+    var a = this.afdb.object('requests/'+this.myId).snapshotChanges().subscribe(data => {   
+>>>>>>> 72081ae692680f7e9a5c8062e925eb4ba5a4567d
       this.transacData.push(data);      
       this.afdb.object('profile/' + data.payload.val().coID).valueChanges()
       .subscribe( profileData => {
@@ -93,9 +101,15 @@ export class HoHomePage {
       });
     });
 
+
   }
 
+<<<<<<< HEAD
   hoProfile;
+=======
+
+
+>>>>>>> 72081ae692680f7e9a5c8062e925eb4ba5a4567d
   ionViewDidLoad() {
     console.log('ionViewDidLoad HoHomePage');
   }
