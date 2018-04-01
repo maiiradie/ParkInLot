@@ -72,14 +72,11 @@ export class HoEditProfilePage {
 
   // Retrieve URL of profile picture
   retrieveImg() {
-    try{
-      firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d=>{
-        this.imgUrl = d;
-      });
-    }
-    catch(e){
+    firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d=>{
+      this.imgUrl = d;
+    }).catch((error) => {
       this.imgUrl = "./assets/imgs/avatar.jpg";
-    }   
+    })  
   }
 
   // Create Toast
@@ -91,24 +88,31 @@ export class HoEditProfilePage {
     toast.present();
   }
 
+  showEmailToast() {
+    let toast = this.toastCtrl.create({
+      message: 'Cannot update email. Email already taken or used.',
+      duration: 3000
+    })
+    toast.present();
+  }
+
   // Open File Chooser and select image
   changeImg() {
     this.fileChooser.open().then((url)=>{
       this.filePath.resolveNativePath(url).then((path)=>{
       
-      this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
-        let dirPath = newUrl.nativeURL;
-        this.imgUrl = dirPath;
-        let dirPathSegments = dirPath.split('/'); //break string to array
-        this.imgName = dirPathSegments.pop();  //remove last element
-        dirPath = dirPathSegments.join('/');
-        this.imgPath = dirPath;          
-        
-      }).catch((error)=>{
-        console.log("error in resolving picture url: " + JSON.stringify(error));
+        this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
+          let dirPath = newUrl.nativeURL;
+          this.imgUrl = dirPath;
+          let dirPathSegments = dirPath.split('/'); //break string to array
+          this.imgName = dirPathSegments.pop();  //remove last element
+          dirPath = dirPathSegments.join('/');
+          this.imgPath = dirPath;            
+        }).catch((error)=>{
+          console.log("error in resolving picture url: " + JSON.stringify(error));
+        })
       })
     })
-  })
   }
 
   // Upload image to Firebase Storage
@@ -127,6 +131,7 @@ export class HoEditProfilePage {
   }
 
   editProfile() {
+    var success = true;
     const loading = this.loadingCtrl.create({
       content:'Updating profile...'
     });
@@ -146,6 +151,9 @@ export class HoEditProfilePage {
     if (this.userForm.value['email'] != this.oldEmail) {
       this.user.updateEmail(this.userForm.value['email']).catch((error)=>{
         console.log("error in update email: " + JSON.stringify(error));
+      }).catch((error:"auth/email-already-in-use") => {
+        this.showEmailToast();
+        success = false;
       })
     }
     
@@ -164,7 +172,10 @@ export class HoEditProfilePage {
     })
 
     loading.dismiss();
-    this.showToast();
-    this.navCtrl.setRoot('HoprofilePage');
+
+    if (success) {
+      this.showToast();
+      this.navCtrl.setRoot('HoprofilePage');
+    } 
   }
 }

@@ -3,15 +3,11 @@ import { IonicPage, NavController, NavParams,  LoadingController, Slides, AlertC
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import firebase from 'firebase';
 
-import { File } from '@ionic-native/file';
+import { File, FileEntry, Entry } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
 
-// import { HomehoPage } from '../homeho/homeho';
-// import { LoginPage } from '../login/login';
-
 import { AuthProvider } from '../../providers/auth/auth';
-import { CapacityValidator } from '../../validators/capacity';
 
 @IonicPage()
 @Component({
@@ -44,16 +40,16 @@ export class HoregisterPage {
     private filePath: FilePath,
     private toastCtrl: ToastController) {
 		  this.userForm = this.fb.group({
-	 		  'fname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.pattern('[a-zA-Z ]*')])],
-	 		  'lname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.pattern('[a-zA-Z ]*')])],
+	 		  'fname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
+	 		  'lname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
 	 		  'email':[null,Validators.compose([Validators.required, Validators.email])],
 	 		  'password':[null,Validators.compose([Validators.required, Validators.minLength(6), Validators.maxLength(30)])],
 			  'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])]
       });
 
       this.garageForm = this.fb.group({
-        'address':[null,Validators.compose([Validators.required, Validators.minLength(10), Validators.pattern('[a-zA-Z ]*')])],
-        'capacity':[null, CapacityValidator.isValid],
+        'address':[null,Validators.compose([Validators.required, Validators.minLength(10)])],
+        'capacity':[null,Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(4)])],
         'details':['']
      });
 
@@ -139,9 +135,14 @@ export class HoregisterPage {
   chooseFile() {
     this.fileChooser.open().then((url)=>{
       this.filePath.resolveNativePath(url).then((path)=>{
-        this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
+        this.file.resolveLocalFilesystemUrl(path).then((newUrl: Entry)=>{
+          var fileEntry = newUrl as FileEntry;
+          var fileType;
+          fileEntry.file(success => {
+            fileType = success.type;
+          })
+
           this.fileUrl = newUrl;
-          alert(this.fileUrl);
   
           let dirPath = newUrl.nativeURL;
           this.fileName = dirPath;
@@ -149,13 +150,14 @@ export class HoregisterPage {
           dirPathSegments.pop();  //remove last element
           dirPath = dirPathSegments.join('/');
           this.fileDir = dirPath;
-          
-          alert(dirPath);
 
           this.files.push({
             path: this.fileDir,
-            name: this.fileUrl.name
+            name: this.fileUrl.name,
+            type: fileType
           });
+
+          alert(fileType);
         })
       })
     })
@@ -171,9 +173,9 @@ export class HoregisterPage {
     })
   }
 
-  uploadFile(path, name) {
+  uploadFile(path, name, type) {
     this.file.readAsArrayBuffer(path, name).then((buffer)=>{
-      let blob = new Blob([buffer], { type: 'application/pdf' });
+      let blob = new Blob([buffer], { type: type });
 
       let storageHere = firebase.storage();
 
@@ -202,7 +204,7 @@ export class HoregisterPage {
 
   register(){
 	const loading = this.loadingCtrl.create({
-		content:'Getting your location...'
+		content:'Creating account...'
 	});
 
   loading.present(loading);
@@ -215,7 +217,7 @@ export class HoregisterPage {
           await this.upload(buffer, this.imgUrl.name).then((d)=>{
         
             for(var i = 0; i < this.files.length; i++) {
-              this.uploadFile(this.files[i].path, this.files[i].name);
+              this.uploadFile(this.files[i].path, this.files[i].name, this.files[i].type);
             }
           }).catch((error)=>{
             alert("error(2): " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
@@ -228,11 +230,9 @@ export class HoregisterPage {
         this.back();
       })
     })
-        // this.authProvider.setID();
-				
-        loading.dismiss();
-        this.showToast();
-        this.navCtrl.setRoot("LoginPage");
- }
-
+			
+    loading.dismiss();
+    this.showToast();
+    this.navCtrl.setRoot("LoginPage");
+  }
 }
