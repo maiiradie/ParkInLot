@@ -89,10 +89,10 @@ export class CoHomePage {
 	ionViewDidLoad() {
 		this.map = this.initMap();
 		this.getCurrentLocation().subscribe(location => {
-			this.centerLocation(location);
 			this.setDirections(location);		
+			this.centerLocation(location);
+			this.setMarkers();
 		});
-		this.setMarkers();
 	}
 
 	openMenu(evt) {
@@ -180,13 +180,16 @@ export class CoHomePage {
 		});
 
 		this.map.addControl(this.directions, 'top-left');
-
-		this.directions.setOrigin(location.lng + ',' + location.lat);
-
 	}
-
+	
 	setDest(lang, latt){
 		this.directions.setDestination(lang + ',' +latt);
+		alert(JSON.stringify(this.marker));
+		this.marker.remove();
+		alert('after remove: ' + JSON.stringify(this.marker));
+		var hoMarker = new mapboxgl.LngLat(lang,latt);
+		
+		this.addMarker(hoMarker);``
 	}
 
 	initMap(location = new mapboxgl.LngLat(120.5960, 16.4023)) {
@@ -241,11 +244,13 @@ export class CoHomePage {
 		if (location) {
 			this.map.panTo(location);
 			this.addMarker(location);
+			this.directions.setOrigin(location.lng + ',' + location.lat);
 		} else {
 			this.getCurrentLocation().subscribe(currentLocation => {
 				this.map.panTo(currentLocation);
 				this.marker.remove();
 				this.addMarker(currentLocation);
+				this.directions.setOrigin(currentLocation.lng + ',' + currentLocation.lat);
 			});
 		}
 	}
