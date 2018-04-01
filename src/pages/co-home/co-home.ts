@@ -88,10 +88,10 @@ export class CoHomePage {
 
 	ionViewDidLoad() {
 		this.map = this.initMap();
-		this.getCurrentLocation().subscribe(location => {
-			this.centerLocation(location);
-			this.setDirections(location);		
-		});
+		// this.getCurrentLocation().subscribe(location => {
+		// 	this.centerLocation(location);
+		// 	this.setDirections(location);		
+		// });
 		this.setMarkers();
 	}
 

@@ -142,7 +142,7 @@ export class HoHomePage {
     this.afdb.object('requests/' + this.myId).update({
       startTime: Date.now()
     });
-    
+    this.transacData = [];
   }
 
   stopTimer() {
@@ -178,12 +178,31 @@ export class HoHomePage {
       }
       // push database
       x.unsubscribe();
+      this.showPayment(new Date(startDate),endDate,payment)
       this.afdb.object('requests/' + this.myId).update({
         endTime: endDate,
         payment: payment
       });
+      
     });
+    
+    this.transacData = [];
 
+  }
+  //showPayment
+  showPayment(start,end,payment){
+    let confirm = this.alertCtrl.create({    
+      title: 'Payment',  
+      subTitle: 'Start time: ' + start + 'End time: ' + end + 'Amount: P' + payment,
+      buttons: [                {
+        text: 'Finish',
+        handler: () => {
+          this.transfer(this.myId);
+        }
+      },]
+  });
+  confirm.present();
+  this.transacData = [];
   }
   transfer(hoID){
     var temp ;
