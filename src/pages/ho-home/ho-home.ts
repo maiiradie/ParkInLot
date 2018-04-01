@@ -50,7 +50,7 @@ export class HoHomePage {
 
       this.fcm.onNotification().subscribe(data => {
 
-        this.afdb.object<any>('profile/' + data.coID).valueChanges().subscribe(codata => {          
+        this.afdb.object<any>('profile/' + data.coID).valueChanges().subscribe(codata => {
           var fname, lname, platenumber: any;
           fname = codata.fname;
           lname = codata.lname;
@@ -72,7 +72,7 @@ export class HoHomePage {
                 {
                   text: 'Accept',
                   handler: () => {
-                    this.requestProvider.acceptRequest(data.coID, data.hoID);                    
+                    this.requestProvider.acceptRequest(data.coID, data.hoID);
                   }
                 }
               ]
@@ -83,14 +83,14 @@ export class HoHomePage {
       });
     });
 
-    
 
-    var x = this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
-      this.transacData.push(data);      
+
+    var x = this.afdb.object(`requests/` + this.myId).snapshotChanges().subscribe(data => {
+      this.transacData.push(data);
       this.afdb.object('profile/' + data.payload.val().coID).valueChanges()
-      .subscribe( profileData => {
+        .subscribe(profileData => {
           this.hoProfile = profileData;
-      });
+        });
     });
 
     menuCtrl.enable(true);
@@ -120,19 +120,19 @@ export class HoHomePage {
   }
 
   openMenu(evt) {
-    if(evt === "Ho-Menu"){
-       this.menuCtrl.enable(true, 'Ho-Menu');
-       this.menuCtrl.enable(false, 'Co-Menu');
-    }else if(evt === "Co-Menu"){
-       this.menuCtrl.enable(false, 'Ho-Menu');
-       this.menuCtrl.enable(true, 'Co-Menu');
+    if (evt === "Ho-Menu") {
+      this.menuCtrl.enable(true, 'Ho-Menu');
+      this.menuCtrl.enable(false, 'Co-Menu');
+    } else if (evt === "Co-Menu") {
+      this.menuCtrl.enable(false, 'Ho-Menu');
+      this.menuCtrl.enable(true, 'Co-Menu');
     }
     this.menuCtrl.toggle();
   }
 
   toParked(transacId: string) {
-    
-    this.afdb.object('requests/' +this.myId).update({ 
+
+    this.afdb.object('requests/' + this.myId).update({
       motionStatus: "parked"
     });
     this.transacData = [];
@@ -142,7 +142,13 @@ export class HoHomePage {
     this.afdb.object('requests/' + this.myId).update({
       startTime: Date.now()
     });
+<<<<<<< HEAD
     this.transacData = [];
+=======
+
+    this.transacData = [];
+
+>>>>>>> 5e589413ff18be125cebe02eb9e6b2ddc0dc3bb4
   }
 
   stopTimer() {
@@ -185,6 +191,7 @@ export class HoHomePage {
       });
       
     });
+<<<<<<< HEAD
     
     this.transacData = [];
 
@@ -206,17 +213,23 @@ export class HoHomePage {
   }
   transfer(hoID){
     var temp ;
+=======
+    this.transacData = [];
+  }
+  transfer(hoID) {
+    var temp;
+>>>>>>> 5e589413ff18be125cebe02eb9e6b2ddc0dc3bb4
     var x = this.afdb.object<any>('requests/' + this.myId).valueChanges().subscribe(data => {
       temp = data;
       console.log(data);
       x.unsubscribe();
-      this.afdb.list('transactions/' +hoID).push(temp);
+      this.afdb.list('transactions/' + hoID).push(temp);
       this.afdb.object<any>('requests/' + this.myId).set({
         coId: "",
         reqStatus: "",
         status: ""
       })
     })
+    this.transacData = [];
   }
-
 }
