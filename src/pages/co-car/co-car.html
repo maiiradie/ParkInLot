@@ -1,7 +1,7 @@
 <ion-content parallax-header no-bounce class="bg-modal transparent-header">
   <ion-header>
       <ion-navbar>
-          <ion-buttons start>
+          <ion-buttons start left>
               <button ion-button menuToggle>
                 <ion-icon name="menu"></ion-icon>
               </button>
@@ -13,7 +13,6 @@
   <div class="main-content" text-wrap text-center>
     <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="!imgName">
       <img [src]="imgName" class="rec" *ngIf="imgName">
-      <h2>{{userData?.fname}} {{userData?.lname}}</h2>
       <hr>
       <ion-list no-lines>
           <ion-item>
