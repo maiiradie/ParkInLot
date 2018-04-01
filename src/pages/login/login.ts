@@ -134,6 +134,7 @@ export class LoginPage {
     } else {
       this.showToastFields();
     }
+    loading.dismiss();
   }
   
   register(){
