@@ -1,18 +1,19 @@
-<ion-menu [content]="content" id="Ho-Menu">
-    <ion-header>
-        <ion-toolbar>
-            <ion-title>Menu</ion-title>
-        </ion-toolbar>
-    </ion-header>
+<ion-menu [content]="content" id="Ho-Menu" class="menu-material" [swipeEnabled]="false">
+    <ion-content> 
+        <div class="menu-header">
+            <img src="./assets/imgs/avatar.jpg" class="user-avatar round" *ngIf="!imgName">
+            <img class="user-avatar round" [src]="imgName" *ngIf="imgName"/>
+            <p class="name">{{profileData?.fname}} {{profileData?.lname}}</p>
+            <p class="e-mail">{{profileData?.email}}</p> 
+        </div>   
 
-    <ion-content>  
-        <ion-list>
+        <ion-list no-lines>
             <button ion-item menuClose (click)="openPage('HoHomePage')">
                 <ion-icon item-start name="home" [color]="isActive('HoHomePage')"></ion-icon>
                 Home
             </button>
             <button ion-item menuClose (click)="openPage('HoprofilePage')">
-                <ion-icon item-start name="contact" [color]="isActive('HoprofilePage')"></ion-icon>
+                <ion-icon item-start name="contact" [color]="isActive('HoProfilePage')"></ion-icon>
                 Profile
             </button>
             <button ion-item menuClose (click)="openPage('HoGaragePage')">
@@ -20,7 +21,7 @@
                 Garage
             </button>
             <button ion-item menuClose (click)="openPage('HoTransacHistoryPage')">
-                <ion-icon item-start name="cash" [color]="isActive('HoTransacHistoryPage')"></ion-icon>
+                <ion-icon item-start name="bookmarks" [color]="isActive('HoTransacHistoryPage')"></ion-icon>
                 Transaction
             </button>
             <button ion-item menuClose (click)="logout()">
@@ -33,15 +34,15 @@
 
 
 
-<ion-menu [content]="content"  id="Co-Menu">
-    <ion-header>
-        <ion-navbar>
-          <ion-title>Menu</ion-title>
-        </ion-navbar>
-      </ion-header>
+<ion-menu [content]="content"  id="Co-Menu" class="menu-material" [swipeEnabled]="false">
     <ion-content>
-            <ion-content>  
-                    <ion-list>
+        <div class="menu-header">
+            <!-- <img src="./assets/imgs/avatar.jpg" class="user-avatar round" *ngIf="!imgName"> -->
+            <img class="user-avatar round" [src]="imgName"/>
+            <p class="name">{{profileData?.fname}} {{profileData?.lname}}</p>
+            <p class="e-mail">{{profileData?.email}}</p> 
+        </div>     
+                    <ion-list no-lines>
                         <button ion-item menuClose (click)="openPage('CoHomePage')">
                             <ion-icon item-start name="home" [color]="isActive('CoHomePage')"></ion-icon>
                             Home
@@ -51,11 +52,11 @@
                             Profile
                         </button>
                         <button ion-item menuClose (click)="openPage('CoCarPage')">
-                            <ion-icon item-start name="wine" [color]="isActive('CoCarPage')"></ion-icon>
+                            <ion-icon item-start name="car" [color]="isActive('CoCarPage')"></ion-icon>
                             Car
                         </button>
                         <button ion-item menuClose (click)="openPage('CoTransacHistoryPage')">
-                            <ion-icon item-start name="cash" [color]="isActive('CoTransacHistoryPage')"></ion-icon>
+                            <ion-icon item-start name="bookmarks" [color]="isActive('CoTransacHistoryPage')"></ion-icon>
                             Transaction
                         </button>
                         <button ion-item menuClose (click)="logout()">
@@ -63,7 +64,7 @@
                             Logout
                         </button>
                     </ion-list>           
-                </ion-content>
+               
     </ion-content>
 </ion-menu>
 

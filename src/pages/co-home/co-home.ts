@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, LoadingController, ActionSheetController,IonicPage, Platform, AlertController, MenuController } from 'ionic-angular';
+import { NavController, LoadingController, ActionSheetController, IonicPage, Platform, AlertController, MenuController } from 'ionic-angular';
 import * as mapboxgl from 'mapbox-gl';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Observable } from 'rxjs/Observable';
@@ -13,10 +13,8 @@ import { ComoredetailsPage } from '../comoredetails/comoredetails';
 import { FCM } from '@ionic-native/fcm';
 import { RequestProvider } from '../../providers/request/request';
 import { AngularFireAuth } from 'angularfire2/auth';
-	
-declare var FCMPlugin;
-	
 
+declare var FCMPlugin;
 
 @IonicPage()
 @Component({
@@ -32,92 +30,92 @@ export class CoHomePage {
 	public hoMarkers;
 
 	//private authProvider:AuthProvider,
-	constructor(private afAuth:AngularFireAuth,
-		private afdb: AngularFireDatabase, 
-		statusBar: StatusBar, 
+	constructor(private afAuth: AngularFireAuth,
+		private afdb: AngularFireDatabase,
+		statusBar: StatusBar,
 		splashScreen: SplashScreen,
 		private requestProvider: RequestProvider,
-		private alertCtrl: AlertController, 
-		private fcm: FCM, 
+		private alertCtrl: AlertController,
+		private fcm: FCM,
 		platform: Platform,
-		public actionSheetCtrl: ActionSheetController, 
-		private geolocation: Geolocation, 
-		public navCtrl: NavController, 
+		public actionSheetCtrl: ActionSheetController,
+		private geolocation: Geolocation,
+		public navCtrl: NavController,
 		public loadingCtrl: LoadingController,
 		private menuCtrl: MenuController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
 		platform.ready().then(() => {
-			this.requestProvider.saveToken();	
+			this.requestProvider.saveToken();
 			this.fcm.onNotification().subscribe(data => {
-  
-			  if (data.wasTapped) {
-				  if (data.status == 'declined') {
-					  alert('Your request has been declined.');
-				  } else if (data.status == 'accepted') {
-					  alert('Your request has been accepted.');
-					  this.navCtrl.pop()
-					  .then( () => {
-						  this.setDest(data.lang, data.latt);
-					  });
-				  } else {
-					  alert('Something went wrong with the request.')
-				  }
-			  } else {
-				  if (data.status == 'declined') {
-					  alert('Your request has been declined.');
-				  } else if (data.status == 'accepted') {
-					  alert('Your request has been accepted.');
-					  this.navCtrl.pop()
-					  .then( () => {
-						  this.setDest(data.lang, data.latt);
-					  });
-				  } else {
-					  alert('Something went wrong with the request.')
-				  }
-  
-			  };
+
+				if (data.wasTapped) {
+					if (data.status == 'declined') {
+						alert('Your request has been declined.');
+					} else if (data.status == 'accepted') {
+						alert('Your request has been accepted.');
+						this.navCtrl.pop()
+							.then(() => {
+								this.setDest(data.lang, data.latt);
+							});
+					} else {
+						alert('Something went wrong with the request.')
+					}
+				} else {
+					if (data.status == 'declined') {
+						alert('Your request has been declined.');
+					} else if (data.status == 'accepted') {
+						alert('Your request has been accepted.');
+						this.navCtrl.pop()
+							.then(() => {
+								this.setDest(data.lang, data.latt);
+							});
+					} else {
+						alert('Something went wrong with the request.')
+					}
+
+				};
 			});
-  
+
 			statusBar.styleDefault();
 			splashScreen.hide();
-		  });
+		});
 
-		  menuCtrl.enable(true);
+		menuCtrl.enable(true);
 
 	}
 
 	ionViewDidLoad() {
 		this.map = this.initMap();
 	}
-	
-	ionViewDidEnter() {
+
+	ionViewDidEnter(){
 		this.getCurrentLocation().subscribe(location => {
-			this.setDirections(location);		
+			this.setDirections(location);
 			this.centerLocation(location);
 			this.setMarkers();
 		});
 	}
 
 	openMenu(evt) {
-		if(evt === "Ho-Menu"){
-		   this.menuCtrl.enable(true, 'Ho-Menu');
-		   this.menuCtrl.enable(false, 'Co-Menu');
-		}else if(evt === "Co-Menu"){
-		   this.menuCtrl.enable(false, 'Ho-Menu');
-		   this.menuCtrl.enable(true, 'Co-Menu');
+		if (evt === "Ho-Menu") {
+			this.menuCtrl.enable(true, 'Ho-Menu');
+			this.menuCtrl.enable(false, 'Co-Menu');
+		} else if (evt === "Co-Menu") {
+			this.menuCtrl.enable(false, 'Ho-Menu');
+			this.menuCtrl.enable(true, 'Co-Menu');
 		}
 		this.menuCtrl.toggle();
 	}
 
 	setMarkers() {
-		
+
 		const arr = [];
 		var map = this.map;
 		this.afdb.list('location').snapshotChanges().subscribe(data => {
 			for (var a = 0; a < data.length; a++) {
 				arr.push(data[a]);
 			}
-			
+
 			const popup = new mapboxgl.Popup();
 
 			for (var i = 0; i < arr.length; i++) {
@@ -130,7 +128,7 @@ export class CoHomePage {
 					.setLngLat(coords)
 					.setPopup(popup)
 					.addTo(map);
-				
+
 				el.addEventListener('click', (e) => {
 					var tmp = e.srcElement.id;
 					let actionSheet = this.actionSheetCtrl.create({
@@ -141,17 +139,17 @@ export class CoHomePage {
 								text: 'Request',
 								role: 'destructive',
 								handler: () => {
-								console.log('Destructive clicked');
-									
+									console.log('Destructive clicked');
+
 								}
 							}, {
 								text: 'More Details',
 								handler: () => {
-									this.navCtrl.push(ComoredetailsPage,{key: tmp})
-									.then( () => {
-										popup.remove();		
-									})
-									
+									this.navCtrl.push("ComoredetailsPage", { key: tmp })
+										.then(() => {
+											popup.remove();
+										})
+
 								}
 							}, {
 								text: 'Cancel',
@@ -165,11 +163,11 @@ export class CoHomePage {
 					});
 					actionSheet.present();
 				});
-			}	
+			}
 		});
 
 	}
-	
+
 
 	setDirections(location) {
 		this.directions = new MapboxDirections({
@@ -177,19 +175,19 @@ export class CoHomePage {
 			interactive: false,
 			controls: {
 				inputs: false,
-				profileSwitcher:false,
+				profileSwitcher: false,
 				instructions: false
 			}
 		});
 
 		this.map.addControl(this.directions, 'top-left');
 	}
-	
-	setDest(lang, latt){
-		this.directions.setDestination(lang + ',' +latt);
+
+	setDest(lang, latt) {
+		this.directions.setDestination(lang + ',' + latt);
 		this.marker.remove();
-		var hoMarker = new mapboxgl.LngLat(lang,latt);
-		
+		var hoMarker = new mapboxgl.LngLat(lang, latt);
+
 		this.addMarker(hoMarker);
 	}
 
@@ -215,8 +213,11 @@ export class CoHomePage {
 
 		loading.present(loading);
 
+		setTimeout(() => {
+			loading.dismiss();
+		}, 5000);
 		let options = {
-			// timeout: 100000,
+			// timeout: 100000,f
 			enableHighAccuracy: true
 		};
 

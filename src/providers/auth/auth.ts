@@ -71,22 +71,28 @@ export class AuthProvider {
       });
   }
 
-  registerCarOwner(form) {
-    return this.afs.auth.createUserWithEmailAndPassword(form.email, form.password)
-      .then((user) => {
+  registerCarOwner(uForm, cForm, img){
+    return this.afs.auth.createUserWithEmailAndPassword(uForm.email,uForm.password)
+     .then((user) => {
         this.afdb.object(`profile/${user.uid}`).set({
-          fname: form.fname,
-          lname: form.lname,
-          email: form.email,
-          mobile: form.mobile,
-          carowner: true,
-          created_at: Date.now()
+           fname:uForm.fname,
+           lname:uForm.lname,
+           email:uForm.email,
+           mobile:uForm.mobile,
+           carowner:true,
+           plateNumber:cForm.plateno,
+           carmodel:cForm.carmodel,
+           carPic:img,
+           profPic:null,
+           reg_status:"pending",
+           created_at:Date.now()
         });
-      })
-      .catch((err) => {
+     })
+     .catch((err) => {
         console.log(err);
-      });
-  }
+     });
+   }
+ 
 
   locateHO() {
     let options = {

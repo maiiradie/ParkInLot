@@ -1,3 +1,42 @@
 page-ho-garage {
-
+	.header-image {
+        background-image: url("../assets/imgs/TopBck2.png");
+        height: 30vh;
+        background-size: cover;
+        background-position: center center;
+        position: relative;
+        z-index: -1;
+    }
+    .title {
+    	color: white;
+	    font-weight: 500;
+	    margin-left: auto;
+	    margin-right: auto;
+    }
+    .main-content {
+        margin-top: -20px;
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 20px;
+        background-color: white;
+        -webkit-box-shadow: 0px 0px 55px -16px rgba(0, 0, 0, 0.75);
+        -moz-box-shadow: 0px 0px 55px -16px rgba(0, 0, 0, 0.75);
+        box-shadow: 0px 0px 55px -16px rgba(0, 0, 0, 0.75);
+        // background: #F5F5F5;
+        position: relative !important;
+    }
+    .rec {
+        width: 300px;
+        height: 200px;
+        position: inherit;
+        border: solid white;
+        background-size: 100%;
+        margin-top: -70px;
+        margin-left: auto;
+        margin-right: auto;
+        // margin-bottom: 50px;
+    }
+    ion-title {
+        color: white;
+    }
 }

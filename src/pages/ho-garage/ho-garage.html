@@ -1,18 +1,20 @@
-<ion-content class="transparent-header">
-    <ion-header>
+<ion-content parallax-header no-bounce class="bg-modal transparent-header">
+  <ion-header>
       <ion-navbar>
-        <ion-buttons start>
-          <button ion-button menuToggle>
-            <ion-icon name="menu"></ion-icon>
-          </button>
-        </ion-buttons>
-        <ion-title>Garage</ion-title>
+          <ion-buttons start left>
+              <button ion-button menuToggle>
+                <ion-icon name="menu"></ion-icon>
+              </button>
+            </ion-buttons>
+          <ion-title>Garage</ion-title>
       </ion-navbar>
     </ion-header>
-    
-    <img [src]="imgName">
-  
-    <div class="details">
+  <div class="header-image"></div>
+  <div class="main-content" text-wrap text-center>
+    <!-- <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="!imgName"> -->
+      <img [src]="imgName" class="rec">
+      <!-- <h2>{{userData?.fname}} {{userData?.lname}}</h2> -->
+      <hr>
       <ion-list no-lines text-wrap>
         <ion-item>
           <ion-icon name="pin" color="secondary"  item-start></ion-icon>
@@ -36,5 +38,5 @@
       <button ion-button block color="secondary" (click)="editGarage()">
         Edit Garage
       </button>
-    </div>
-  </ion-content>
+  </div>
+</ion-content>

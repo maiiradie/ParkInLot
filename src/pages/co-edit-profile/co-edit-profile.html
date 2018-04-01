@@ -1,18 +1,54 @@
-<!--
-  Generated template for the CoEditProfilePage page.
+<ion-content parallax-header no-bounce class="transparent-header bg-modal">
+  <ion-header>
+    <ion-navbar>
+      <ion-title>Edit Profile</ion-title>
+    </ion-navbar>
+  </ion-header>
+  
+  <div class="bg"></div>
+  <div padding class="info">
+    <img [src]="imgUrl" class="circular">
+    <button type="button" ion-button block clear (click)="changeImg()">Change Photo</button>
+    <br>
+      
+    <form [formGroup]='userForm' (ngSubmit)="editProfile()">
+      <ion-list-header>
+        Personal Details  
+      </ion-list-header>
+  
+      <ion-list>
+        <ion-item>
+          <ion-label stacked>First Name</ion-label>  
+          <ion-input type="text" formControlName = 'fname' value="{{profileData?.fname}}"></ion-input>
+        </ion-item>
+  
+        <ion-item>
+          <ion-label stacked>Last Name</ion-label> 
+          <ion-input type="text" formControlName = 'lname' value="{{profileData?.lname}}"></ion-input>
+        </ion-item>   
+  
+        <ion-item>
+          <ion-label stacked>Mobile Number</ion-label>
+          <ion-input type="number" formControlName = 'mobile' value="{{profileData?.mobile}}"></ion-input>
+        </ion-item> 
+        <br>
+        <br>
+  
+        <ion-list-header>
+          Account Settings  
+        </ion-list-header>
 
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
-<ion-header>
-
-  <ion-navbar>
-    <ion-title>Edit Profile</ion-title>
-  </ion-navbar>
-
-</ion-header>
-
-
-<ion-content padding>
-
+        <ion-item>
+          <ion-label stacked>Email</ion-label>
+          <ion-input type="email" formControlName = 'email' value="{{profileData?.email}}"></ion-input>
+        </ion-item> 
+  
+        <ion-item>
+          <ion-label stacked>New Password</ion-label>
+          <ion-input type="password" formControlName = 'password'></ion-input>
+        </ion-item>
+      </ion-list>    
+      <button ion-button block type="submit" [disabled]='!userForm.valid' class="save">Save Changes</button>
+    </form>
+  </div>
 </ion-content>
