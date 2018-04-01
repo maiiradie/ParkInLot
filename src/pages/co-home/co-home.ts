@@ -88,6 +88,9 @@ export class CoHomePage {
 
 	ionViewDidLoad() {
 		this.map = this.initMap();
+	}
+	
+	ionViewDidEnter() {
 		this.getCurrentLocation().subscribe(location => {
 			this.setDirections(location);		
 			this.centerLocation(location);
@@ -162,7 +165,7 @@ export class CoHomePage {
 					});
 					actionSheet.present();
 				});
-			}
+			}	
 		});
 
 	}
@@ -173,7 +176,7 @@ export class CoHomePage {
 			accessToken: mapboxgl.accessToken,
 			interactive: false,
 			controls: {
-				inputs: true,
+				inputs: false,
 				profileSwitcher:false,
 				instructions: false
 			}
@@ -184,12 +187,10 @@ export class CoHomePage {
 	
 	setDest(lang, latt){
 		this.directions.setDestination(lang + ',' +latt);
-		alert(JSON.stringify(this.marker));
 		this.marker.remove();
-		alert('after remove: ' + JSON.stringify(this.marker));
 		var hoMarker = new mapboxgl.LngLat(lang,latt);
 		
-		this.addMarker(hoMarker);``
+		this.addMarker(hoMarker);
 	}
 
 	initMap(location = new mapboxgl.LngLat(120.5960, 16.4023)) {
@@ -198,7 +199,7 @@ export class CoHomePage {
 			container: 'map',
 			style: 'mapbox://styles/mapbox/streets-v10',
 			center: location,
-			zoom: 16,
+			zoom: 15,
 			attributionControl: false,
 		});
 

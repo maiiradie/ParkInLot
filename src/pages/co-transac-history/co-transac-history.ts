@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { AngularFireAuth } from 'angularfire2/auth';
+import { AngularFireDatabase } from 'angularfire2/database';
 
 /**
  * Generated class for the CoTransacHistoryPage page.
@@ -15,11 +17,24 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class CoTransacHistoryPage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  transactions; 
+
+  constructor(private afs: AngularFireAuth, private afdb: AngularFireDatabase, public navCtrl: NavController, public navParams: NavParams) {
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad CoTransacHistoryPage');
+    this.getTransactions();
+  }
+
+  getTransactions(){
+    var id = this.afs.auth.currentUser.uid;
+    this.afdb.list('transactions', ref => ref.orderByChild('coID').equalTo(id)).valueChanges()
+    .subscribe( data => {
+      alert(id);
+      this.transactions = data;
+      alert(JSON.stringify(data));
+    }); 
   }
 
 }

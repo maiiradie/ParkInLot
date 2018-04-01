@@ -206,11 +206,12 @@ export class HoHomePage {
   }
   transfer(hoID){
     var temp ;
+    alert('pumasok sa transfer');
     var x = this.afdb.object<any>('requests/' + this.myId).valueChanges().subscribe(data => {
       temp = data;
-      console.log(data);
+      temp.hoID = hoID;
       x.unsubscribe();
-      this.afdb.list('transactions/' +hoID).push(temp);
+      this.afdb.list('transactions/').push(temp);
       this.afdb.object<any>('requests/' + this.myId).set({
         coId: "",
         reqStatus: "",

@@ -14,6 +14,13 @@
         </ion-buttons> 
     <ion-title>Transaction History</ion-title>
   </ion-navbar>
+  <ion-list>
+     <!-- (click)="itemSelected(item) -->
+    <button ion-item *ngFor="let item of transactions">
+      {{ item.coID }}
+       {{ item.status }}
+    </button>
+  </ion-list>
 
 </ion-header>
 
