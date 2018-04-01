@@ -91,6 +91,14 @@ page-horegister {
     border-bottom: 2px solid white !important;
     box-shadow: none !important;
   }
+  .invalid {
+    border-bottom-color: #f53d3d !important;
+  }
+  .invalidMsg {
+    // background-color: rgba(255, 179, 179, .6) !important;
+    font-size: 0.7em;
+    color: #f53d3d !important;
+  }
   //
   .login-button {
     width: 100%;
@@ -142,4 +150,3 @@ page-horegister {
     color: #404040;
   }
 }
-

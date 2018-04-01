@@ -1,3 +1,38 @@
 page-co-edit-profile {
-
+	ion-label {
+        color: #808080;
+    }
+    .save {
+        color: white !important;
+    }
+    .circular {
+        width: auto;
+        height: 100px;
+        position: inherit;
+        border-radius: 50%;
+        -webkit-border-radius: 150px;
+        -moz-border-radius: 150px;
+        border: solid white;
+        background-size: 100%;
+        margin: auto;
+        display: block;
+    }
+    .bg {
+        background-image: url("../assets/imgs/TopBck2.png");
+        height: 35vh;
+        background-size: cover;
+        background-position: center center;
+        position: relative;
+        z-index: -1;
+    }
+    .info {
+        margin-top: -28vh;
+        margin-left: 10px;
+        margin-right: 10px;
+        padding: 20px;
+        position: relative !important;
+        button {
+            color: #404040;
+        }
+    }
 }

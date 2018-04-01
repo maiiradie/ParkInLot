@@ -6,7 +6,6 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 // import { CoregisterPage } from '../pages/coregister/coregister';
 // import { HoregisterPage } from '../pages/horegister/horegister';
 // import { ProfilePage } from '../pages/profile/profile';
-import { AuthProvider } from '../providers/auth/auth'; 
 
 import { HoHomePage }  from '../pages/ho-home/ho-home';
 import { HoprofilePage }  from '../pages/hoprofile/hoprofile';
@@ -17,6 +16,16 @@ import { CoHomePage } from '../pages/co-home/co-home';
 import { CoEditProfilePage } from '../pages/co-edit-profile/co-edit-profile';
 import { CoCarPage } from '../pages/co-car/co-car';
 import { CoTransacHistoryPage } from '../pages/co-transac-history/co-transac-history';
+
+import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireAuth } from 'angularfire2/auth';
+import { AuthProvider } from '../providers/auth/auth';
+import firebase from 'firebase';
+
+import 'rxjs/add/operator/take';
+
+import { Profile } from '../models/profile';
+import { LoginPage } from '../pages/login/login';
 
 // import { EditProfilePage } from '../pages/edit-profile/edit-profile';
 // import { GaragePage } from '../pages/garage/garage';
@@ -30,13 +39,66 @@ export class MyApp {
   rootPage: any = "LoginPage";
   // rootPage: any = "MenuPage";
   @ViewChild(Nav) nav: Nav;
-  constructor(private menuCtrl: MenuController, private authProvider: AuthProvider, platform: Platform, statusBar: StatusBar, splashScreen: SplashScreen) {
+
+  profileData: any;
+  public imgName;
+  private userId;
+  private loggedIn;
+
+  constructor(private menuCtrl: MenuController,
+    private authProvider: AuthProvider,
+    private afdb: AngularFireDatabase, 
+    private afs: AngularFireAuth,
+    platform: Platform,
+    statusBar: StatusBar,
+    splashScreen: SplashScreen) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
+
+      this.checkUser();
+      this.menuCtrl.swipeEnable(false);
+      var user = firebase.auth().currentUser;
+
+      if (user) {
+        this.authProvider.getUser().subscribe((data)=>{
+          if (data.reg_status === "approved") {
+            if (data.carowner) {
+              this.rootPage = CoHomePage;
+            } else if(data.homeowner){
+              this.rootPage = HoHomePage;
+            }
+          }
+
+      //     var userId = this.authProvider.setID();
+
+      //     this.afdb.object(`/profile/` + userId).valueChanges().subscribe( data => {
+      //       this.profileData = data;
+      //       this.retrieveImg();
+      //     });
+      //   })
+      // } else {
+      //   this.rootPage = LoginPage;
+      // }
+
+      // this.storage.get('loggedInUser').then((isLoggedIn) => {
+      //   this.loggedIn = isLoggedIn;
+
+      //   if (!this.loggedIn) {
+      //     this.rootPage = LoginPage;
+      //   } else if (this.loggedIn) {
+      //     this.afs.authState.take(1).subscribe( auth => {
+      //       this.afdb.object(`/profile/${auth.uid}`).valueChanges().subscribe( data => {
+      //         this.profileData = data;
+      //         this.retrieveImg();
+      //       });
+          });
+        }
+      // })
     });
+
   // this.pages = [
   //     {title: 'Profile', component: ProfilePage }
   //   ]
@@ -69,6 +131,23 @@ export class MyApp {
     }
   }
 
+  checkUser() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        var userId = this.authProvider.setID();
+
+          this.afdb.object(`/profile/` + userId).valueChanges().subscribe( data => {
+            this.profileData = data;
+            this.retrieveImg();
+          });
+      } else {
+        this.profileData = null;
+        this.imgName = "./assets/imgs/avatar.jpg";
+      }
+    })
+  }
+
+
   openMenu(evt) {
     if(evt === "Ho-Menu"){
        this.menuCtrl.enable(true, 'Ho-Menu');
@@ -80,6 +159,16 @@ export class MyApp {
     this.menuCtrl.toggle();
   }
 
+  retrieveImg() {
+    this.userId = this.authProvider.setID();
+    firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d => {
+      this.imgName = d;
+      console.log(this.imgName);
+    }).catch((error) => {
+      this.imgName = "./assets/imgs/avatar.jpg";
+    })
+ }
+
   logout(){
     this.authProvider.logoutUser()
     .then(() => {
@@ -87,8 +176,8 @@ export class MyApp {
        .then( () => {
           this.nav.setRoot('LoginPage');
        });
-
     });
   }
+  
 }
 

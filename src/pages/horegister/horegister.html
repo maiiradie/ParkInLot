@@ -1,97 +1,119 @@
 <ion-content class="transparent-header">
-		<ion-header>
-			<ion-navbar>
-			</ion-navbar>
-		</ion-header>
-	
-		<ion-slides #slider class="content-slider">
-			<!-- Personal Details -->
-			<ion-slide class="swiper-no-swiping">
-				<div style="padding: 0 32px 32px 32px">
-					<h3>Personal Details</h3>
-					<form [formGroup]='userForm' (ngSubmit)="next()">
-						<ion-list>
-							<ion-item>
-								<ion-input type="text" formControlName = 'fname' placeholder="First Name"></ion-input>
-							</ion-item>
-	
-							<ion-item>
-								<ion-input type="text" formControlName = 'lname' placeholder="Last Name"></ion-input>
-							</ion-item>		
-	
-							<ion-item>
-								<ion-input type="email" formControlName = 'email' placeholder="Email"></ion-input>
-							</ion-item>	
-	
-							<ion-item>
-								<ion-input type="number" formControlName = 'mobile' placeholder="Mobile Number"></ion-input>
-							</ion-item>
-	
-							<ion-item>
-								<ion-input type="password" formControlName = 'password' placeholder="Password"></ion-input>
-							</ion-item>
-						</ion-list>
-						<button ion-button block type="submit" [disabled]='!userForm.valid'>Next</button>
-					</form>
-				</div>
-			</ion-slide>
-			
-			<!-- Garage Details -->
-			<ion-slide class="zoom swiper-no-swiping">
-				<button ion-button clear (click)="back()" class="slide-button">
-					<ion-icon name="arrow-back"></ion-icon>
-					<span class="arrow">Back To Personal Details</span>
-				</button>
-	
-				<div style="padding: 32px">
-					<h3>Garage Details</h3>
-					<form [formGroup]='garageForm' (ngSubmit)="next()">
-						<ion-item>
-							<ion-input type="text" formControlName="address" placeholder="Address"></ion-input>
-						</ion-item>
-	
-						<ion-item>
-							<ion-input type="number" formControlName="capacity" placeholder="Capacity"></ion-input>
-						</ion-item>
-	
-						<ion-item>
-							<ion-textarea formControlName="details" placeholder="Details (optional)"></ion-textarea>
-						</ion-item>
-	
-						<ion-item>
-							<button ion-button block type="button" (click)="choose()">{{caption}}</button>
-							<img [src]="imgName" *ngIf="imgName" id="selImg"/>
-						</ion-item>
-	
-						<button ion-button block type="submit" [disabled]="!garageForm.valid || !imgName">Next</button>
-					</form>
-				</div>
-			</ion-slide>
-		
-			<!-- File Upload -->
-			<ion-slide class="zoom swiper-no-swiping">
-				<button ion-button clear (click)="back()" class="slide-button">
-					<ion-icon name="arrow-back"></ion-icon>
-					<span class="arrow">Back to Garage Details</span>
-				</button>
-	
-				<div style="padding: 32px">
-					<h3>File Upload</h3>
-					<p class="fileUp">Upload Barangay Clearance and a valid ID for verification of your registration.</p>
-					<button ion-button block type="button" (click)="chooseFile()">Add File</button>
-	
+	<ion-header>
+		<ion-navbar>
+		</ion-navbar>
+	</ion-header>
+
+	<ion-slides #slider class="content-slider">
+		<!-- Personal Details -->
+		<ion-slide class="swiper-no-swiping">
+			<div style="padding: 0 32px 32px 32px">
+				<h3>Personal Details</h3>
+				<form [formGroup]='userForm' (ngSubmit)="next()">
 					<ion-list>
-						<ion-item *ngFor="let file of files">
-							<ion-label>{{file.name}}</ion-label>
-							<button ion-button icon-only item-end clear (click)="presentActionSheet(file)">
-								<ion-icon name="more" class="more"></ion-icon>
-							</button>
+						<ion-item>
+							<ion-input type="text" formControlName = 'fname' placeholder="First Name"></ion-input>
 						</ion-item>
+						<p class="invalidMsg" *ngIf="!userForm.controls.fname.valid  && (userForm.controls.fname.touched || submitAttempt)">
+							<!-- <p>Please enter a valid first name.</p> -->
+							Please enter a valid first name.
+						</p>
+
+						<ion-item>
+							<ion-input type="text" formControlName = 'lname' placeholder="Last Name"></ion-input>
+						</ion-item>		
+						<p class="invalidMsg" *ngIf="!userForm.controls.lname.valid  && (userForm.controls.lname.touched || submitAttempt)">
+							Please enter a valid last name.
+						</p>
+
+						<ion-item>
+							<ion-input type="email" formControlName = 'email' placeholder="Email"></ion-input>
+						</ion-item>
+						<p class="invalidMsg" *ngIf="!userForm.controls.email.valid  && (userForm.controls.email.touched || submitAttempt)">
+							Please enter a valid email.
+						</p>
+
+						<ion-item>
+							<ion-input type="number" formControlName = 'mobile' placeholder="Mobile Number"></ion-input>
+						</ion-item>
+						<p class="invalidMsg" *ngIf="!userForm.controls.mobile.valid  && (userForm.controls.mobile.touched || submitAttempt)">
+							Please enter a valid mobile number.
+						</p>
+
+						<ion-item>
+							<ion-input type="password" formControlName = 'password' placeholder="Password (at least 6 characters)"></ion-input>
+						</ion-item>
+						<p class="invalidMsg" *ngIf="!userForm.controls.password.valid  && (userForm.controls.password.touched || submitAttempt)">
+							Please enter a valid password. Password must contain at least 6 characters.
+						</p>
 					</ion-list>
-	
-					<button ion-button block type="submit" (click)="register()" *ngIf="files?.length > 0">Register</button>
-				</div>
-			</ion-slide>
-		</ion-slides>
-	</ion-content>
+					<button ion-button block type="submit" [disabled]='!userForm.valid'>Next</button>
+				</form>
+			</div>
+		</ion-slide>
 		
+		<!-- Garage Details -->
+		<ion-slide class="zoom swiper-no-swiping">
+			<button ion-button clear (click)="back()" class="slide-button">
+				<ion-icon name="arrow-back"></ion-icon>
+				<span class="arrow">Back To Personal Details</span>
+			</button>
+
+			<div style="padding: 32px">
+				<h3>Garage Details</h3>
+				<form [formGroup]='garageForm' (ngSubmit)="next()">
+					<ion-item>
+						<ion-input type="text" formControlName="address" placeholder="Address"></ion-input>
+					</ion-item>
+					<p class="invalidMsg" *ngIf="!garageForm.controls.address.valid  && (garageForm.controls.address.touched || submitAttempt)">
+						Please enter a valid address.
+					</p>
+
+					<ion-item>
+						<ion-input type="number" formControlName="capacity" placeholder="Capacity"></ion-input>
+					</ion-item>
+					<p class="invalidMsg" *ngIf="!garageForm.controls.capacity.valid  && (garageForm.controls.capacity.touched || submitAttempt)">
+						Please enter a valid number. Number must be greater than 0.
+					</p>
+	
+
+					<ion-item>
+						<ion-textarea formControlName="details" placeholder="Details (optional)"></ion-textarea>
+					</ion-item>
+
+					<ion-item>
+						<button ion-button block type="button" (click)="choose()">{{caption}}</button>
+						<img [src]="imgName" *ngIf="imgName" id="selImg"/>
+					</ion-item>
+
+					<button ion-button block type="submit" [disabled]="!garageForm.valid || !imgName">Next</button>
+				</form>
+			</div>
+		</ion-slide>
+	
+		<!-- File Upload -->
+		<ion-slide class="zoom swiper-no-swiping">
+			<button ion-button clear (click)="back()" class="slide-button">
+				<ion-icon name="arrow-back"></ion-icon>
+				<span class="arrow">Back to Garage Details</span>
+			</button>
+
+			<div style="padding: 32px">
+				<h3>File Upload</h3>
+				<p class="fileUp">Upload Barangay Clearance and a valid ID for verification of your registration.</p>
+				<button ion-button block type="button" (click)="chooseFile()">Add File</button>
+
+				<ion-list>
+					<ion-item *ngFor="let file of files">
+						<ion-label>{{file.name}}</ion-label>
+						<button ion-button icon-only item-end clear (click)="presentActionSheet(file)">
+							<ion-icon name="more" class="more"></ion-icon>
+						</button>
+					</ion-item>
+				</ion-list>
+
+				<button ion-button block type="submit" (click)="register()" *ngIf="files?.length > 0">Register</button>
+			</div>
+		</ion-slide>
+	</ion-slides>
+</ion-content>

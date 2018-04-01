@@ -11,6 +11,7 @@ import { FilePath } from '@ionic-native/file-path';
 // import { LoginPage } from '../login/login';
 
 import { AuthProvider } from '../../providers/auth/auth';
+import { CapacityValidator } from '../../validators/capacity';
 
 @IonicPage()
 @Component({
@@ -43,16 +44,16 @@ export class HoregisterPage {
     private filePath: FilePath,
     private toastCtrl: ToastController) {
 		  this.userForm = this.fb.group({
-	 		  'fname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
-	 		  'lname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
+	 		  'fname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.pattern('[a-zA-Z ]*')])],
+	 		  'lname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.pattern('[a-zA-Z ]*')])],
 	 		  'email':[null,Validators.compose([Validators.required, Validators.email])],
 	 		  'password':[null,Validators.compose([Validators.required, Validators.minLength(6), Validators.maxLength(30)])],
 			  'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])]
       });
 
       this.garageForm = this.fb.group({
-        'address':[null,Validators.compose([Validators.required, Validators.minLength(10)])],
-        'capacity':[null,Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(4)])],
+        'address':[null,Validators.compose([Validators.required, Validators.minLength(10), Validators.pattern('[a-zA-Z ]*')])],
+        'capacity':[null, CapacityValidator.isValid],
         'details':['']
      });
 

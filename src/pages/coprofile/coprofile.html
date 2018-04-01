@@ -1,0 +1,47 @@
+<ion-content parallax-header no-bounce class="bg-modal transparent-header">
+	<ion-header>
+    	<ion-navbar>
+        	<ion-buttons start>
+              <button ion-button menuToggle>
+                <ion-icon name="menu"></ion-icon>
+              </button>
+            </ion-buttons>
+        	<ion-title>Profile</ion-title>
+    	</ion-navbar>
+    </ion-header>
+	<div class="header-image"></div>
+	<div class="main-content" text-wrap text-center>
+	    <img src="./assets/imgs/avatar.jpg" class="circular" *ngIf="!imgName">
+	    <img [src]="imgName" class="circular" *ngIf="imgName">
+	    <h2>{{profileData?.fname}} {{profileData?.lname}}</h2>
+	    <hr>
+	    <ion-list no-lines>
+	        <ion-item>
+	            <ion-icon name="contact" color="secondary" item-start></ion-icon>
+	            <p>First Name</p>
+	            <span>{{profileData?.fname}}</span>
+	        </ion-item>
+	        <ion-item>
+	          <ion-icon name="contact" color="secondary" item-start></ion-icon>
+	          <p>Last Name</p>
+	          <span>{{profileData?.lname}}</span>
+	        </ion-item>
+	     
+	        <ion-item>
+	            <ion-icon item-start name="mail" color="secondary"></ion-icon>
+	            <p>Email</p>
+	            <span>{{profileData?.email}}</span>
+	        </ion-item>
+	        <ion-item>
+	          <ion-icon item-start name="call" color="secondary"></ion-icon>
+	          <p>Mobile Number</p>
+	          <span>{{profileData?.mobile}}</span>
+	      </ion-item>
+	    </ion-list>
+	    <hr>
+	    <button ion-button block color="secondary" (click)="editProfile()">
+	      Edit Profile
+	    </button>
+	</div>
+
+</ion-content>
