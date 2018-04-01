@@ -34,6 +34,7 @@
     "@mapbox/mapbox-gl-directions": "^3.1.2",
     "angularfire2": "^5.0.0-rc.6",
     "cordova-android": "6.4.0",
+    "cordova-android-support-gradle-release": "^1.3.0",
     "cordova-browser": "5.0.3",
     "cordova-ios": "4.5.4",
     "cordova-plugin-device": "^2.0.1",
@@ -78,7 +79,10 @@
       "cordova-plugin-ionic-keyboard": {},
       "cordova-plugin-fcm": {},
       "cordova-plugin-inappbrowser": {},
-      "cordova-plugin-file-transfer": {}
+      "cordova-plugin-file-transfer": {},
+      "cordova-android-support-gradle-release": {
+        "ANDROID_SUPPORT_VERSION": "27.0.0"
+      }
     },
     "platforms": [
       "android",

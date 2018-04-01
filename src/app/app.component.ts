@@ -79,5 +79,16 @@ export class MyApp {
     }
     this.menuCtrl.toggle();
   }
+
+  logout(){
+    this.authProvider.logoutUser()
+    .then(() => {
+       this.menuCtrl.close()
+       .then( () => {
+          this.nav.setRoot('LoginPage');
+       });
+
+    });
+  }
 }
 
