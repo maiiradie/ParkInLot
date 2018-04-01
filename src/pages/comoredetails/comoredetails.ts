@@ -11,9 +11,10 @@ import { RequestProvider } from '../../providers/request/request';
 })
 
 export class ComoredetailsPage {
-
-    hoID;
-    profileData:any;
+  hoID;
+  profileData:any;
+  userData:any;
+  public imgName;
 
   constructor(private requestProvider:RequestProvider, private afdb:AngularFireDatabase,public navCtrl: NavController, public navParams: NavParams) {
 
@@ -22,17 +23,30 @@ export class ComoredetailsPage {
   ionViewDidLoad() { 
     this.hoID = this.navParams.get('key');
     this.displayInfo();
+    this.retrieveImg();
   }
 
   displayInfo(){
     this.afdb.object('profile/'+ this.hoID).snapshotChanges().subscribe( data => {
       this.profileData = data.payload.val();
     });
+    this.afdb.object('location/'+ this.hoID).snapshotChanges().subscribe( data => {
+      this.userData = data.payload.val();
+    });
   }
 
   sendRequest(HoToken){
     let coID = this.requestProvider.setID();   
     this.requestProvider.sendRequest(HoToken, coID, this.hoID);
+  }
+
+  retrieveImg() {
+    
+      firebase.storage().ref().child("images/" + this.hoID + "/" + this.profileData.garagePic).getDownloadURL().then(d=>{
+        this.imgName = d;
+      }).catch((error)=>{
+        alert(JSON.stringify(error));
+      })  
   }
 
 }

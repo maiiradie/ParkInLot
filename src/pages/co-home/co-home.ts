@@ -121,6 +121,7 @@ export class CoHomePage {
 				var el = document.createElement('div');
 				el.innerHTML = "mapmarker";
 				el.id = data[i].key;
+				el.className = "mapmarker";
 				var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
 				new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)
