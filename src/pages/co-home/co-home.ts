@@ -16,8 +16,6 @@ import { AngularFireAuth } from 'angularfire2/auth';
 	
 declare var FCMPlugin;
 	
-
-
 @IonicPage()
 @Component({
 	selector: 'page-co-home',
