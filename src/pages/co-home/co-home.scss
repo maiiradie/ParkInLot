@@ -10,4 +10,22 @@ page-co-home {
 		position:absolute;
 		width:100%;
 	}
+
+	.mapmarker{
+		background-image: url('../assets/imgs/open.png');
+
+		background-size: 35px 48px;
+		width: 35px;
+		height: 48px; 
+		cursor: pointer;
+	}
+
+	.carmarker{
+		background-image: url('../assets/imgs/car.png');
+
+		background-size: 60px 30px;
+		width: 60px;
+		height: 30px; 
+		cursor: pointer;
+	}
 }
