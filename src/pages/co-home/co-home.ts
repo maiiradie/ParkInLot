@@ -85,14 +85,15 @@ export class CoHomePage {
 		  menuCtrl.enable(true);
 
 	}
-
-	ionViewDidLoad() {
-		this.map = this.initMap();
+	ionViewDidEnter(){		
 		this.getCurrentLocation().subscribe(location => {
 			this.setDirections(location);		
 			this.centerLocation(location);
 			this.setMarkers();
 		});
+	}
+	ionViewDidLoad() {		
+		this.map = this.initMap();
 	}
 
 	openMenu(evt) {
@@ -144,7 +145,7 @@ export class CoHomePage {
 							}, {
 								text: 'More Details',
 								handler: () => {
-									this.navCtrl.push(ComoredetailsPage,{key: tmp})
+									this.navCtrl.push("ComoredetailsPage",{key: tmp})
 									.then( () => {
 										popup.remove();		
 									})
@@ -201,7 +202,7 @@ export class CoHomePage {
 			zoom: 16,
 			attributionControl: false,
 		});
-
+		
 		return map;
 	}
 
@@ -214,8 +215,11 @@ export class CoHomePage {
 
 		loading.present(loading);
 
+		setTimeout(() => {
+			loading.dismiss();
+		  }, 5000);		
 		let options = {
-			// timeout: 100000,
+			// timeout: 100000,f
 			enableHighAccuracy: true
 		};
 

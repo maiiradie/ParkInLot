@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController,LoadingController } from 'ionic-angular';
 
 // import { RegisterPage } from '../register/register';
 
@@ -28,7 +28,8 @@ export class LoginPage {
     public navParams: NavParams, 
     private afdb:AngularFireDatabase,
     private afs:AngularFireAuth,
-    private toastCtrl:ToastController) {
+    private toastCtrl:ToastController,
+    private loadingCtrl:LoadingController) {
   }
 
   ionViewDidLoad() {
@@ -91,6 +92,12 @@ export class LoginPage {
   }
 
   onSignin(){
+		let loading = this.loadingCtrl.create({
+      content: 'Logging In',
+      dismissOnPageChange:true
+		});
+
+		loading.present(loading);    
     if((this.login.email != null) && (this.login.password != null)) {
       this.authProvider.loginUser(this.login).then(() => {
         this.authProvider.setID();
@@ -98,7 +105,11 @@ export class LoginPage {
           this.x =  this.authProvider.getUser().subscribe((data)=>{
             if (data.reg_status === "approved") {
               if (data.carowner) {
-                this.navCtrl.setRoot("CoHomePage");
+                this.x.unsubscribe()
+                this.navCtrl.setRoot("CoHomePage").then(data => {
+              }, (error) => {
+                  alert(error);
+              });
               } else if(data.homeowner){
                 this.navCtrl.setRoot("HoHomePage");
               }

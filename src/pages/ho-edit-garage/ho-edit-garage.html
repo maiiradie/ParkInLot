@@ -23,7 +23,8 @@
                 <ion-item>
                     <ion-label stacked>Capacity</ion-label> 
                   <ion-input type="number" formControlName = 'capacity' value="{{userData?.capacity}}"></ion-input>
-                </ion-item>		
+                </ion-item>	
+
                 <ion-item>
                     <ion-label stacked>Details</ion-label> 
                     <ion-textarea formControlName = "details" value="{{userData?.details}}"></ion-textarea>
@@ -32,14 +33,5 @@
               <button ion-button block class="save" type="submit" [disabled]='!garageForm.valid'>Save Changes</button>
           </form>
     </div>
-  </ion-content>              </ion-item>		
-              <ion-item>
-                  <ion-label stacked>Details</ion-label> 
-                  <ion-textarea formControlName = "details" value="{{userData?.details}}"></ion-textarea>
-                </ion-item>
-            </ion-list>
-            <button ion-button block type="submit" [disabled]='!garageForm.valid'>Save Changes</button>
-        </form>
-    <!-- </div> -->
   <!-- </div> -->
 </ion-content>
