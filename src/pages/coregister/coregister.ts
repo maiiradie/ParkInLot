@@ -44,16 +44,16 @@ export class CoregisterPage {
    		private transfer: FileTransfer,
 		private toastCtrl: ToastController) {
      	this.userForm = this.fb.group({
-	 	    'fname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30)])],
-	 	    'lname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30)])],
-	 	    'email':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30)])],
-	 	    'password':[null,Validators.compose([Validators.required, Validators.minLength(6), Validators.maxLength(30)])],
-	 	    'mobile':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(11)])],
+	 	    'fname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30), Validators.pattern('[a-zA-Z ]*')])],
+	 	    'lname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30), Validators.pattern('[a-zA-Z ]*')])],
+	 	    'email':[null,Validators.compose([Validators.required, Validators.email])],
+	 	    'password':[null,Validators.compose([Validators.required, Validators.minLength(6)])],
+	 	    'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11), Validators.pattern('[0-9]*')])]
 	    });
 
 	    this.carForm = this.fb.group({
-		    'plateno':[null,Validators.compose([Validators.required, Validators.minLength(7), Validators.maxLength(8)])],
-		    'carmodel':[null,Validators.compose([Validators.required, Validators.minLength(4)])],
+		    'plateno':[null,Validators.compose([Validators.required, Validators.minLength(6), Validators.maxLength(8), Validators.pattern('[a-zA-Z]{3}[0-9]{3,4}')])],
+		    'carmodel':[null,Validators.compose([Validators.required, Validators.minLength(4), Validators.pattern('[a-zA-Z0-9 ]*')])]
 	    });
 
 	    this.files = [];
@@ -177,41 +177,42 @@ export class CoregisterPage {
 
   showToast() {
     let toast = this.toastCtrl.create({
-      message: 'Account was created successfully.',
-			duration: 8000
+      message: 'Account was created successfully. Account is pending for approval from admin.',
+			duration: 3000
     })
     toast.present();
   }
 
   register(){
-	const loading = this.loadingCtrl.create({
-		content:'Logging in...'
-	});
+	  const loading = this.loadingCtrl.create({
+		  content:'Creating account...'
+	  });
 
-	loading.present(loading);
+	  loading.present(loading);
 
-	this.authProvider.registerCarOwner(this.userForm.value, this.carForm.value, this.imgUrl.name).then((d) => {
-			this.userId = this.authProvider.setID();
+	  this.authProvider.registerCarOwner(this.userForm.value, this.carForm.value, this.imgUrl.name).then((d) => {
+		  this.userId = this.authProvider.setID();
 
-			this.file.readAsArrayBuffer(this.imgPath, this.imgUrl.name).then(async (buffer)=>{
-				await this.upload(buffer, this.imgUrl.name).then((d)=>{
+		  this.file.readAsArrayBuffer(this.imgPath, this.imgUrl.name).then(async (buffer)=>{
+			  await this.upload(buffer, this.imgUrl.name).then((d)=>{
 			
-					for(var i = 0; i < this.files.length; i++) {
-						this.uploadFile(this.files[i].path, this.files[i].name);
-					}
-				}).catch((error)=>{
-					alert("error(2): " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
-				})
-			}).catch((err)=> {
-				alert("error(3): " + JSON.stringify(err, Object.getOwnPropertyNames(err)));
-			}).catch((error:"auth/email-already-in-use") => {
-				this.showAlert();
-        this.back();
-			})
-	})
-
-	loading.dismiss();
-    this.showToast();
-    this.navCtrl.setRoot("LoginPage");
+				  for(var i = 0; i < this.files.length; i++) {
+					  this.uploadFile(this.files[i].path, this.files[i].name);
+          }
+          
+          loading.dismiss();
+          this.showToast();
+          this.navCtrl.setRoot("LoginPage");
+			  }).catch((error)=>{
+				  alert("error(2): " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
+			  })
+		  }).catch((err)=> {
+			  alert("error(3): " + JSON.stringify(err, Object.getOwnPropertyNames(err)));
+		  })
+	  }).catch((error:"auth/email-already-in-use") => {
+      loading.dismiss();
+      this.showAlert();
+      this.slider.slideTo(0);
+    })
   }
 }

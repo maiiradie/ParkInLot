@@ -121,6 +121,7 @@ export class LoginPage {
          })
        }
       }).catch((error)=>{
+        loading.dismiss();
         if (error.code === "auth/arguement-error") {
           this.showToastFields();
         } else if (error.code === "auth/invalid-email") {
@@ -132,9 +133,9 @@ export class LoginPage {
         }
       })
     } else {
+      loading.dismiss();
       this.showToastFields();
     }
-    loading.dismiss();
   }
   
   register(){

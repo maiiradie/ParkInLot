@@ -28,7 +28,10 @@ export class HoHomePage {
 
   carStatuses = ['arriving', 'parked'];
 
-  transacData: Array<any> = [];
+  // transacData: Array<any> = [];
+  arrivingData: Array<any> = [];
+  parkedData: Array<any> = [];
+
   userData: any;
   unfiltered: any;
   filtered: any;
@@ -85,13 +88,32 @@ export class HoHomePage {
 
     
 
-    var x = this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
-      this.transacData.push(data);      
+    // var x = this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
+    //   this.transacData.push(data);      
+    //   this.afdb.object('profile/' + data.payload.val().coID).valueChanges()
+    //   .subscribe( profileData => {
+    //       this.hoProfile = profileData;
+    //   });
+    // });
+
+
+    this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
+
+      if(data.payload.val().motionStatus == 'arriving'){
+        this.arrivingData.push(data);      
+
+      } else if(data.payload.val().motionStatus == 'parked'){
+        this.parkedData.push(data);
+        console.log(data.payload.val().startTime);
+      }
+
       this.afdb.object('profile/' + data.payload.val().coID).valueChanges()
       .subscribe( profileData => {
           this.hoProfile = profileData;
       });
+
     });
+
 
     menuCtrl.enable(true);
 
@@ -135,14 +157,17 @@ export class HoHomePage {
     this.afdb.object('requests/' +this.myId).update({ 
       motionStatus: "parked"
     });
-    this.transacData = [];
+    // this.transacData = [];
+    this.arrivingData=[];
+
 
   }
   startTimer() {
     this.afdb.object('requests/' + this.myId).update({
       startTime: Date.now()
     });
-    this.transacData = [];
+    // this.transacData = [];
+    this.parkedData = [];
   }
 
   stopTimer() {
@@ -186,7 +211,8 @@ export class HoHomePage {
       
     });
     
-    this.transacData = [];
+    // this.transacData = [];
+    this.parkedData = [];
 
   }
   //showPayment
@@ -202,7 +228,8 @@ export class HoHomePage {
       },]
   });
   confirm.present();
-  this.transacData = [];
+  // this.transacData = [];
+  this.parkedData = [];
   }
   transfer(hoID){
     var temp ;

@@ -130,8 +130,14 @@ export class HoEditProfilePage {
     })
   }
 
+  // Update password
+  updatePassword() {
+    if (this.userForm.value['password'] != null) {
+      this.user.updatePassword(this.userForm.value['password']);
+    }
+  }
+
   editProfile() {
-    var success = true;
     const loading = this.loadingCtrl.create({
       content:'Updating profile...'
     });
@@ -139,43 +145,32 @@ export class HoEditProfilePage {
     loading.present(loading);
 
     this.user = firebase.auth().currentUser;
-    
-    // Update password
-    if (this.userForm.value['password'] != null) {
-      this.user.updatePassword(this.userForm.value['password']).catch((error)=>{
-        console.log("error in update password: " + JSON.stringify(error));
-      })
-    }
-
-    // Update email
+    // success = this.updateEmail();
     if (this.userForm.value['email'] != this.oldEmail) {
-      this.user.updateEmail(this.userForm.value['email']).catch((error)=>{
-        console.log("error in update email: " + JSON.stringify(error));
-      }).catch((error:"auth/email-already-in-use") => {
-        this.showEmailToast();
-        success = false;
-      })
-    }
-    
-    // Update profile values
-    this.afdb.object(`/profile/` + this.userId).update(this.userForm.value).then(d => {
-      // Update profile picture
-      if (this.imgName != undefined) {
-        this.afdb.object(`/profile/` + this.userId).update({profPic: this.imgName}).then(() => {
-          this.upload(this.imgPath, this.imgName);
+      this.user.updateEmail(this.userForm.value['email']).then(() => {
+        this.updatePassword();
+        
+        // Update profile values
+        this.afdb.object(`/profile/` + this.userId).update(this.userForm.value).then(d => {
+          // Update profile picture
+          if (this.imgName != undefined) {
+            this.afdb.object(`/profile/` + this.userId).update({profPic: this.imgName}).then(() => {
+              this.upload(this.imgPath, this.imgName);
+            }).catch((error)=>{
+              console.log("error in update profile pic value: " + JSON.stringify(error));
+            })     
+          }     
+          
+          loading.dismiss();
+          this.showToast();
+          this.navCtrl.setRoot('HoprofilePage');
         }).catch((error)=>{
-          console.log("error in update profile pic value: " + JSON.stringify(error));
-        })     
-      }     
-    }).catch((error)=>{
-      console.log("error in update profile values: " + JSON.stringify(error));
-    })
-
-    loading.dismiss();
-
-    if (success) {
-      this.showToast();
-      this.navCtrl.setRoot('HoprofilePage');
-    } 
+          console.log("error in update profile values: " + JSON.stringify(error));
+        })
+      }).catch((error: "auth/email-already-in-use")=> {
+        loading.dismiss();
+        this.showEmailToast();
+      })
+    }  
   }
 }

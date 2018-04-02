@@ -40,16 +40,16 @@ export class HoregisterPage {
     private filePath: FilePath,
     private toastCtrl: ToastController) {
 		  this.userForm = this.fb.group({
-	 		  'fname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
-	 		  'lname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
+	 		  'fname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.pattern('[a-zA-Z ]*')])],
+	 		  'lname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.pattern('[a-zA-Z ]*')])],
 	 		  'email':[null,Validators.compose([Validators.required, Validators.email])],
-	 		  'password':[null,Validators.compose([Validators.required, Validators.minLength(6), Validators.maxLength(30)])],
-			  'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])]
+	 		  'password':[null,Validators.compose([Validators.required, Validators.minLength(6)])],
+			  'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11), Validators.pattern('[0-9]*')])]
       });
 
       this.garageForm = this.fb.group({
-        'address':[null,Validators.compose([Validators.required, Validators.minLength(10)])],
-        'capacity':[null,Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(4)])],
+        'address':[null,Validators.compose([Validators.required, Validators.minLength(10), Validators.pattern('[a-zA-Z0-9#- ]*')])],
+        // 'capacity':[null,Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(4)])],
         'details':['']
      });
 
@@ -197,7 +197,7 @@ export class HoregisterPage {
   showToast() {
     let toast = this.toastCtrl.create({
       message: 'Account was created successfully. Account is pending for approval from admin.',
-      duration: 8000
+      duration: 3000
     })
     toast.present();
   }
@@ -209,7 +209,7 @@ export class HoregisterPage {
 
   loading.present(loading);
 
-  	this.authProvider.locateHO().subscribe( location => {
+  	this.authProvider.locateHO().subscribe(location => {
 		  this.authProvider.registerHomeOwner(this.userForm.value,this.garageForm.value,this.imgUrl.name,location).then((d)=>{
         this.userId = this.authProvider.setID();
 
@@ -225,14 +225,15 @@ export class HoregisterPage {
         }).catch((err)=> {
           alert("error(3): " + JSON.stringify(err, Object.getOwnPropertyNames(err)));
         })
-      }).catch((error:"auth/email-already-in-use") => {
+  	
+        loading.dismiss();
+        this.showToast();
+        this.navCtrl.setRoot("LoginPage");
+      }).catch((error) => {
+        loading.dismiss();
         this.showAlert();
-        this.back();
+        this.slider.slideTo(0);
       })
     })
-			
-    loading.dismiss();
-    this.showToast();
-    this.navCtrl.setRoot("LoginPage");
   }
 }

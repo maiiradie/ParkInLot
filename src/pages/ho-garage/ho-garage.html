@@ -11,24 +11,22 @@
     </ion-header>
   <div class="header-image"></div>
   <div class="main-content" text-wrap text-center>
-    <!-- <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="!imgName"> -->
       <img [src]="imgName" class="rec">
-      <!-- <h2>{{userData?.fname}} {{userData?.lname}}</h2> -->
       <hr>
       <ion-list no-lines text-wrap>
         <ion-item>
           <ion-icon name="pin" color="secondary"  item-start></ion-icon>
           <p>Address</p>
-          <span>{{userData?.address}}</span>
+          <span>{{location?.address}}</span>
         </ion-item>
     
-        <ion-item>
+        <!-- <ion-item>
           <ion-icon name="car" color="secondary"  item-start></ion-icon>
           <p>Capacity</p>
           <span>{{userData?.capacity}} cars</span>
-        </ion-item>
+        </ion-item> -->
     
-        <ion-item>
+        <ion-item *ngIf="userData?.details">
           <ion-icon name="paper" color="secondary" item-start></ion-icon>
           <p>Details</p>
           <span>{{userData?.details}}</span>

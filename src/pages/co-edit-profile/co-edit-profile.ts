@@ -70,19 +70,24 @@ export class CoEditProfilePage {
   }
 
   retrieveImg() {
-    try{
-      firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d=>{
-        this.imgUrl = d;
-      });
-    }
-    catch(e){
+    firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d=>{
+      this.imgUrl = d;
+    }).catch(e => {
       this.imgUrl = "./assets/imgs/avatar.jpg";
-    }   
+    })   
   }
 
   showToast() {
     let toast = this.toastCtrl.create({
       message: 'Profile updated successfully.',
+      duration: 3000
+    })
+    toast.present();
+  }
+
+  showEmailToast() {
+    let toast = this.toastCtrl.create({
+      message: 'Cannot update email. Email already taken or used.',
       duration: 3000
     })
     toast.present();
@@ -121,6 +126,13 @@ export class CoEditProfilePage {
     })
   }
 
+  // Update password
+  updatePassword() {
+    if (this.userForm.value['password'] != null) {
+      this.user.updatePassword(this.userForm.value['password']);
+    }
+  }
+
   editProfile() {
     const loading = this.loadingCtrl.create({
       content:'Updating profile...'
@@ -129,38 +141,32 @@ export class CoEditProfilePage {
     loading.present(loading);
 
     this.user = firebase.auth().currentUser;
-    
-    // Update password
-    if (this.userForm.value['password'] != null) {
-      this.user.updatePassword(this.userForm.value['password']).catch((error)=>{
-        console.log("error in update password: " + JSON.stringify(error));
-      })
-    }
-
-    // Update email
+    // success = this.updateEmail();
     if (this.userForm.value['email'] != this.oldEmail) {
-      this.user.updateEmail(this.userForm.value['email']).catch((error)=>{
-        console.log("error in update email: " + JSON.stringify(error));
-      })
-    }
-    
-    // Update profile values
-    this.afdb.object(`/profile/` + this.userId).update(this.userForm.value).then(d => {
-      // Update profile picture
-      if (this.imgName != undefined) {
-        this.afdb.object(`/profile/` + this.userId).update({profPic: this.imgName}).then(() => {
-          this.upload(this.imgPath, this.imgName);
+      this.user.updateEmail(this.userForm.value['email']).then(() => {
+        this.updatePassword();
+        
+        // Update profile values
+        this.afdb.object(`/profile/` + this.userId).update(this.userForm.value).then(d => {
+          // Update profile picture
+          if (this.imgName != undefined) {
+            this.afdb.object(`/profile/` + this.userId).update({profPic: this.imgName}).then(() => {
+              this.upload(this.imgPath, this.imgName);
+            }).catch((error)=>{
+              console.log("error in update profile pic value: " + JSON.stringify(error));
+            })     
+          }     
+          
+          loading.dismiss();
+          this.showToast();
+          this.navCtrl.setRoot('HoprofilePage');
         }).catch((error)=>{
-          console.log("error in update profile pic value: " + JSON.stringify(error));
-        })     
-      }     
-    }).catch((error)=>{
-      console.log("error in update profile values: " + JSON.stringify(error));
-    })
-
-    loading.dismiss();
-    this.showToast();
-    this.navCtrl.setRoot('CoProfilePage');
+          console.log("error in update profile values: " + JSON.stringify(error));
+        })
+      }).catch((error: "auth/email-already-in-use")=> {
+        loading.dismiss();
+        this.showEmailToast();
+      })
+    }  
   }
-
 }

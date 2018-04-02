@@ -11,8 +11,8 @@
     </ion-header>
 	<div class="header-image"></div>
 	<div class="main-content" text-wrap text-center>
-	    <img src="./assets/imgs/avatar.jpg" class="circular" *ngIf="!imgName">
-	    <img [src]="imgName" class="circular" *ngIf="imgName">
+	    <!-- <img src="./assets/imgs/avatar.jpg" class="circular" *ngIf="!imgName"> -->
+	    <img [src]="imgName" class="circular">
 	    <h2>{{profileData?.fname}} {{profileData?.lname}}</h2>
 	    <hr>
 	    <ion-list no-lines>

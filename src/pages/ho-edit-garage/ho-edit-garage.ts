@@ -20,6 +20,7 @@ import 'rxjs/add/operator/take';
 
 export class HoEditGaragePage {
   userData:any;
+  location:any;
   garageForm:FormGroup;
   public imgName;
   public imgUrl;
@@ -40,7 +41,7 @@ export class HoEditGaragePage {
     private toastCtrl: ToastController) {
       this.garageForm = this.fb.group({
         'address':[null,Validators.compose([Validators.required, Validators.minLength(10)])],
-        'capacity':[null,Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(4)])],
+        // 'capacity':[null,Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(4)])],
         'details':['']
      });
   }
@@ -51,6 +52,10 @@ export class HoEditGaragePage {
     this.afdb.object(`/profile/` + this.userId).valueChanges().subscribe( data => {
       this.userData = data;
       this.retrieveImg();
+
+      this.afdb.object(`/location/` + this.userId).valueChanges().subscribe( out => {
+        this.location = out;
+      })
     });
   }
 
@@ -68,7 +73,7 @@ export class HoEditGaragePage {
     this.userId = this.authProvider.setID();
     try{
       firebase.storage().ref().child("images/" + this.userId + "/" + this.userData.garagePic).getDownloadURL().then(d=>{
-        this.imgName = d;
+        this.imgUrl = d;
       });
     }
     catch(e){
@@ -81,12 +86,12 @@ export class HoEditGaragePage {
     this.fileChooser.open().then((url)=>{
       this.filePath.resolveNativePath(url).then((path)=>{
         this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
-          this.imgUrl = newUrl;
+          // this.imgUrl = newUrl;
 
           let dirPath = newUrl.nativeURL;
-          this.imgName = dirPath;
+          this.imgUrl = dirPath;
           let dirPathSegments = dirPath.split('/'); //break string to array
-          dirPathSegments.pop();  //remove last element
+          this.imgName = dirPathSegments.pop();  //remove last element
           dirPath = dirPathSegments.join('/');
           this.imgPath = dirPath;           
         }).catch((e)=>{
@@ -117,12 +122,14 @@ export class HoEditGaragePage {
   
     loading.present(loading);
 
-    this.afs.authState.take(1).subscribe( auth => {
-      this.afdb.object(`/profile/${auth.uid}`).update(this.garageForm.value).then(d => {
-        this.afdb.object(`/profile/${auth.uid}`).update({garagePic: this.imgUrl.name})
-        this.upload(this.imgPath, this.imgUrl.name);
+    // this.afs.authState.take(1).subscribe( auth => {
+      this.afdb.object(`/profile/` + this.userId).update({details: this.garageForm.value['details']}).then(d => {
+        this.afdb.object(`/location/` + this.userId).update({address: this.garageForm.value['address']}).then(d => {
+          this.afdb.object(`/profile/` + this.userId).update({garagePic: this.imgName});
+          this.upload(this.imgPath, this.imgName);
+        })
       })
-    })
+    // })
 
     loading.dismiss();
     this.showToast();
