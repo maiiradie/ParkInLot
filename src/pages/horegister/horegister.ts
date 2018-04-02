@@ -49,7 +49,7 @@ export class HoregisterPage {
 
       this.garageForm = this.fb.group({
         'address':[null,Validators.compose([Validators.required, Validators.minLength(10)])],
-        'capacity':[null,Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(4)])],
+        // 'capacity':[null,Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(4)])],
         'details':['']
      });
 
@@ -209,7 +209,7 @@ export class HoregisterPage {
 
   loading.present(loading);
 
-  	this.authProvider.locateHO().subscribe( location => {
+  	this.authProvider.locateHO().subscribe(location => {
 		  this.authProvider.registerHomeOwner(this.userForm.value,this.garageForm.value,this.imgUrl.name,location).then((d)=>{
         this.userId = this.authProvider.setID();
 
@@ -225,14 +225,15 @@ export class HoregisterPage {
         }).catch((err)=> {
           alert("error(3): " + JSON.stringify(err, Object.getOwnPropertyNames(err)));
         })
-      }).catch((error:"auth/email-already-in-use") => {
+  	
+        loading.dismiss();
+        this.showToast();
+        this.navCtrl.setRoot("LoginPage");
+      }).catch((error) => {
+        loading.dismiss();
         this.showAlert();
-        this.back();
+        this.slider.slideTo(0);
       })
     })
-			
-    loading.dismiss();
-    this.showToast();
-    this.navCtrl.setRoot("LoginPage");
   }
 }

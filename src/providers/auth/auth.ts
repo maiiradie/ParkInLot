@@ -88,9 +88,6 @@ export class AuthProvider {
            created_at:Date.now()
         });
      })
-     .catch((err) => {
-        console.log(err);
-     });
    }
  
 
@@ -122,7 +119,7 @@ export class AuthProvider {
           lname: uForm.lname,
           email: uForm.email,
           mobile: uForm.mobile,
-          capacity: gForm.capacity,
+          // capacity: gForm.capacity,
           details: gForm.details,
           homeowner: true,
           garagePic: img,
@@ -137,9 +134,6 @@ export class AuthProvider {
           });
         });
       })
-      .catch((err) => {
-        console.log(err);
-      });
   }
 
 

@@ -20,10 +20,11 @@
                   <ion-label stacked>Address</ion-label>  
                   <ion-input type="text" formControlName = 'address' value="{{userData?.address}}"></ion-input>
                 </ion-item>
-                <ion-item>
+                
+                <!-- <ion-item>
                     <ion-label stacked>Capacity</ion-label> 
                   <ion-input type="number" formControlName = 'capacity' value="{{userData?.capacity}}"></ion-input>
-                </ion-item>	
+                </ion-item>	 -->
 
                 <ion-item>
                     <ion-label stacked>Details</ion-label> 
@@ -31,13 +32,7 @@
                 </ion-item>
               </ion-list>
               <button ion-button block class="save" type="submit" [disabled]='!garageForm.valid'>Save Changes</button>
-<<<<<<< HEAD
           </form>
     </div>
   <!-- </div> -->
-=======
-          </form>           
-    <!-- </div> -->
-  </div>
->>>>>>> c3a2a52f5ca6d95ab79d4948acb8b8fffcd2d059
 </ion-content>

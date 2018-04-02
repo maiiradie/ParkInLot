@@ -52,7 +52,7 @@ export class CoregisterPage {
 	    });
 
 	    this.carForm = this.fb.group({
-		    'plateno':[null,Validators.compose([Validators.required, Validators.minLength(7), Validators.maxLength(8)])],
+		    'plateno':[null,Validators.compose([Validators.required, Validators.minLength(6), Validators.maxLength(8)])],
 		    'carmodel':[null,Validators.compose([Validators.required, Validators.minLength(4)])],
 	    });
 

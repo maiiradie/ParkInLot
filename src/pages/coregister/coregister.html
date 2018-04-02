@@ -9,7 +9,8 @@
 				<!-- <h1>Personal Details</h1> -->
 			<div style="padding: 0 32px 32px 32px">
 				<h3>Personal Details</h3>
-				<form [formGroup]='userForm' (ngSubmit)="next()">	<ion-list>
+				<form [formGroup]='userForm' (ngSubmit)="next()">	
+					<ion-list>
 						<ion-item>
 							<ion-input type="text" formControlName = 'fname' placeholder="First Name"></ion-input>
 						</ion-item>
@@ -44,7 +45,7 @@
 				<span class="arrow">Back to Personal Details</span>
 			</button>
 			<div style="padding: 32px">
-				<h3>Garage Details</h3>
+				<h3>Car Details</h3>
 				<form [formGroup]='carForm' (ngSubmit)="next()">
 					<ion-item>
 						<ion-input type="text" formControlName="plateno" placeholder="Plate Number"></ion-input>
