@@ -70,15 +70,26 @@
               {{hoProfile?.fname}}
               {{hoProfile?.lname}}
             </h2>
-            <button ion-button (click)="startTimer()">Start Timer</button>
-            <button ion-button (click)="stopTimer()">Stop Timer</button>            
+            <div *ngIf="park?.payload.val().startTime == undefined; else stop">
+                <button ion-button block color="secondary" (click)="startTimer()">Start Timer</button>
+
+            </div>
+
+            <ng-template #stop>
+              <div *ngIf="park?.payload.val().endTime == undefined; else elseTemplate">
+                <button ion-button block color="danger" (click)="stopTimer()">Stop Timer</button>            
+                
+              </div>
+            
+            </ng-template>
+          
           </ion-item>
+          <ng-template #elseTemplate>
+              <h2>No parked</h2>
+            
+          </ng-template>
         </div>
-
-
-
       </ion-list>
-
     <!-- </div> -->
   </div>
 </ion-content>

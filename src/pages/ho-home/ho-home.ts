@@ -99,12 +99,12 @@ export class HoHomePage {
 
     this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
 
-      if(data.payload.val().motionStatus == 'Arriving'){
+      if(data.payload.val().motionStatus == 'arriving'){
         this.arrivingData.push(data);      
 
       } else if(data.payload.val().motionStatus == 'parked'){
         this.parkedData.push(data);
-
+        console.log(data.payload.val().startTime);
       }
 
       this.afdb.object('profile/' + data.payload.val().coID).valueChanges()
