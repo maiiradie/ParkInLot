@@ -53,7 +53,9 @@ export class AuthProvider {
   //Status helper
   updateStatus(status) {
     return this.afdb.object('profile/' + this.userId)
-      .update({ status: status });
+      .update({ 
+        status: status
+      });
   }
 
   //location helper / for markers

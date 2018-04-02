@@ -75,7 +75,7 @@ export class CoHomePage {
 
 				};
 			});
-
+			
 			statusBar.styleDefault();
 			splashScreen.hide();
 		});

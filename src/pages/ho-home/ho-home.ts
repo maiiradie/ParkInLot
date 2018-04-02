@@ -9,6 +9,9 @@ import { AuthProvider } from '../../providers/auth/auth';
 
 import { RequestProvider } from '../../providers/request/request';
 import { FCM } from '@ionic-native/fcm';
+
+import { StatusBar } from '@ionic-native/status-bar';
+import { SplashScreen } from '@ionic-native/splash-screen';
 /**
  * Generated class for the HoHomePage page.
  *
@@ -106,18 +109,8 @@ export class HoHomePage {
           };
         });
       });
+      
     });
-
-    
-
-    // var x = this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
-    //   this.transacData.push(data);      
-    //   this.afdb.object('profile/' + data.payload.val().coID).valueChanges()
-    //   .subscribe( profileData => {
-    //       this.hoProfile = profileData;
-    //   });
-    // });
-
 
     this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
 
@@ -255,7 +248,6 @@ export class HoHomePage {
   }
   transfer(hoID){
     var temp ;
-    alert('pumasok sa transfer');
     var x = this.afdb.object<any>('requests/' + this.myId).valueChanges().subscribe(data => {
       temp = data;
       temp.hoID = hoID;

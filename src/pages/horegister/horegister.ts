@@ -48,7 +48,7 @@ export class HoregisterPage {
       });
 
       this.garageForm = this.fb.group({
-        'address':[null,Validators.compose([Validators.required, Validators.minLength(10), Validators.pattern('[a-zA-Z0-9#- ]*')])],
+        'address':[null,Validators.compose([Validators.required, Validators.minLength(10)])],
         // 'capacity':[null,Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(4)])],
         'details':['']
      });
