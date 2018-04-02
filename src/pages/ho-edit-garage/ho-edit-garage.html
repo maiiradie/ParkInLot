@@ -7,7 +7,7 @@
   
   <div class="bg"></div>
   <div padding class="info">
-    <img [src]="imgName" class="image">
+    <img [src]="imgUrl" class="image">
     <button type="button" ion-button block clear (click)="changeImg()">Change Photo</button>
   
       <!-- <div class="info"> -->
@@ -18,7 +18,7 @@
               <ion-list>
                 <ion-item>
                   <ion-label stacked>Address</ion-label>  
-                  <ion-input type="text" formControlName = 'address' value="{{userData?.address}}"></ion-input>
+                  <ion-input type="text" formControlName = 'address' value="{{location?.address}}"></ion-input>
                 </ion-item>
                 
                 <!-- <ion-item>

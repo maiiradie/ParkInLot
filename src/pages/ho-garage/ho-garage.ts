@@ -7,13 +7,6 @@ import firebase from 'firebase';
 
 import 'rxjs/add/operator/take';
 
-/**
- * Generated class for the HoprofilePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
   selector: 'page-ho-garage',
@@ -21,6 +14,7 @@ import 'rxjs/add/operator/take';
 })
 export class HoGaragePage {
   userData:any;
+  location:any;
   public imgName;
   private userId;
 
@@ -36,6 +30,10 @@ export class HoGaragePage {
       this.afdb.object(`/profile/${auth.uid}`).valueChanges().subscribe( data => {
         this.userData = data;
         this.retrieveImg();
+
+        this.afdb.object(`/location/${auth.uid}`).valueChanges().subscribe( out => {
+          this.location = out;
+        })
       });
     });
   }
