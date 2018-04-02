@@ -89,10 +89,11 @@ export class CoHomePage {
 	}
 
 	ionViewDidEnter(){
-		this.getCurrentLocation().subscribe(location => {
+		var location = this.getCurrentLocation().subscribe(location => {
 			this.setDirections(location);
 			this.centerLocation(location);
 			this.setMarkers();
+			location.unsubscribe();
 		});
 	}
 
@@ -111,7 +112,7 @@ export class CoHomePage {
 
 		const arr = [];
 		var map = this.map;
-		this.afdb.list('location').snapshotChanges().subscribe(data => {
+		var markers = this.afdb.list('location').snapshotChanges().subscribe(data => {
 			for (var a = 0; a < data.length; a++) {
 				arr.push(data[a]);
 			}
@@ -119,7 +120,7 @@ export class CoHomePage {
 			const popup = new mapboxgl.Popup();
 
 			for (var i = 0; i < arr.length; i++) {
-				popup.setHTML('<h1>Loakan namba wan!</h1>');
+				// popup.setHTML('<h1>Loakan namba wan!</h1>');
 				var el = document.createElement('div');
 				el.innerHTML = "mapmarker";
 				el.id = data[i].key;
@@ -133,17 +134,18 @@ export class CoHomePage {
 				el.addEventListener('click', (e) => {
 					var tmp = e.srcElement.id;
 					let actionSheet = this.actionSheetCtrl.create({
-						title: 'insert name of place here',
+						title: '',
 						buttons: [
 
-							{
-								text: 'Request',
-								role: 'destructive',
-								handler: () => {
-									console.log('Destructive clicked');
+							// {
+							// 	text: 'Request',
+							// 	role: 'destructive',
+							// 	handler: () => {
+							// 		console.log('Destructive clicked');
 
-								}
-							}, {
+							// 	}
+							// }, 
+							{
 								text: 'More Details',
 								handler: () => {
 									this.navCtrl.push("ComoredetailsPage", { key: tmp })
@@ -156,7 +158,6 @@ export class CoHomePage {
 								text: 'Cancel',
 								role: 'cancel',
 								handler: () => {
-									console.log('Cancel clicked');
 									popup.remove();
 								}
 							}
@@ -165,6 +166,8 @@ export class CoHomePage {
 					actionSheet.present();
 				});
 			}
+			markers.unsubscribe();
+
 		});
 
 	}
@@ -182,6 +185,8 @@ export class CoHomePage {
 		});
 
 		this.map.addControl(this.directions, 'top-left');
+
+		this.directions.setOrigin(location.lng + ',' + location.lat);
 	}
 
 	setDest(lang, latt) {
@@ -198,7 +203,7 @@ export class CoHomePage {
 			container: 'map',
 			style: 'mapbox://styles/mapbox/streets-v10',
 			center: location,
-			zoom: 15,
+			zoom: 16,
 			attributionControl: false,
 		});
 
@@ -247,13 +252,12 @@ export class CoHomePage {
 		if (location) {
 			this.map.panTo(location);
 			this.addMarker(location);
-			this.directions.setOrigin(location.lng + ',' + location.lat);
 		} else {
-			this.getCurrentLocation().subscribe(currentLocation => {
+			var location = this.getCurrentLocation().subscribe(currentLocation => {
 				this.map.panTo(currentLocation);
 				this.marker.remove();
 				this.addMarker(currentLocation);
-				this.directions.setOrigin(currentLocation.lng + ',' + currentLocation.lat);
+				location.unsubscribe();
 			});
 		}
 	}

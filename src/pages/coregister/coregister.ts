@@ -122,7 +122,6 @@ export class CoregisterPage {
         this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
           // const fileTransfer: FileTransferObject = this.transfer.create();
           this.fileUrl = newUrl;
-          alert(this.fileUrl);
   
           let dirPath = newUrl.nativeURL;
           this.fileName = dirPath;
@@ -131,14 +130,11 @@ export class CoregisterPage {
           dirPath = dirPathSegments.join('/');
           this.fileDir = dirPath;
           
-          alert(dirPath);
-
           this.files.push({
             path: this.fileDir,
             name: this.fileUrl.name
           });
 
-          alert(JSON.stringify(this.files));
         })
       })
     })

@@ -60,11 +60,10 @@ export class HoHomePage {
           platenumber = 'ABC-169';
           if (data.wasTapped) {
 
-          } else {
-
             let confirm = this.alertCtrl.create({
               // add platenumber here
               title: 'You have a parking space request from ' + fname + ' ' + lname,
+              enableBackdropDismiss:false,
               buttons: [
                 {
                   text: 'Decline',
@@ -78,7 +77,30 @@ export class HoHomePage {
                     this.requestProvider.acceptRequest(data.coID, data.hoID);                    
                   }
                 }
-              ]
+              ],
+            });
+            confirm.present();
+            
+          } else {
+
+            let confirm = this.alertCtrl.create({
+              // add platenumber here
+              title: 'You have a parking space request from ' + fname + ' ' + lname,
+              enableBackdropDismiss:false,
+              buttons: [
+                {
+                  text: 'Decline',
+                  handler: () => {
+                    this.requestProvider.declineRequest(data.coID, data.hoID);
+                  }
+                },
+                {
+                  text: 'Accept',
+                  handler: () => {
+                    this.requestProvider.acceptRequest(data.coID, data.hoID);                    
+                  }
+                }
+              ],
             });
             confirm.present();
           };

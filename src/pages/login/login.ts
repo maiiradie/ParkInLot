@@ -97,7 +97,8 @@ export class LoginPage {
       dismissOnPageChange:true
 		});
 
-		loading.present(loading);    
+		loading.present(loading);   
+
     if((this.login.email != null) && (this.login.password != null)) {
       this.authProvider.loginUser(this.login).then(() => {
         this.authProvider.setID();
@@ -105,19 +106,23 @@ export class LoginPage {
           this.x =  this.authProvider.getUser().subscribe((data)=>{
             if (data.reg_status === "approved") {
               if (data.carowner) {
-                this.x.unsubscribe()
+                this.x.unsubscribe();
                 this.navCtrl.setRoot("CoHomePage").then(data => {
               }, (error) => {
                   alert(error);
               });
               } else if(data.homeowner){
+                this.x.unsubscribe();
                 this.navCtrl.setRoot("HoHomePage");
               }
             } else if (data.reg_status === "rejected") {
+              this.x.unsubscribe();
               this.showToastReject();
             } else {
+              this.x.unsubscribe();
               this.showToastPending();
             }
+            loading.dismiss();
          })
        }
       }).catch((error)=>{

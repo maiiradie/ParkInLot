@@ -50,7 +50,7 @@ export class RequestProvider {
         let body = {
           "notification": {
             "title": "You have a parking request!",
-            "body": "text",
+            "body": "",
             "sound": "default",
             "click_action": "FCM_PLUGIN_ACTIVITY",
             "icon": "fcm_push_icon"
