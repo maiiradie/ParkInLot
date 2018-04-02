@@ -11,7 +11,7 @@
             <ion-icon name="menu"></ion-icon>
           </button>
         </ion-buttons>
-      <ion-title>Transaction</ion-title>
+      <ion-title>Transactions</ion-title>
     </ion-navbar>
   
   </ion-header>
@@ -20,11 +20,12 @@
   <ion-content padding>
   
       <ion-list>
-        <ion-item ion-item *ngFor="let data of profData">
-          <h2>
-              {{data?.lname}}
-
-          </h2>
+        <ion-item *ngFor="let item of transactions">
+          <h6>{{item?.fullName}}</h6>
+          <p>startTime: {{item?.ste}}</p>
+          <p>endTime: {{item?.ete}}</p>
+          <p> Amount: {{item?.payment}}php</p>
+          <!-- </button> -->
         </ion-item>
       </ion-list>
   

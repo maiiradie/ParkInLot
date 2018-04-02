@@ -12,14 +12,16 @@
             <ion-icon name='menu'></ion-icon>
           </button>
         </ion-buttons> 
-    <ion-title>Transaction History</ion-title>
+    <ion-title>Transactions</ion-title>
   </ion-navbar>
   <ion-list>
-     <!-- (click)="itemSelected(item) -->
-    <button ion-item *ngFor="let item of transactions">
-      {{ item.coID }}
-       {{ item.status }}
-    </button>
+    <ion-item *ngFor="let item of transactions">
+       <h6>{{item?.fullName}}</h6>
+       <p>startTime: {{item?.ste}}</p>
+        <p>endTime: {{item?.ete}}</p>
+       <p> Amount: {{item?.payment}}php</p>
+    <!-- </button> -->
+    </ion-item>
   </ion-list>
 
 </ion-header>
