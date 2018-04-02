@@ -14,22 +14,37 @@
 						<ion-item>
 							<ion-input type="text" formControlName = 'fname' placeholder="First Name"></ion-input>
 						</ion-item>
+						<p class="invalidMsg" *ngIf="!userForm.controls.fname.valid  && (userForm.controls.fname.touched || submitAttempt)">
+							Please enter a valid first name.
+						</p>
 							
 						<ion-item>
 							<ion-input type="text" formControlName = 'lname' placeholder="Last Name"></ion-input>
 						</ion-item>
+						<p class="invalidMsg" *ngIf="!userForm.controls.lname.valid  && (userForm.controls.lname.touched || submitAttempt)">
+							Please enter a valid last name.
+						</p>
 								
 						<ion-item>
 							<ion-input type="email" formControlName = 'email' placeholder="Email"></ion-input>
 						</ion-item>
+						<p class="invalidMsg" *ngIf="!userForm.controls.email.valid  && (userForm.controls.email.touched || submitAttempt)">
+							Please enter a valid email.
+						</p>
 										
 						<ion-item>
 							<ion-input type="number" formControlName = 'mobile' placeholder="Mobile Number"></ion-input>
 						</ion-item>
+						<p class="invalidMsg" *ngIf="!userForm.controls.mobile.valid  && (userForm.controls.mobile.touched || submitAttempt)">
+							Please enter a valid mobile number.
+						</p>
 							
 						<ion-item>
-							<ion-input type="password" formControlName = 'password' placeholder="Password"></ion-input>
-							</ion-item>
+							<ion-input type="password" formControlName = 'password' placeholder="Password (at least 6 characters)"></ion-input>
+						</ion-item>
+						<p class="invalidMsg" *ngIf="!userForm.controls.password.valid  && (userForm.controls.password.touched || submitAttempt)">
+							Please enter a valid password. Password must contain at least 6 characters.
+						</p>
 					</ion-list>
 
 					<button ion-button block type="submit" [disabled]='!userForm.valid'>Next</button>
@@ -50,10 +65,16 @@
 					<ion-item>
 						<ion-input type="text" formControlName="plateno" placeholder="Plate Number"></ion-input>
 					</ion-item>
+					<p class="invalidMsg" *ngIf="!carForm.controls.plateno.valid  && (carForm.controls.plateno.touched || submitAttempt)">
+						Please enter a valid plate number.
+					</p>
 					
 					<ion-item>
 						<ion-input type="text" formControlName="carmodel" placeholder="Car Model"></ion-input>
 					</ion-item>
+					<p class="invalidMsg" *ngIf="!carForm.controls.carmodel.valid  && (carForm.controls.carmodel.touched || submitAttempt)">
+						Please enter a valid car model.
+					</p>
 
 					<ion-item>
 						<p>Upload photo of motor vehicle</p>

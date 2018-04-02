@@ -47,7 +47,7 @@ export class CoprofilePage {
 	      this.imgName = d;
 	      console.log(this.imgName);
 	    }).catch((error) => {
-	      alert(JSON.stringify(error));
+				this.imgName = "./assets/imgs/avatar.jpg";
 	    })
  	}
 
