@@ -19,41 +19,52 @@
     </ion-segment>
   </ion-toolbar>
 
+
 </ion-header>
 
 <ion-content>
 
   <div [ngSwitch]="carStatus">
-    <div *ngFor="let transac of transacData">
+    <!-- <div *ngFor="let transac of transacData"> -->
       <!-- arriving -->
       <ion-list *ngSwitchCase="'arriving'" class="margin-bottom-0">
-        <ion-item-sliding *ngIf="transac.payload.val().motionStatus == 'arriving'">
-          <ion-item>
-            <!-- <ion-thumbnail item-start>
-                        <img src="img/thumbnail-puppy-1.jpg">
-                      </ion-thumbnail> -->
-            <h2 ion-start>
-              {{hoProfile?.fname}}
-              {{hoProfile?.lname}}
-            </h2>
-            <!-- <p>{{transac?.payload.val().timeStarted}} : {{transac?.key}}</p> -->
-          </ion-item>
-          <ion-item-options side="right">
+        <!-- <ion-item-sliding *ngIf="transac.payload.val().motionStatus == 'arriving'"> -->
+        <div *ngFor="let arrive of arrivingData">
+            <ion-item-sliding >
+          
+                <ion-item>
 
-            <!--parked button-->
+                  <h2 ion-start>
+                    {{hoProfile?.fname}}
+                    {{hoProfile?.lname}}
+                  </h2>
+                </ion-item>
+                <ion-item-options side="right">
+      
+                  <!--parked button-->
+      
+                  <button ion-button color="secondary" (click)="toParked(arrive?.key)">
+                    <ion-icon name="car"></ion-icon>
+                    arrived
+                    <!-- <ng-template #parking> -->
+                  </button>
+                </ion-item-options>
+              </ion-item-sliding>
+        </div>
 
-            <button ion-button color="secondary" (click)="toParked(transac?.key)">
-              <ion-icon name="car"></ion-icon>
-              arrived
-              <!-- <ng-template #parking> -->
-            </button>
-          </ion-item-options>
-        </ion-item-sliding>
+        <div *ngIf="arrivingData.length == 0">
+            <h2>No arriving</h2>
+          </div>
+  
       </ion-list>
 
       <ion-list *ngSwitchCase="'Parked'" class="margin-bottom-0">
 
-        <div *ngIf="transac?.payload.val().motionStatus == 'parked'">
+        <!-- <div *ngIf="transac?.payload.val().motionStatus == 'parked'"> -->
+        <div *ngIf="parkedData.length == 0">
+                <h2>No parked</h2>
+        </div>
+        <div *ngFor="let park of parkedData">
           <ion-item>
             <h2 ion-start>
               {{hoProfile?.fname}}
@@ -64,8 +75,10 @@
           </ion-item>
         </div>
 
+
+
       </ion-list>
 
-    </div>
+    <!-- </div> -->
   </div>
 </ion-content>
