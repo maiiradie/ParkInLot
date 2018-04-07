@@ -63,7 +63,7 @@
 				<h3>Car Details</h3>
 				<form [formGroup]='carForm' (ngSubmit)="next()">
 					<ion-item>
-						<ion-input type="text" formControlName="plateno" placeholder="Plate Number"></ion-input>
+						<ion-input type="text" formControlName="plateno" placeholder="Plate Number (ex. ABC123 or ABC1234)"></ion-input>
 					</ion-item>
 					<p class="invalidMsg" *ngIf="!carForm.controls.plateno.valid  && (carForm.controls.plateno.touched || submitAttempt)">
 						Please enter a valid plate number.

@@ -90,6 +90,13 @@ export class LoginPage {
     })
     toast.present();
   }
+  showToastNet() {
+    let toast = this.toastCtrl.create({
+      message: 'Cannot login. No internet connection.',
+      duration: 3000
+    })
+    toast.present();
+  }
 
   onSignin(){
 		let loading = this.loadingCtrl.create({
@@ -99,7 +106,7 @@ export class LoginPage {
 
 		loading.present(loading);   
 
-    if((this.login.email != null) && (this.login.password != null)) {
+    if((this.login.email != null) || (this.login.password != null)) {
       this.authProvider.loginUser(this.login).then(() => {
         this.authProvider.setID();
         if (this.authProvider.setID().length != 0) {
@@ -127,8 +134,8 @@ export class LoginPage {
        }
       }).catch((error)=>{
         loading.dismiss();
-        if (error.code === "auth/arguement-error") {
-          this.showToastFields();
+        if (error.code === "auth/network-request-failed") {
+          this.showToastNet();
         } else if (error.code === "auth/invalid-email") {
           this.showToastFormat();
         } else if (error.code === "auth/user-not-found") {
