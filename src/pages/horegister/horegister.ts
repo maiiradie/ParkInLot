@@ -26,6 +26,7 @@ export class HoregisterPage {
   private fileUrl;
   private imgPath;
   private fileDir;
+  private imgType;
   private userId;
 
 	constructor(public loadingCtrl: LoadingController, 
@@ -121,6 +122,7 @@ export class HoregisterPage {
             if (fileObj.type === "image/jpeg" || fileObj.type === "image/png") {
               if (fileObj.size <= 5000000) {
                 this.imgUrl = newUrl;
+                this.imgType = fileObj.type;
   
                 let dirPath = newUrl.nativeURL;
                 this.imgName = dirPath;
@@ -152,8 +154,6 @@ export class HoregisterPage {
           var fileType;
           fileEntry.file(fileObj => {
             fileType = fileObj.type;
-            alert("filetype: " + fileType);
-            alert("file size: " + fileObj.size);
 
             if (fileObj.size <= 5000000) {
               this.fileUrl = newUrl;
@@ -179,8 +179,8 @@ export class HoregisterPage {
     })
   }
 
-  async upload(buffer, name) {
-    let blob = new Blob([buffer], { type: 'image/jpeg' });
+  async upload(buffer, name, type) {
+    let blob = new Blob([buffer], { type: type });
 
     let storageHere = firebase.storage();
 
@@ -230,7 +230,7 @@ export class HoregisterPage {
         this.userId = this.authProvider.setID();
 
         this.file.readAsArrayBuffer(this.imgPath, this.imgUrl.name).then(async (buffer)=>{
-          await this.upload(buffer, this.imgUrl.name).then((d)=>{
+          await this.upload(buffer, this.imgUrl.name, this.imgType).then((d)=>{
         
             for(var i = 0; i < this.files.length; i++) {
               this.uploadFile(this.files[i].path, this.files[i].name, this.files[i].type);

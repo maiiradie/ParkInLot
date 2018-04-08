@@ -2,7 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, Slides, AlertController, ToastController, ActionSheetController } from 'ionic-angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
-import { File } from '@ionic-native/file';
+import { File, FileEntry, Entry } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
@@ -29,6 +29,7 @@ export class CoregisterPage {
   private fileUrl;
   private imgPath;
   private fileDir;
+  private imgType;
   private userId;
  
 	constructor(public loadingCtrl: LoadingController,
@@ -40,8 +41,8 @@ export class CoregisterPage {
 		public actionSheetCtrl: ActionSheetController,
 		private fileChooser: FileChooser,
 		private file: File,
-   		private filePath: FilePath,
-   		private transfer: FileTransfer,
+ 		private filePath: FilePath,
+ 		private transfer: FileTransfer,
 		private toastCtrl: ToastController) {
      	this.userForm = this.fb.group({
 	 	    'fname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30), Validators.pattern('[a-zA-Z ]*')])],
@@ -97,51 +98,72 @@ export class CoregisterPage {
   choose() {
     this.fileChooser.open().then((url)=>{
       this.filePath.resolveNativePath(url).then((path)=>{
-	      this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
-	        this.imgUrl = newUrl;
+        this.file.resolveLocalFilesystemUrl(path).then((newUrl: Entry)=>{
+          var fileEntry = newUrl as FileEntry;
 
-	        let dirPath = newUrl.nativeURL;
-	        this.imgName = dirPath;
-	        let dirPathSegments = dirPath.split('/'); //break string to array
-	        dirPathSegments.pop();  //remove last element
-	        dirPath = dirPathSegments.join('/');
-	        this.imgPath = dirPath;
-	        
-	        this.caption = "Change Photo";
-	                 
-	      }).catch((e)=>{
-	        alert("error " + JSON.stringify(e));
-	      })
-      })
-  	})
-  }
+          fileEntry.file(fileObj => {
+            if (fileObj.type === "image/jpeg" || fileObj.type === "image/png") {
+              if (fileObj.size <= 5000000) {
+                this.imgUrl = newUrl;
+                this.imgType = fileObj.type;
 
-  chooseFile() {
-    this.fileChooser.open().then((url)=>{
-      this.filePath.resolveNativePath(url).then((path)=>{
-        this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
-          // const fileTransfer: FileTransferObject = this.transfer.create();
-          this.fileUrl = newUrl;
-  
-          let dirPath = newUrl.nativeURL;
-          this.fileName = dirPath;
-          let dirPathSegments = dirPath.split('/'); //break string to array
-          dirPathSegments.pop();  //remove last element
-          dirPath = dirPathSegments.join('/');
-          this.fileDir = dirPath;
+                let dirPath = newUrl.nativeURL;
+                this.imgName = dirPath;
+                let dirPathSegments = dirPath.split('/'); //break string to array
+                dirPathSegments.pop();  //remove last element
+                dirPath = dirPathSegments.join('/');
+                this.imgPath = dirPath;
           
-          this.files.push({
-            path: this.fileDir,
-            name: this.fileUrl.name
-          });
-
+                this.caption = "Change Photo";
+              } else {
+                this.showAlert('File Size Exceeded', 'Your file has exceeded 5MB.');
+              }
+            } else {
+              this.showAlert('Invalid Image', 'Image must be a png or jpeg file.');
+            }
+          })  
+        }).catch((e)=>{
+          alert("error " + JSON.stringify(e));
         })
       })
     })
   }
 
-  async upload(buffer, name) {
-    let blob = new Blob([buffer], { type: 'image/jpeg' });
+  chooseFile() {
+    this.fileChooser.open().then((url)=>{
+      this.filePath.resolveNativePath(url).then((path)=>{
+        this.file.resolveLocalFilesystemUrl(path).then((newUrl: Entry)=>{
+          var fileEntry = newUrl as FileEntry;
+          var fileType;
+          fileEntry.file(fileObj => {
+            fileType = fileObj.type;
+
+            if (fileObj.size <= 5000000) {
+              this.fileUrl = newUrl;
+  
+              let dirPath = newUrl.nativeURL;
+              this.fileName = dirPath;
+              let dirPathSegments = dirPath.split('/'); //break string to array
+              dirPathSegments.pop();  //remove last element
+              dirPath = dirPathSegments.join('/');
+              this.fileDir = dirPath;
+
+              this.files.push({
+                path: this.fileDir,
+                name: this.fileUrl.name,
+                type: fileType
+              });
+            } else {
+              this.showAlert('File Size Exceeded', 'Your file has exceeded 5MB.');
+            }
+          })
+        })
+      })
+    })
+  }
+
+  async upload(buffer, name, type) {
+    let blob = new Blob([buffer], { type: type });
 
     let storageHere = firebase.storage();
 
@@ -150,9 +172,9 @@ export class CoregisterPage {
     })
   }
 
-  uploadFile(path, name) {
+  uploadFile(path, name, type) {
     this.file.readAsArrayBuffer(path, name).then((buffer)=>{
-      let blob = new Blob([buffer], { type: 'application/pdf' });
+      let blob = new Blob([buffer], { type: type });
 
       let storageHere = firebase.storage();
 
@@ -162,10 +184,10 @@ export class CoregisterPage {
     })
   }
 
-  showAlert() {
+  showAlert(title, subtitle) {
     let alert = this.alertCtrl.create({
-      title: 'Email in Use',
-      subTitle: 'Your email is already taken or used.',
+      title: title,
+      subTitle: subtitle,
       buttons: ['OK']
     });
     alert.present();
@@ -190,10 +212,10 @@ export class CoregisterPage {
 		  this.userId = this.authProvider.setID();
 
 		  this.file.readAsArrayBuffer(this.imgPath, this.imgUrl.name).then(async (buffer)=>{
-			  await this.upload(buffer, this.imgUrl.name).then((d)=>{
+			  await this.upload(buffer, this.imgUrl.name, this.imgType).then((d)=>{
 			
 				  for(var i = 0; i < this.files.length; i++) {
-					  this.uploadFile(this.files[i].path, this.files[i].name);
+					  this.uploadFile(this.files[i].path, this.files[i].name, this.files[i].type);
           }
           
           loading.dismiss();
@@ -207,7 +229,7 @@ export class CoregisterPage {
 		  })
 	  }).catch((error:"auth/email-already-in-use") => {
       loading.dismiss();
-      this.showAlert();
+      this.showAlert('Email in Use', 'Your email is already taken or used.');
       this.slider.slideTo(0);
     })
   }
