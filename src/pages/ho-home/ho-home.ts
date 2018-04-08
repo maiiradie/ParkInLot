@@ -26,12 +26,10 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 })
 export class HoHomePage {
 
-  carStatus: string = "parked";
+  carStatus: string = "Parked";
   isAndroid: boolean = false;
 
-  carStatuses = ['arriving', 'parked'];
 
-  // transacData: Array<any> = [];
   arrivingData: Array<any> = [];
   parkedData: Array<any> = [];
 

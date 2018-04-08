@@ -2,4 +2,20 @@ page-ho-home {
     .margin-bottom-0{
         margin-bottom: 5px;
     }
+
+    .noArriving{
+        background-image: url("../assets/imgs/arriving.png");
+        height: 70vh;
+        background-size: cover;
+        background-position: center center;
+        position: relative;
+    }
+    
+    .noParked{
+        background-image: url("../assets/imgs/parked.png");
+        height: 70vh;
+        background-size: cover;
+        background-position: center center;
+        position: relative;
+    }
 }

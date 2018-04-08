@@ -53,7 +53,8 @@
         </div>
 
         <div *ngIf="arrivingData.length == 0">
-            <h2>No cars arriving</h2>
+            <div class="noArriving"></div>
+          
           </div>
   
       </ion-list>
@@ -62,7 +63,7 @@
 
         <!-- <div *ngIf="transac?.payload.val().motionStatus == 'parked'"> -->
         <div *ngIf="parkedData.length == 0">
-                <h2>No cars parked</h2>
+          <div class="noParked"></div>
         </div>
         <div *ngFor="let park of parkedData">
           <ion-item>
@@ -85,8 +86,7 @@
           
           </ion-item>
           <ng-template #elseTemplate>
-              <h2>No cars parked</h2>
-            
+              <div class="noParked"></div>
           </ng-template>
         </div>
       </ion-list>
