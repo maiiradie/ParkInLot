@@ -82,6 +82,8 @@
 					</ion-item>
 
 					<ion-item>
+						<p>Upload an image of your garage.</p> 
+						<p>(File size limit: 5MB)</p>
 						<button ion-button block type="button" (click)="choose()">{{caption}}</button>
 						<img [src]="imgName" *ngIf="imgName" id="selImg"/>
 					</ion-item>
@@ -100,7 +102,7 @@
 
 			<div style="padding: 32px">
 				<h3>File Upload</h3>
-				<p class="fileUp">Upload Barangay Clearance and a valid ID for verification of your registration.</p>
+				<p class="fileUp">Upload Barangay Clearance and a valid ID for verification of your registration. (File size limit: 5MB)</p>
 				<button ion-button block type="button" (click)="chooseFile()">Add File</button>
 
 				<ion-list>

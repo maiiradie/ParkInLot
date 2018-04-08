@@ -114,17 +114,29 @@ export class HoregisterPage {
 	choose() {
     this.fileChooser.open().then((url)=>{
       this.filePath.resolveNativePath(url).then((path)=>{
-        this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
-          this.imgUrl = newUrl;
+        this.file.resolveLocalFilesystemUrl(path).then((newUrl: Entry)=>{
+          var fileEntry = newUrl as FileEntry;
 
-          let dirPath = newUrl.nativeURL;
-          this.imgName = dirPath;
-          let dirPathSegments = dirPath.split('/'); //break string to array
-          dirPathSegments.pop();  //remove last element
-          dirPath = dirPathSegments.join('/');
-          this.imgPath = dirPath;
-        
-          this.caption = "Change Photo";
+          fileEntry.file(fileObj => {
+            if (fileObj.type === "image/jpeg" || fileObj.type === "image/png") {
+              if (fileObj.size <= 5000000) {
+                this.imgUrl = newUrl;
+  
+                let dirPath = newUrl.nativeURL;
+                this.imgName = dirPath;
+                let dirPathSegments = dirPath.split('/'); //break string to array
+                dirPathSegments.pop();  //remove last element
+                dirPath = dirPathSegments.join('/');
+                this.imgPath = dirPath;
+          
+                this.caption = "Change Photo";
+              } else {
+                this.showAlert('File Size Exceeded', 'Your file has exceeded 5MB.');
+              }
+            } else {
+              this.showAlert('Invalid Image', 'Image must be a png or jpeg file.');
+            }
+          })  
         }).catch((e)=>{
           alert("error " + JSON.stringify(e));
         })
@@ -138,26 +150,30 @@ export class HoregisterPage {
         this.file.resolveLocalFilesystemUrl(path).then((newUrl: Entry)=>{
           var fileEntry = newUrl as FileEntry;
           var fileType;
-          fileEntry.file(success => {
-            fileType = success.type;
-          })
+          fileEntry.file(fileObj => {
+            fileType = fileObj.type;
+            alert("filetype: " + fileType);
+            alert("file size: " + fileObj.size);
 
-          this.fileUrl = newUrl;
+            if (fileObj.size <= 5000000) {
+              this.fileUrl = newUrl;
   
-          let dirPath = newUrl.nativeURL;
-          this.fileName = dirPath;
-          let dirPathSegments = dirPath.split('/'); //break string to array
-          dirPathSegments.pop();  //remove last element
-          dirPath = dirPathSegments.join('/');
-          this.fileDir = dirPath;
+              let dirPath = newUrl.nativeURL;
+              this.fileName = dirPath;
+              let dirPathSegments = dirPath.split('/'); //break string to array
+              dirPathSegments.pop();  //remove last element
+              dirPath = dirPathSegments.join('/');
+              this.fileDir = dirPath;
 
-          this.files.push({
-            path: this.fileDir,
-            name: this.fileUrl.name,
-            type: fileType
-          });
-
-          alert(fileType);
+              this.files.push({
+                path: this.fileDir,
+                name: this.fileUrl.name,
+                type: fileType
+              });
+            } else {
+              this.showAlert('File Size Exceeded', 'Your file has exceeded 5MB.');
+            }
+          })
         })
       })
     })
@@ -185,10 +201,10 @@ export class HoregisterPage {
     })
   }
 
-  showAlert() {
+  showAlert(title, subtitle) {
     let alert = this.alertCtrl.create({
-      title: 'Email in Use',
-      subTitle: 'Your email is already taken or used.',
+      title: title,
+      subTitle: subtitle,
       buttons: ['OK']
     });
     alert.present();
@@ -197,7 +213,7 @@ export class HoregisterPage {
   showToast() {
     let toast = this.toastCtrl.create({
       message: 'Account was created successfully. Account is pending for approval from admin.',
-      duration: 3000
+      duration: 4000
     })
     toast.present();
   }
@@ -231,7 +247,7 @@ export class HoregisterPage {
         this.navCtrl.setRoot("LoginPage");
       }).catch((error) => {
         loading.dismiss();
-        this.showAlert();
+        this.showAlert('Email in Use', 'Your email is already taken or used.');
         this.slider.slideTo(0);
       })
     })
