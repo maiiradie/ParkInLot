@@ -90,7 +90,6 @@ export class AuthProvider {
            reg_status:"pending",
            created_at:Date.now()
         });
-        this.logoutUser();
      })
    }
  
@@ -136,7 +135,6 @@ export class AuthProvider {
             lng: location.lng,
             address: gForm.address,
           });
-          this.logoutUser();
         });
       })
   }

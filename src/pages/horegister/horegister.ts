@@ -230,14 +230,16 @@ export class HoregisterPage {
         this.userId = this.authProvider.setID();
 
         this.file.readAsArrayBuffer(this.imgPath, this.imgUrl.name).then(async (buffer)=>{
-          await this.upload(buffer, this.imgUrl.name, this.imgType).then((d)=>{
+          await this.upload(buffer, this.imgUrl.name, this.imgType).then(async (d)=>{
         
             for(var i = 0; i < this.files.length; i++) {
               this.uploadFile(this.files[i].path, this.files[i].name, this.files[i].type);
             }
+            
+            await this.authProvider.logoutUser();
           })
         })
-  	
+        
         loading.dismiss();
         this.showToast();
         this.navCtrl.setRoot("LoginPage");
