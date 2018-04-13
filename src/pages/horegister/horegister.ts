@@ -235,11 +235,7 @@ export class HoregisterPage {
             for(var i = 0; i < this.files.length; i++) {
               this.uploadFile(this.files[i].path, this.files[i].name, this.files[i].type);
             }
-          }).catch((error)=>{
-            alert("error(2): " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
           })
-        }).catch((err)=> {
-          alert("error(3): " + JSON.stringify(err, Object.getOwnPropertyNames(err)));
         })
   	
         loading.dismiss();
@@ -247,8 +243,12 @@ export class HoregisterPage {
         this.navCtrl.setRoot("LoginPage");
       }).catch((error) => {
         loading.dismiss();
-        this.showAlert('Email in Use', 'Your email is already taken or used.');
-        this.slider.slideTo(0);
+        if (error.code === "auth/email-already-in-use") {
+          this.showAlert('Email in Use', 'Your email is already taken or used.');
+          this.slider.slideTo(0);
+        } else if (error.code === "auth/network-request-failed") {
+          this.showAlert('No Connection', 'No internet connection detected. Please connect and try again.');
+        }
       })
     })
   }
