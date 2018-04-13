@@ -225,10 +225,14 @@ export class CoregisterPage {
           this.navCtrl.setRoot("LoginPage");
 			  })
 		  })
-	  }).catch((error:"auth/email-already-in-use") => {
+	  }).catch((error) => {
       loading.dismiss();
-      this.showAlert('Email in Use', 'Your email is already taken or used.');
-      this.slider.slideTo(0);
+      if (error.code === "auth/email-already-in-use") {
+        this.showAlert('Email in Use', 'Your email is already taken or used.');
+        this.slider.slideTo(0);
+      } else if (error.code === "auth/network-request-failed") {
+        this.showAlert('No Connection', 'No internet connection detected. Please connect and try again.');
+      }
     })
   }
 }

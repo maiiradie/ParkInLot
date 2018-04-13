@@ -45,55 +45,10 @@ export class LoginPage {
     this.navCtrl.push("ForgotPasswordPage");
   }
 
-  showToastReject() {
+  showToast(message) {
     let toast = this.toastCtrl.create({
-      message: 'Cannot login to application. Account request has been rejected by admin.',
+      message: message,
       duration: 5000
-    })
-    toast.present();
-  }
-
-  showToastPending() {
-    let toast = this.toastCtrl.create({
-      message: 'Cannot login to application. Account request has not yet been approved by admin.',
-      duration: 5000
-    })
-    toast.present();
-  }
-
-  showToastPassword() {
-    let toast = this.toastCtrl.create({
-      message: 'The password is incorrect',
-      duration: 3000
-    })
-    toast.present();
-  }
-
-  showToastEmail() {
-    let toast = this.toastCtrl.create({
-      message: 'No user registered with the email',
-      duration: 3000
-    })
-    toast.present();
-  }
-  showToastFields() {
-    let toast = this.toastCtrl.create({
-      message: 'Please input email and password',
-      duration: 3000
-    })
-    toast.present();
-  }
-  showToastFormat() {
-    let toast = this.toastCtrl.create({
-      message: 'Invalid email address',
-      duration: 3000
-    })
-    toast.present();
-  }
-  showToastNet() {
-    let toast = this.toastCtrl.create({
-      message: 'Cannot login. No internet connection.',
-      duration: 3000
     })
     toast.present();
   }
@@ -124,10 +79,10 @@ export class LoginPage {
               }
             } else if (data.reg_status === "rejected") {
               this.x.unsubscribe();
-              this.showToastReject();
+              this.showToast('Cannot login to application. Account request has been rejected by admin.');
             } else {
               this.x.unsubscribe();
-              this.showToastPending();
+              this.showToast('Cannot login to application. Account request has not yet been approved by admin.');
             }
             loading.dismiss();
          })
@@ -135,18 +90,18 @@ export class LoginPage {
       }).catch((error)=>{
         loading.dismiss();
         if (error.code === "auth/network-request-failed") {
-          this.showToastNet();
+          this.showToast('Cannot login. No internet connection.');
         } else if (error.code === "auth/invalid-email") {
-          this.showToastFormat();
+          this.showToast('Invalid email address');
         } else if (error.code === "auth/user-not-found") {
-          this.showToastEmail();
+          this.showToast('No user registered with the email');
         } else if (error.code === "auth/wrong-password") {
-          this.showToastPassword();
+          this.showToast('The password is incorrect');
         }
       })
     } else {
       loading.dismiss();
-      this.showToastFields();
+      this.showToast('Please input email and password');
     }
   }
   
