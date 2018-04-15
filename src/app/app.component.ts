@@ -108,15 +108,6 @@ export class MyApp {
   //   this.nav.push(page.component);
   // }
 
-  // logout(){
-  //   this.authProvider.logoutUser()
-  //   .then(() => {
-  //      this.menuCtrl.close()
-  //      .then( () => {
-  //         this.nav.setRoot(LoginPage);
-  //      });
-
-  //   });
   }
 
   

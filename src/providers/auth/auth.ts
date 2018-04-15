@@ -68,10 +68,12 @@ export class AuthProvider {
   }
 
   logoutUser() {
-    return this.afs.auth.signOut()
-      .then(() => {
-        this.updateStatus('offline');
-      });
+    return this.updateStatus('offline').then( () =>{
+      this.afs.auth.signOut();
+    });
+      // .then(() => {
+      //   this.updateStatus('offline');
+      // });
   }
 
   registerCarOwner(uForm, cForm, img){

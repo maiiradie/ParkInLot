@@ -14,6 +14,7 @@ export class RequestProvider {
 
   userId: any;
   public coID: any;
+  key = "key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM";
 
   constructor(private toastCtrl: ToastController, private afAuth: AngularFireAuth, private fcm: FCM, public http: HttpClient, private afdb: AngularFireDatabase) {
     this.setID();
@@ -68,7 +69,7 @@ export class RequestProvider {
         this.showToastRequest();
         let options = new HttpHeaders().set('Content-Type', 'application/json');
         this.http.post("https://fcm.googleapis.com/fcm/send", body, {
-          headers: options.set('Authorization', 'key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM'),
+          headers: options.set('Authorization', this.key),
         }).subscribe();
 
       }
@@ -93,9 +94,10 @@ export class RequestProvider {
       reqStatus: ""
     });
 
-    this.afdb.list('/transactions/' + hoID).push({
+    this.afdb.list('transactions/').push({
       coID: coID,
-      status: "rejected",
+      hoID: hoID,
+      status: "declined",
       createdAt: Date.now()
     });
 
@@ -105,7 +107,7 @@ export class RequestProvider {
         let body = {
           "notification": {
             "title": "Your request has been declined! :(",
-            "body": "text",
+            "body": "",
             "sound": "default",
             "click_action": "FCM_PLUGIN_ACTIVITY",
             "icon": "fcm_push_icon"
@@ -119,7 +121,7 @@ export class RequestProvider {
         }
         let options = new HttpHeaders().set('Content-Type', 'application/json');
         this.http.post("https://fcm.googleapis.com/fcm/send", body, {
-          headers: options.set('Authorization', 'key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM'),
+          headers: options.set('Authorization', this.key),
         }).subscribe();
 
       });
@@ -155,7 +157,7 @@ export class RequestProvider {
               }
               let options = new HttpHeaders().set('Content-Type', 'application/json');
               this.http.post("https://fcm.googleapis.com/fcm/send", body, {
-                headers: options.set('Authorization', 'key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM'),
+                headers: options.set('Authorization', this.key),
               }).subscribe();
             });
         });

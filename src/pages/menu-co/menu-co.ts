@@ -43,8 +43,4 @@ export class MenuCoPage {
     }
   }
 
-  logout(){
-    
-  }
-
 }

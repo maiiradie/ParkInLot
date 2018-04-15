@@ -58,8 +58,5 @@ export class MenuHoPage {
     }
   }
 
-  logout(){
-    
-  }
 
 }
