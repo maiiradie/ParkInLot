@@ -86,7 +86,7 @@ export class HoHomePage {
 
             let confirm = this.alertCtrl.create({
               // add platenumber here
-              title: 'You have a parking space request from ' + fname + ' ' + lname,
+              title: 'You have a parking space request from ' + fname + ' ' + lname ,
               enableBackdropDismiss:false,
               buttons: [
                 {
@@ -179,7 +179,7 @@ export class HoHomePage {
     this.afdb.object('requests/' + this.myId).update({
       startTime: Date.now()
     });
-    // this.transacData = [];
+    // this.transacData = [];s
     this.parkedData = [];
   }
 
@@ -216,7 +216,10 @@ export class HoHomePage {
       }
       // push database
       x.unsubscribe();
-      this.showPayment(new Date(startDate),endDate,payment)
+      var startTimeF = startDateH.toLocaleTimeString();
+      var endTimeF = endDateH.toLocaleTimeString();
+      
+      this.showPayment(startTimeF, endTimeF, payment)
       this.afdb.object('requests/' + this.myId).update({
         endTime: endDate,
         payment: payment
@@ -229,14 +232,15 @@ export class HoHomePage {
 
   }
   //showPayment
-  showPayment(start,end,payment){
+  showPayment(start, end, payment){
     let confirm = this.alertCtrl.create({    
       title: 'Payment',  
-      subTitle: 'Start time: ' + start + 'End time: ' + end + 'Amount: P' + payment,
+      subTitle: 'Start time: ' + start + '<br>End time: ' + end + '<br>Amount: P' + payment,
+      enableBackdropDismiss: false,
       buttons: [                {
         text: 'Finish',
         handler: () => {
-          this.transfer(this.myId);
+          this.transfer(this.myId, start,end,payment);
         }
       },]
   });
@@ -244,7 +248,8 @@ export class HoHomePage {
   // this.transacData = [];
   this.parkedData = [];
   }
-  transfer(hoID){
+
+  transfer(hoID, start, end, payment ){
     var temp ;
     var x = this.afdb.object<any>('requests/' + this.myId).valueChanges().subscribe(data => {
       temp = data;
@@ -255,8 +260,10 @@ export class HoHomePage {
         coId: "",
         reqStatus: "",
         status: ""
-      })
-    })
+      });
+    });
+
+    // this.requestProvider.sendCoTransac(homeID, token, start, end, payment);
   }
 
 }

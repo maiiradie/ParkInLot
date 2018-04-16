@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
 import * as firebase from 'firebase/app';
+import { FCM } from '@ionic-native/fcm';
 
 @Injectable()
 export class AuthProvider {
@@ -13,7 +14,7 @@ export class AuthProvider {
   //Current ID
   userId: any;
 
-  constructor(private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
+  constructor(private FCM: FCM, private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
     this.afs.auth.onAuthStateChanged(user => {
       if (user) {
         this.updateOnConnect();
@@ -68,9 +69,9 @@ export class AuthProvider {
   }
 
   logoutUser() {
-    return this.updateStatus('offline').then( () =>{
-      this.afs.auth.signOut();
-    });
+    // return this.updateStatus('offline').then( () =>{
+   return this.afs.auth.signOut();
+    // });
       // .then(() => {
       //   this.updateStatus('offline');
       // });

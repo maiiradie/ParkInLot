@@ -21,11 +21,20 @@
   
       <ion-list>
         <ion-item *ngFor="let item of transactions">
-          <h6>{{item?.fullName}}</h6>
-          <p>startTime: {{item?.ste}}</p>
-          <p>endTime: {{item?.ete}}</p>
-          <p> Amount: {{item?.payment}}php</p>
-          <!-- </button> -->
+
+          <div *ngIf="item.status == 'ongoing'; else declined ">
+
+              <h6>{{item?.fullName}}</h6>
+              <p>startTime: {{item?.ste}}</p>
+              <p>endTime: {{item?.ete}}</p>
+              <p> Amount: {{item?.payment}}php</p>
+          </div>
+
+          <ng-template #declined>
+            <h6>{{item?.fullName}}</h6>
+            <p>Status:declined</p>
+          </ng-template>
+          
         </ion-item>
       </ion-list>
   
