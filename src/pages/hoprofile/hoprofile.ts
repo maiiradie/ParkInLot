@@ -34,7 +34,7 @@ export class HoprofilePage {
   ionViewWillEnter() {
     this.userId = this.authProvider.setID();
 
-    this.afdb.object(`/profile/` + this.userId).valueChanges().subscribe( data => {
+    this.afdb.object(`/profile/` + this.userId).valueChanges().subscribe(data => {
       this.profileData = data;
       firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d=>{
         this.imgName = d;

@@ -58,10 +58,10 @@ export class MyApp {
       statusBar.styleDefault();
       splashScreen.hide();
 
-      this.checkUser();
       this.menuCtrl.swipeEnable(false);
       var user = firebase.auth().currentUser;
-
+      this.retrieveUser();
+            
       if (user) {
         this.authProvider.getUser().subscribe((data)=>{
           if (data.reg_status === "approved") {
@@ -108,6 +108,15 @@ export class MyApp {
   //   this.nav.push(page.component);
   // }
 
+  // logout(){
+  //   this.authProvider.logoutUser()
+  //   .then(() => {
+  //      this.menuCtrl.close()
+  //      .then( () => {
+  //         this.nav.setRoot(LoginPage);
+  //      });
+
+  //   });
   }
 
   
@@ -122,15 +131,14 @@ export class MyApp {
     }
   }
 
-  checkUser() {
+  retrieveUser() {
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         var userId = this.authProvider.setID();
-
-          this.afdb.object(`/profile/` + userId).valueChanges().subscribe( data => {
-            this.profileData = data;
-            this.retrieveImg();
-          });
+        this.afdb.object(`/profile/` + userId).valueChanges().subscribe( data => {
+          this.profileData = data;
+          this.retrieveImg();
+        });
       } else {
         this.profileData = null;
         this.imgName = "./assets/imgs/avatar.jpg";
@@ -154,8 +162,8 @@ export class MyApp {
     this.userId = this.authProvider.setID();
     firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d => {
       this.imgName = d;
-      console.log(this.imgName);
     }).catch((error) => {
+      console.log("error in retrieving image: " + JSON.stringify(error));
       this.imgName = "./assets/imgs/avatar.jpg";
     })
  }
@@ -171,4 +179,3 @@ export class MyApp {
   }
   
 }
-

@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Nav, LoadingController, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Nav, LoadingController, ToastController, AlertController } from 'ionic-angular';
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import firebase from 'firebase';
 
-import { File } from '@ionic-native/file';
+import { File, FileEntry, Entry } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
 
@@ -31,6 +31,7 @@ export class HoEditProfilePage {
   public imgUrl;
   public gender;
   private imgPath;
+  private imgType;
   private userId;
   public user;
   private oldEmail;
@@ -43,6 +44,7 @@ export class HoEditProfilePage {
     public navParams: NavParams,
     private authProvider: AuthProvider,
     public loadingCtrl: LoadingController, 
+    public alertCtrl: AlertController,
     private fb:FormBuilder,
     private fileChooser: FileChooser,
 		private file: File,
@@ -80,34 +82,48 @@ export class HoEditProfilePage {
   }
 
   // Create Toast
-  showToast() {
+  showToast(message) {
     let toast = this.toastCtrl.create({
-      message: 'Profile updated successfully.',
+      message: message,
       duration: 3000
     })
     toast.present();
   }
 
-  showEmailToast() {
-    let toast = this.toastCtrl.create({
-      message: 'Cannot update email. Email already taken or used.',
-      duration: 3000
-    })
-    toast.present();
+  showAlert(title, subtitle) {
+    let alert = this.alertCtrl.create({
+      title: title,
+      subTitle: subtitle,
+      buttons: ['OK']
+    });
+    alert.present();
   }
 
   // Open File Chooser and select image
   changeImg() {
     this.fileChooser.open().then((url)=>{
       this.filePath.resolveNativePath(url).then((path)=>{
-      
-        this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
-          let dirPath = newUrl.nativeURL;
-          this.imgUrl = dirPath;
-          let dirPathSegments = dirPath.split('/'); //break string to array
-          this.imgName = dirPathSegments.pop();  //remove last element
-          dirPath = dirPathSegments.join('/');
-          this.imgPath = dirPath;            
+        this.file.resolveLocalFilesystemUrl(path).then((newUrl: Entry)=>{
+          var fileEntry = newUrl as FileEntry;
+
+          fileEntry.file(fileObj => {
+            if (fileObj.type === "image/jpeg" || fileObj.type === "image/png") {
+              if (fileObj.size <= 5000000) {
+                this.imgType = fileObj.type;
+
+                let dirPath = newUrl.nativeURL;
+                this.imgUrl = dirPath;
+                let dirPathSegments = dirPath.split('/'); //break string to array
+                this.imgName = dirPathSegments.pop();  //remove last element
+                dirPath = dirPathSegments.join('/');
+                this.imgPath = dirPath;  
+              } else {
+                this.showAlert('File Size Exceeded', 'Your file has exceeded 5MB.');
+              }
+            } else {
+              this.showAlert('Invalid Image', 'Image must be a png or jpeg file.');
+            }
+          })       
         }).catch((error)=>{
           console.log("error in resolving picture url: " + JSON.stringify(error));
         })
@@ -116,28 +132,18 @@ export class HoEditProfilePage {
   }
 
   // Upload image to Firebase Storage
-  upload(path, name) {
-    this.file.readAsArrayBuffer(path, name).then((buffer)=>{
-      let blob = new Blob([buffer], { type: 'image/jpeg' });
+  async upload(buffer, name, type) {
+      let blob = new Blob([buffer], { type: type });
 
       let storageHere = firebase.storage();
 
       storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
-        console.log("error in upload picture: " + JSON.stringify(error));
+        alert("error in upload picture: " + JSON.stringify(error));
       })
-    }).catch((error)=>{
-      console.log("error in buffer: " + JSON.stringify(error));
-    })
-  }
-
-  // Update password
-  updatePassword() {
-    if (this.userForm.value['password'] != null) {
-      this.user.updatePassword(this.userForm.value['password']);
-    }
   }
 
   editProfile() {
+    var cont = true;
     const loading = this.loadingCtrl.create({
       content:'Updating profile...'
     });
@@ -147,30 +153,39 @@ export class HoEditProfilePage {
     this.user = firebase.auth().currentUser;
     // success = this.updateEmail();
     if (this.userForm.value['email'] != this.oldEmail) {
-      this.user.updateEmail(this.userForm.value['email']).then(() => {
-        this.updatePassword();
-        
-        // Update profile values
-        this.afdb.object(`/profile/` + this.userId).update(this.userForm.value).then(d => {
-          // Update profile picture
-          if (this.imgName != undefined) {
-            this.afdb.object(`/profile/` + this.userId).update({profPic: this.imgName}).then(() => {
-              this.upload(this.imgPath, this.imgName);
-            }).catch((error)=>{
-              console.log("error in update profile pic value: " + JSON.stringify(error));
-            })     
-          }     
-          
+      this.user.updateEmail(this.userForm.value['email'])
+        .catch((error: "auth/email-already-in-use")=> {
           loading.dismiss();
-          this.showToast();
-          this.navCtrl.setRoot('HoprofilePage');
-        }).catch((error)=>{
-          console.log("error in update profile values: " + JSON.stringify(error));
-        })
-      }).catch((error: "auth/email-already-in-use")=> {
-        loading.dismiss();
-        this.showEmailToast();
+          this.showToast('Cannot update email. Email already taken or used.');
+          cont = false;
       })
-    }  
+    }
+
+    if (this.userForm.value['password'] != null) {
+      this.user.updatePassword(this.userForm.value['password']);
+    }
+
+    // Update profile values
+    this.afdb.object(`/profile/` + this.userId).update(this.userForm.value).then(d => {
+
+      // Update profile picture
+      if (this.imgName != undefined) {
+        this.afdb.object(`/profile/` + this.userId).update({profPic: this.imgName}).then(() => {
+          this.file.readAsArrayBuffer(this.imgPath, this.imgName).then(async (buffer)=>{
+            await this.upload(buffer, this.imgName, this.imgType).then(() => {
+              loading.dismiss();
+              this.showToast('Profile updated successfully.');
+              this.navCtrl.setRoot('HoprofilePage');
+            })
+          })
+        })    
+      } else {
+        if (cont) {
+          loading.dismiss();
+          this.showToast('Profile updated successfully.');
+          this.navCtrl.setRoot('HoprofilePage');
+        }
+      }       
+    })
   }
 }
