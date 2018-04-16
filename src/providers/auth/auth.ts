@@ -46,9 +46,13 @@ export class AuthProvider {
     return this.afdb.object('.info/connected').valueChanges()
       .subscribe(connected => {
         if (connected) {
-          status = 'online';
-          this.updateStatus(status);
-          console.log("user status: " + status);
+          this.getUser().subscribe(data => {
+            if (data.reg_status === "approved") {
+              status = 'online';
+              this.updateStatus(status);
+              console.log("user status: " + status);
+            }
+          })
         }
       });
   }
