@@ -76,8 +76,8 @@ export class CoHomePage {
 			// 	};
 			// });
 			
-			statusBar.styleDefault();
-			splashScreen.hide();
+			// statusBar.styleDefault();
+			// splashScreen.hide();
 		});
 		menuCtrl.enable(true);
 	}
@@ -86,18 +86,19 @@ export class CoHomePage {
 		this.map = this.initMap();
 	}
 
-	ngOnDestroy(){
-		this.location.unsubscribe();
-		this.hoMarkers.unsubscribe();
+	ionViewDidLeave(){
+		// this.location.unsubscribe();
+		// this.hoMarkers.unsubscribe();
+		alert('ngondestroy');
 	}
 
 	ionViewDidEnter(){
-		var location = this.getCurrentLocation()
-		.subscribe(location => {
-			this.setDirections(location);
-			this.centerLocation(location);
-			this.setMarkers();
-		});
+		// this.location = this.getCurrentLocation()
+		// .subscribe(location => {
+		// 	this.setDirections(location);
+		// 	this.centerLocation(location);
+		// 	this.setMarkers();
+		// });
 	}
 
 	openMenu(evt) {

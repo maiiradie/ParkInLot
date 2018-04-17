@@ -35,10 +35,9 @@ export class LoginPage {
   ionViewDidLoad() {
   }
 
-  ionViewDidLeave() {
-    if (this.x != undefined) {
-      this.x.unsubscribe();
-    }
+  ionViewDidLeave(){
+    this.x.unsubscribe();
+    alert('ondestroy login');
   }
 
   forgotPassword() {
@@ -55,56 +54,54 @@ export class LoginPage {
 
   onSignin(){
 		let loading = this.loadingCtrl.create({
-      content: 'Logging In',
-      dismissOnPageChange:true
+      content: 'Logging In'
 		});
 
-		loading.present(loading);   
+		loading.present(loading).then( () => {
+      if ((this.login.email != null) || (this.login.password != null)) {
+        this.authProvider.loginUser(this.login).then(() => {
 
-    if((this.login.email != null) || (this.login.password != null)) {
-      this.authProvider.loginUser(this.login).then(() => {
-        this.authProvider.setID();
-        if (this.authProvider.setID().length != 0) {
-          this.x =  this.authProvider.getUser().subscribe((data)=>{
-            if (data.reg_status === "approved") {
-              if (data.carowner) {
-                this.x.unsubscribe();
-                this.navCtrl.setRoot("CoHomePage").then(data => {
-              }, (error) => {
-                  alert(error);
-              });
-              } else if(data.homeowner){
-                this.x.unsubscribe();
-                this.navCtrl.setRoot("HoHomePage");
+          this.authProvider.setID();
+
+          if (this.authProvider.setID().length != 0) {
+
+            this.x = this.authProvider.getUser().subscribe((data) => {
+              if (data.reg_status === "approved") {
+                if (data.carowner) {
+                  this.navCtrl.setRoot("CoHomePage");
+                } else if (data.homeowner) {
+                  this.navCtrl.setRoot("HoHomePage");
+                }
+              } else if (data.reg_status === "rejected") {
+                this.showToast('Cannot login to application. Account request has been rejected by admin.');
+              } else {
+                this.showToast('Cannot login to application. Account request has not yet been approved by admin.');
               }
-            } else if (data.reg_status === "rejected") {
-              this.x.unsubscribe();
-              this.showToast('Cannot login to application. Account request has been rejected by admin.');
-            } else {
-              this.x.unsubscribe();
-              this.showToast('Cannot login to application. Account request has not yet been approved by admin.');
-            }
-            loading.dismiss();
-         })
-       }
-      }).catch((error)=>{
+              loading.dismiss();
+            });
+          }
+
+        }).catch((error) => {
+          loading.dismiss();
+          if (error.code === "auth/network-request-failed") {
+            this.showToast('Cannot login. No internet connection.');
+          } else if (error.code === "auth/invalid-email") {
+            this.showToast('Invalid email address');
+          } else if (error.code === "auth/user-not-found") {
+            this.showToast('No user registered with the email');
+          } else if (error.code === "auth/wrong-password") {
+            this.showToast('The password is incorrect');
+          }
+        });
+
+      } else {
         loading.dismiss();
-        if (error.code === "auth/network-request-failed") {
-          this.showToast('Cannot login. No internet connection.');
-        } else if (error.code === "auth/invalid-email") {
-          this.showToast('Invalid email address');
-        } else if (error.code === "auth/user-not-found") {
-          this.showToast('No user registered with the email');
-        } else if (error.code === "auth/wrong-password") {
-          this.showToast('The password is incorrect');
-        }
-      })
-    } else {
-      loading.dismiss();
-      this.showToast('Please input email and password');
-    }
+        this.showToast('Please input email and password');
+      }
+
+    });   
   }
-  
+
   register(){
   	this.navCtrl.push("RegisterPage");
   }  
