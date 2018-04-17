@@ -45,55 +45,58 @@ export class CoHomePage {
 		private menuCtrl: MenuController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
 		platform.ready().then(() => {
-			this.requestProvider.saveToken();
-			this.fcm.onNotification().subscribe(data => {
+			// this.requestProvider.saveToken();
+			// this.fcm.onNotification().subscribe(data => {
 
-				if (data.wasTapped) {
-					if (data.status == 'declined') {
-						alert('Your request has been declined.');
-					} else if (data.status == 'accepted') {
-						alert('Your request has been accepted.');
-						this.navCtrl.pop()
-							.then(() => {
-								this.setDest(data.lang, data.latt);
-							});
-					} else {
-						alert('Something went wrong with the request.')
-					}
-				} else {
-					if (data.status == 'declined') {
-						alert('Your request has been declined.');
-					} else if (data.status == 'accepted') {
-						alert('Your request has been accepted.');
-						this.navCtrl.pop()
-							.then(() => {
-								this.setDest(data.lang, data.latt);
-							});
-					} else {
-						alert('Something went wrong with the request.')
-					}
+			// 	if (data.wasTapped) {
+			// 		if (data.status == 'declined') {
+			// 			alert('Your request has been declined.');
+			// 		} else if (data.status == 'accepted') {
+			// 			alert('Your request has been accepted.');
+			// 			this.navCtrl.pop()
+			// 				.then(() => {
+			// 					this.setDest(data.lang, data.latt);
+			// 				});
+			// 		} else {
+			// 			alert('Something went wrong with the request.')
+			// 		}
+			// 	} else {
+			// 		if (data.status == 'declined') {
+			// 			alert('Your request has been declined.');
+			// 		} else if (data.status == 'accepted') {
+			// 			alert('Your request has been accepted.');
+			// 			this.navCtrl.pop()
+			// 				.then(() => {
+			// 					this.setDest(data.lang, data.latt);
+			// 				});
+			// 		} else {
+			// 			alert('Something went wrong with the request.')
+			// 		}
 
-				};
-			});
+			// 	};
+			// });
 			
 			statusBar.styleDefault();
 			splashScreen.hide();
 		});
-
 		menuCtrl.enable(true);
-
 	}
 
 	ionViewDidLoad() {
 		this.map = this.initMap();
 	}
 
+	ngOnDestroy(){
+		this.location.unsubscribe();
+		this.hoMarkers.unsubscribe();
+	}
+
 	ionViewDidEnter(){
-		var location = this.getCurrentLocation().subscribe(location => {
+		var location = this.getCurrentLocation()
+		.subscribe(location => {
 			this.setDirections(location);
 			this.centerLocation(location);
 			this.setMarkers();
-			location.unsubscribe();
 		});
 	}
 
@@ -109,56 +112,43 @@ export class CoHomePage {
 	}
 
 	setMarkers() {
-
 		const arr = [];
 		var map = this.map;
-		var markers = this.afdb.list('location').snapshotChanges().subscribe(data => {
+		this.hoMarkers = this.afdb.list('location').snapshotChanges().subscribe(data => {
 			for (var a = 0; a < data.length; a++) {
 				arr.push(data[a]);
 			}
 
-			const popup = new mapboxgl.Popup();
-
 			for (var i = 0; i < arr.length; i++) {
-				// popup.setHTML('<h1>Loakan namba wan!</h1>');
+
 				var el = document.createElement('div');
-				el.innerHTML = "mapmarker";
+				el.innerHTML = "Marker!";
 				el.id = data[i].key;
 				el.className = "mapmarker";
+
 				var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
+
 				new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)
-					.setPopup(popup)
 					.addTo(map);
 
 				el.addEventListener('click', (e) => {
+					
 					var tmp = e.srcElement.id;
+
 					let actionSheet = this.actionSheetCtrl.create({
 						title: '',
 						buttons: [
-
-							// {
-							// 	text: 'Request',
-							// 	role: 'destructive',
-							// 	handler: () => {
-							// 		console.log('Destructive clicked');
-
-							// 	}
-							// }, 
 							{
 								text: 'More Details',
 								handler: () => {
-									this.navCtrl.push("ComoredetailsPage", { key: tmp })
-										.then(() => {
-											popup.remove();
-										})
-
+									this.navCtrl.push("ComoredetailsPage", { key: tmp });
 								}
-							}, {
+							},
+							{
 								text: 'Cancel',
 								role: 'cancel',
 								handler: () => {
-									popup.remove();
 								}
 							}
 						]
@@ -166,12 +156,9 @@ export class CoHomePage {
 					actionSheet.present();
 				});
 			}
-			markers.unsubscribe();
-
 		});
 
 	}
-
 
 	setDirections(location) {
 		this.directions = new MapboxDirections({
@@ -212,18 +199,14 @@ export class CoHomePage {
 
 	//returns latlng coordinates
 	getCurrentLocation() {
-
 		let loading = this.loadingCtrl.create({
 			content: 'Locating...'
 		});
 
 		loading.present(loading);
 
-		setTimeout(() => {
-			loading.dismiss();
-		}, 5000);
 		let options = {
-			// timeout: 100000,f
+			// timeout: 100000,
 			enableHighAccuracy: true
 		};
 
@@ -232,7 +215,6 @@ export class CoHomePage {
 				.then(resp => {
 					let lat = resp.coords.latitude;
 					let lng = resp.coords.longitude;
-
 
 					let location = new mapboxgl.LngLat(lng, lat);
 
@@ -248,16 +230,17 @@ export class CoHomePage {
 		return locationsObs;
 	}
 
+	location;
+
 	centerLocation(location) {
 		if (location) {
 			this.map.panTo(location);
 			this.addMarker(location);
 		} else {
-			var location = this.getCurrentLocation().subscribe(currentLocation => {
+			this.location = this.getCurrentLocation().subscribe(currentLocation => {
 				this.map.panTo(currentLocation);
 				this.marker.remove();
 				this.addMarker(currentLocation);
-				location.unsubscribe();
 			});
 		}
 	}

@@ -31,9 +31,7 @@ export class RequestProvider {
       });
     });
   }
-
-
-
+  
   sendRequest(token, coID, hoID) {
     // alert('request sent');
     var x = this.afdb.object<any>('requests/' + hoID).valueChanges().subscribe(data => {

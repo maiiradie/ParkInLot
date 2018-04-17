@@ -20,12 +20,9 @@ export class AuthProvider {
         this.updateOnConnect();
         this.updateOnDisconnect();
       } else {
-        //debug
         console.log('currently logged out');
       }
     });
-
-    this.afdb.list('/location');
   }
 
   setID() {
@@ -64,10 +61,6 @@ export class AuthProvider {
       });
   }
 
-  //location helper / for markers
-  getHO() {
-  }
-
   loginUser(login) {
     return this.afs.auth.signInWithEmailAndPassword(login.email, login.password);
   }
@@ -99,7 +92,6 @@ export class AuthProvider {
         });
      })
    }
- 
 
   locateHO() {
     let options = {

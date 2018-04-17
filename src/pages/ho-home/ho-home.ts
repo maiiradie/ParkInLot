@@ -12,12 +12,6 @@ import { FCM } from '@ionic-native/fcm';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-/**
- * Generated class for the HoHomePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
 
 @IonicPage()
 @Component({
@@ -29,84 +23,84 @@ export class HoHomePage {
   carStatus: string = "Parked";
   isAndroid: boolean = false;
 
-
   arrivingData: Array<any> = [];
   parkedData: Array<any> = [];
 
   userData: any;
   unfiltered: any;
   filtered: any;
-  private userId;
+  userId;
   arr: any;
   myId = this.authProvider.setID();
-  public items: Array<any> = [];
-  public itemRef: firebase.database.Reference = firebase.database().ref('/transac');
+  items: Array<any> = [];
+  itemRef: firebase.database.Reference = firebase.database().ref('/transac');
 
-  public fname;
-  public lname;
+  fname;
+  lname;
+  
   constructor(private requestProvider: RequestProvider, private fcm: FCM, public navCtrl: NavController, public navParams: NavParams,
     private platform: Platform, private afdb: AngularFireDatabase, private authProvider: AuthProvider, private alertCtrl: AlertController,
     private menuCtrl: MenuController) {
     this.isAndroid = platform.is('android');
 
     platform.ready().then(() => {
-      this.requestProvider.saveToken();
+      // this.requestProvider.saveToken();
 
-      this.fcm.onNotification().subscribe(data => {
+      // this.fcm.onNotification().subscribe(data => {
 
-        this.afdb.object<any>('profile/' + data.coID).valueChanges().subscribe(codata => {          
-          var fname, lname, platenumber: any;
-          fname = codata.fname;
-          lname = codata.lname;
-          platenumber = 'ABC-169';
-          if (data.wasTapped) {
+      //   this.afdb.object<any>('profile/' + data.coID).valueChanges().subscribe(codata => {          
+      //     var fname, lname, platenumber: any;
+      //     fname = codata.fname;
+      //     lname = codata.lname;
+      //     platenumber = 'ABC-169';
+      //     if (data.wasTapped) {
 
-            let confirm = this.alertCtrl.create({
-              // add platenumber here
-              title: 'You have a parking space request from ' + fname + ' ' + lname,
-              enableBackdropDismiss:false,
-              buttons: [
-                {
-                  text: 'Decline',
-                  handler: () => {
-                    this.requestProvider.declineRequest(data.coID, data.hoID);
-                  }
-                },
-                {
-                  text: 'Accept',
-                  handler: () => {
-                    this.requestProvider.acceptRequest(data.coID, data.hoID);                    
-                  }
-                }
-              ],
-            });
-            confirm.present();
+      //       let confirm = this.alertCtrl.create({
+      //         // add platenumber here
+      //         title: 'You have a parking space request from ' + fname + ' ' + lname,
+      //         enableBackdropDismiss:false,
+      //         buttons: [
+      //           {
+      //             text: 'Decline',
+      //             handler: () => {
+      //               this.requestProvider.declineRequest(data.coID, data.hoID);
+      //             }
+      //           },
+      //           {
+      //             text: 'Accept',
+      //             handler: () => {
+      //               this.requestProvider.acceptRequest(data.coID, data.hoID);                    
+      //             }
+      //           }
+      //         ],
+      //       });
+      //       confirm.present();
             
-          } else {
+      //     } else {
 
-            let confirm = this.alertCtrl.create({
-              // add platenumber here
-              title: 'You have a parking space request from ' + fname + ' ' + lname ,
-              enableBackdropDismiss:false,
-              buttons: [
-                {
-                  text: 'Decline',
-                  handler: () => {
-                    this.requestProvider.declineRequest(data.coID, data.hoID);
-                  }
-                },
-                {
-                  text: 'Accept',
-                  handler: () => {
-                    this.requestProvider.acceptRequest(data.coID, data.hoID);                    
-                  }
-                }
-              ],
-            });
-            confirm.present();
-          };
-        });
-      });
+      //       let confirm = this.alertCtrl.create({
+      //         // add platenumber here
+      //         title: 'You have a parking space request from ' + fname + ' ' + lname ,
+      //         enableBackdropDismiss:false,
+      //         buttons: [
+      //           {
+      //             text: 'Decline',
+      //             handler: () => {
+      //               this.requestProvider.declineRequest(data.coID, data.hoID);
+      //             }
+      //           },
+      //           {
+      //             text: 'Accept',
+      //             handler: () => {
+      //               this.requestProvider.acceptRequest(data.coID, data.hoID);                    
+      //             }
+      //           }
+      //         ],
+      //       });
+      //       confirm.present();
+      //     };
+      //   });
+      // });
       
     });
 
