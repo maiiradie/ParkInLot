@@ -53,73 +53,13 @@ export class MyApp {
     statusBar: StatusBar,
     splashScreen: SplashScreen) {
     platform.ready().then(() => {
-      // Okay, so the platform is ready and our plugins are available.
-      // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
 
       this.menuCtrl.swipeEnable(false);
-      var user = firebase.auth().currentUser;
-      this.retrieveUser();
-            
-      if (user) {
-        this.authProvider.getUser().subscribe((data)=>{
-          if (data.reg_status === "approved") {
-            if (data.carowner) {
-              this.rootPage = CoHomePage;
-            } else if(data.homeowner){
-              this.rootPage = HoHomePage;
-            }
-          }
-
-      //     var userId = this.authProvider.setID();
-
-      //     this.afdb.object(`/profile/` + userId).valueChanges().subscribe( data => {
-      //       this.profileData = data;
-      //       this.retrieveImg();
-      //     });
-      //   })
-      // } else {
-      //   this.rootPage = LoginPage;
-      // }
-
-      // this.storage.get('loggedInUser').then((isLoggedIn) => {
-      //   this.loggedIn = isLoggedIn;
-
-      //   if (!this.loggedIn) {
-      //     this.rootPage = LoginPage;
-      //   } else if (this.loggedIn) {
-      //     this.afs.authState.take(1).subscribe( auth => {
-      //       this.afdb.object(`/profile/${auth.uid}`).valueChanges().subscribe( data => {
-      //         this.profileData = data;
-      //         this.retrieveImg();
-      //       });
-          });
-        }
-      // })
+      // this.retrieveUser();
     });
-
-  // this.pages = [
-  //     {title: 'Profile', component: ProfilePage }
-  //   ]
-  // }
-
-  // openPage(page){
-  //   this.nav.push(page.component);
-  // }
-
-  // logout(){
-  //   this.authProvider.logoutUser()
-  //   .then(() => {
-  //      this.menuCtrl.close()
-  //      .then( () => {
-  //         this.nav.setRoot(LoginPage);
-  //      });
-
-  //   });
   }
-
-  
   
   openPage(page: string){
     this.nav.setRoot(page);
@@ -143,7 +83,7 @@ export class MyApp {
         this.profileData = null;
         this.imgName = "./assets/imgs/avatar.jpg";
       }
-    })
+    });
   }
 
 

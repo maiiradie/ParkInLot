@@ -13,12 +13,12 @@ export class AuthProvider {
 
   //Current ID
   userId: any;
+  userStatus;
 
   constructor(private FCM: FCM, private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
     this.afs.auth.onAuthStateChanged(user => {
       if (user) {
-        // this.updateOnConnect();
-        console.log('user logged in');
+        this.updateOnConnect();
         this.updateOnDisconnect();
       } else {
         console.log('currently logged out');
@@ -41,16 +41,16 @@ export class AuthProvider {
   }
 
   updateOnConnect() {
-    return this.afdb.object('.info/connected').valueChanges()
+    return this.userStatus = this.afdb.object('.info/connected').valueChanges()
       .subscribe(connected => {
         if (connected) {
-          this.getUser().subscribe(data => {
-            if (data.reg_status === "approved") {
+          // this.getUser().subscribe(data => {
+          //   if (data.reg_status === "approved") {
               status = 'online';
               this.updateStatus(status);
               console.log("user status: " + status);
-            }
-          })
+        //     }
+        //   });
         }
       });
   }

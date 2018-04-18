@@ -36,8 +36,12 @@ export class LoginPage {
   }
 
   ionViewDidLeave(){
-    this.x.unsubscribe();
-    alert('ondestroy login');
+    if(this.x != null){
+      this.x.unsubscribe();
+      alert('x not null unsubscribed');
+    }     
+    // this.authProvider.userStatus.unsubscribe();
+    alert('ondestroy login unsubscribed');
   }
 
   forgotPassword() {
