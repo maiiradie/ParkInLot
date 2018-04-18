@@ -165,7 +165,7 @@ export class MyApp {
     }).catch((error) => {
       console.log("error in retrieving image: " + JSON.stringify(error));
       this.imgName = "./assets/imgs/avatar.jpg";
-    })
+    });
  }
 
   logout(){

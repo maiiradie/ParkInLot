@@ -15,14 +15,15 @@ export class AuthProvider {
   userId: any;
 
   constructor(private FCM: FCM, private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
-    // this.afs.auth.onAuthStateChanged(user => {
-    //   if (user) {
-    //     this.updateOnConnect();
-    //     this.updateOnDisconnect();
-    //   } else {
-    //     console.log('currently logged out');
-    //   }
-    // });
+    this.afs.auth.onAuthStateChanged(user => {
+      if (user) {
+        // this.updateOnConnect();
+        console.log('user logged in');
+        this.updateOnDisconnect();
+      } else {
+        console.log('currently logged out');
+      }
+    });
   }
 
   setID() {
@@ -66,12 +67,9 @@ export class AuthProvider {
   }
 
   logoutUser() {
-    // return this.updateStatus('offline').then( () =>{
-   return this.afs.auth.signOut();
-    // });
-      // .then(() => {
-      //   this.updateStatus('offline');
-      // });
+    return this.updateStatus('offline').then( () => {
+        this.afs.auth.signOut();
+    });
   }
 
   registerCarOwner(uForm, cForm, img){
