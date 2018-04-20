@@ -3,16 +3,15 @@ import { NavController, LoadingController, ActionSheetController, IonicPage, Pla
 import * as mapboxgl from 'mapbox-gl';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Observable } from 'rxjs/Observable';
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
-
 import { AngularFireDatabase } from 'angularfire2/database';
 import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
 
 import { ComoredetailsPage } from '../comoredetails/comoredetails';
 import { FCM } from '@ionic-native/fcm';
 import { RequestProvider } from '../../providers/request/request';
+import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireAuth } from 'angularfire2/auth';
+import * as firebase from 'firebase/app';
 
 declare var FCMPlugin;
 
@@ -24,81 +23,99 @@ declare var FCMPlugin;
 
 export class CoHomePage {
 
-	public map;
-	public marker;
-	public directions;
-	public hoMarkers;
+	map;
+	marker;
+	directions;
+	hoMarkers;
+	location;
+	userId = this.authProvider.userId;
 
-	//private authProvider:AuthProvider,
 	constructor(private afAuth: AngularFireAuth,
 		private afdb: AngularFireDatabase,
-		statusBar: StatusBar,
-		splashScreen: SplashScreen,
+		private authProvider:AuthProvider,
 		private requestProvider: RequestProvider,
 		private alertCtrl: AlertController,
 		private fcm: FCM,
-		platform: Platform,
+		public platform: Platform,
 		public actionSheetCtrl: ActionSheetController,
 		private geolocation: Geolocation,
 		public navCtrl: NavController,
 		public loadingCtrl: LoadingController,
 		private menuCtrl: MenuController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
-		platform.ready().then(() => {
-			// this.requestProvider.saveToken();
-			// this.fcm.onNotification().subscribe(data => {
-
-			// 	if (data.wasTapped) {
-			// 		if (data.status == 'declined') {
-			// 			alert('Your request has been declined.');
-			// 		} else if (data.status == 'accepted') {
-			// 			alert('Your request has been accepted.');
-			// 			this.navCtrl.pop()
-			// 				.then(() => {
-			// 					this.setDest(data.lang, data.latt);
-			// 				});
-			// 		} else {
-			// 			alert('Something went wrong with the request.')
-			// 		}
-			// 	} else {
-			// 		if (data.status == 'declined') {
-			// 			alert('Your request has been declined.');
-			// 		} else if (data.status == 'accepted') {
-			// 			alert('Your request has been accepted.');
-			// 			this.navCtrl.pop()
-			// 				.then(() => {
-			// 					this.setDest(data.lang, data.latt);
-			// 				});
-			// 		} else {
-			// 			alert('Something went wrong with the request.')
-			// 		}
-
-			// 	};
-			// });
-			
-			// statusBar.styleDefault();
-			// splashScreen.hide();
+		this.afAuth.auth.onAuthStateChanged(user => {
+			if (user) {
+				this.authProvider.updateStatus('online');
+				this.authProvider.updateOnDisconnect();
+			}
 		});
+
+		this.requestProvider.saveToken();
+		this.onNotification();
 		menuCtrl.enable(true);
+	}
+
+	async onNotification(){
+		try {
+			await this.platform.ready();
+
+			this.fcm.onNotification().subscribe(data => {
+
+				if (data.wasTapped) {
+
+					if (data.status == 'declined') {
+						alert('Your request has been declined.');
+					} else if (data.status == 'accepted') {
+						alert('Your request has been accepted.');
+						this.navCtrl.pop()
+							.then(() => {
+								this.setDest(data.lang, data.latt);
+							});
+					} else {
+						alert('Something went wrong with the request.')
+					}
+
+				} else {
+
+					if (data.status == 'declined') {
+						alert('Your request has been declined.');
+					} else if (data.status == 'accepted') {
+						alert('Your request has been accepted.');
+						this.navCtrl.pop()
+							.then(() => {
+								this.setDest(data.lang, data.latt);
+							});
+					} else {
+						alert('Something went wrong with the request.')
+					}
+
+				};
+			},(error) => {
+				console.log(error);
+			});
+
+		} catch (e) {
+			console.log(e);
+		}
 	}
 
 	ionViewDidLoad() {
 		this.map = this.initMap();
 	}
 
-	ionViewDidLeave(){
-		// this.location.unsubscribe();
-		// this.hoMarkers.unsubscribe();
-		alert('ngondestroy');
+	ngOnDestroy(){
+		this.location.unsubscribe();
+		this.hoMarkers.unsubscribe();
+		alert('ngondestroy cohome');
 	}
 
 	ionViewDidEnter(){
-		// this.location = this.getCurrentLocation()
-		// .subscribe(location => {
-		// 	this.setDirections(location);
-		// 	this.centerLocation(location);
-		// 	this.setMarkers();
-		// });
+		this.location = this.getCurrentLocation()
+		.subscribe(location => {
+			this.setDirections(location);
+			this.centerLocation(location);
+			this.setMarkers();
+		});
 	}
 
 	openMenu(evt) {
@@ -113,9 +130,11 @@ export class CoHomePage {
 	}
 
 	setMarkers() {
-		const arr = [];
+		var arr = [];
 		var map = this.map;
+
 		this.hoMarkers = this.afdb.list('location').snapshotChanges().subscribe(data => {
+
 			for (var a = 0; a < data.length; a++) {
 				arr.push(data[a]);
 			}
@@ -134,9 +153,7 @@ export class CoHomePage {
 					.addTo(map);
 
 				el.addEventListener('click', (e) => {
-					
 					var tmp = e.srcElement.id;
-
 					let actionSheet = this.actionSheetCtrl.create({
 						title: '',
 						buttons: [
@@ -166,7 +183,7 @@ export class CoHomePage {
 			accessToken: mapboxgl.accessToken,
 			interactive: false,
 			controls: {
-				inputs: false,
+				inputs: true,
 				profileSwitcher: false,
 				instructions: false
 			}
@@ -174,7 +191,7 @@ export class CoHomePage {
 
 		this.map.addControl(this.directions, 'top-left');
 
-		this.directions.setOrigin(location.lng + ',' + location.lat);
+		// this.directions.setOrigin(location.lng + ',' + location.lat);
 	}
 
 	setDest(lang, latt) {
@@ -198,40 +215,37 @@ export class CoHomePage {
 		return map;
 	}
 
-	//returns latlng coordinates
 	getCurrentLocation() {
 		let loading = this.loadingCtrl.create({
 			content: 'Locating...'
 		});
-
-		loading.present(loading);
 
 		let options = {
 			// timeout: 100000,
 			enableHighAccuracy: true
 		};
 
-		let locationsObs = Observable.create(observable => {
-			this.geolocation.getCurrentPosition(options)
-				.then(resp => {
-					let lat = resp.coords.latitude;
-					let lng = resp.coords.longitude;
+		loading.present(loading);
 
-					let location = new mapboxgl.LngLat(lng, lat);
+			let locationsObs = Observable.create(observable => {
+				this.geolocation.getCurrentPosition(options)
+					.then(resp => {
+						let lat = resp.coords.latitude;
+						let lng = resp.coords.longitude;
 
-					observable.next(location);
-					loading.dismiss();
+						let location = new mapboxgl.LngLat(lng, lat);
 
-				}).catch(error => {
-					console.log('Error getting location', error);
-					loading.dismiss();
-				});
-		});
+						observable.next(location);
+						loading.dismiss();
 
-		return locationsObs;
+					}).catch(error => {
+						console.log('Error getting location', error);
+						loading.dismiss();
+					});
+			});
+			
+			return locationsObs;
 	}
-
-	location;
 
 	centerLocation(location) {
 		if (location) {
@@ -247,15 +261,11 @@ export class CoHomePage {
 	}
 
 	addMarker(location) {
-		if (location) {
-			var el = document.createElement('div');
-			el.className = "carmarker";
+		var el = document.createElement('div');
+		el.className = "carmarker";
 
-			this.marker = new mapboxgl.Marker(el)
-				.setLngLat(location)
-				.addTo(this.map);
-		} else {
-			console.log('No coordinates!');
-		}
+		this.marker = new mapboxgl.Marker(el)
+			.setLngLat(location)
+			.addTo(this.map);
 	}
 }

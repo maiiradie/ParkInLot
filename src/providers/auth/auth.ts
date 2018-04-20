@@ -11,21 +11,13 @@ import { FCM } from '@ionic-native/fcm';
 @Injectable()
 export class AuthProvider {
 
-  //Current ID
+  //Logged in user ID
   userId: any;
-  userStatus;
 
   constructor(private FCM: FCM, private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
-    this.afs.auth.onAuthStateChanged(user => {
-      if (user) {
-        this.updateOnConnect();
-        this.updateOnDisconnect();
-      } else {
-        console.log('currently logged out');
-      }
-    });
   }
 
+  //run onlogin
   setID() {
     return this.userId = this.afs.auth.currentUser.uid;
   }
@@ -37,24 +29,9 @@ export class AuthProvider {
   updateOnDisconnect() {
     firebase.database().ref().child('profile/' + this.userId)
       .onDisconnect()
-      .update({ status: 'offline' })
+      .update({ status: 'offline' });
   }
 
-  updateOnConnect() {
-    return this.userStatus = this.afdb.object('.info/connected').valueChanges()
-      .subscribe(connected => {
-        if (connected) {
-          // this.getUser().subscribe(data => {
-          //   if (data.reg_status === "approved") {
-              status = 'online';
-              this.updateStatus(status);
-              console.log("user status: " + status);
-        //     }
-        //   });
-        }
-      });
-  }
-  //Status helper
   updateStatus(status) {
     return this.afdb.object('profile/' + this.userId)
       .update({ 

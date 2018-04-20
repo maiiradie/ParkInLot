@@ -14,10 +14,9 @@ export class ComoredetailsPage {
   hoID;
   profileData:any;
   userData:any;
-  public imgName;
+  imgName;
 
   constructor(private requestProvider:RequestProvider, private afdb:AngularFireDatabase,public navCtrl: NavController, public navParams: NavParams) {
-
   }
 
   ionViewDidLoad() { 
@@ -26,11 +25,16 @@ export class ComoredetailsPage {
     this.retrieveImg();
   }
 
+  ngOnDestroy(){
+    alert('this is ngondestroy of comoredetails');
+  }
+
   displayInfo(){
-    this.afdb.object('profile/'+ this.hoID).snapshotChanges().subscribe( data => {
+    
+    this.afdb.object('profile/'+ this.hoID).snapshotChanges().take(1).subscribe( data => {
       this.profileData = data.payload.val();
     });
-    this.afdb.object('location/'+ this.hoID).snapshotChanges().subscribe( data => {
+    this.afdb.object('location/'+ this.hoID).snapshotChanges().take(1).subscribe( data => {
       this.userData = data.payload.val();
     });
   }
@@ -41,12 +45,10 @@ export class ComoredetailsPage {
   }
 
   retrieveImg() {
-    
       firebase.storage().ref().child("images/" + this.hoID + "/" + this.profileData.garagePic).getDownloadURL().then(d=>{
         this.imgName = d;
       }).catch((error)=>{
         alert(JSON.stringify(error));
       })  
   }
-
 }

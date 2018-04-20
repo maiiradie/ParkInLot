@@ -13,8 +13,8 @@ import { ValidationPath } from '@firebase/database/dist/esm/src/core/util/Path';
 export class RequestProvider {
 
   userId: any;
-  public coID: any;
-  key = "key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM";
+  coID: any;
+  private key = "key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM";
 
   constructor(private toastCtrl: ToastController, private afAuth: AngularFireAuth, private fcm: FCM, public http: HttpClient, private afdb: AngularFireDatabase) {
     this.setID();
@@ -33,7 +33,6 @@ export class RequestProvider {
   }
   
   sendRequest(token, coID, hoID) {
-    // alert('request sent');
     var x = this.afdb.object<any>('requests/' + hoID).valueChanges().subscribe(data => {
       if (data.reqStatus == 'occupied' || data.reqStatus == 'accepted') {
         alert(data.reqStatus);
@@ -70,9 +69,7 @@ export class RequestProvider {
           headers: options.set('Authorization', this.key),
         }).subscribe();
       }
-
     });
-
 
   }
 
@@ -80,7 +77,8 @@ export class RequestProvider {
     let toast = this.toastCtrl.create({
       message: 'Request sent!',
       duration: 5000
-    })
+    });
+
     toast.present();
   }
 
@@ -98,7 +96,6 @@ export class RequestProvider {
       status: "declined",
       createdAt: Date.now()
     });
-
 
     this.afdb.object<any>('profile/' + coID).valueChanges()
       .subscribe(data => {
@@ -123,9 +120,7 @@ export class RequestProvider {
           headers: options.set('Authorization', this.key),
         }).subscribe();
 
-      }).unsubscribe();
-
-
+      });
   }
   
   acceptRequest(coID, hoID) {
@@ -160,9 +155,9 @@ export class RequestProvider {
               this.http.post("https://fcm.googleapis.com/fcm/send", body, {
                 headers: options.set('Authorization', this.key),
               }).subscribe();
-            }).unsubscribe();
+            });
         });
-      }).unsubscribe();
+      });
 
   }
 

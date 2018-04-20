@@ -1,14 +1,9 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController,LoadingController } from 'ionic-angular';
-
-// import { RegisterPage } from '../register/register';
-
 import { RegisterPage } from '../register/register';
-
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
-
 import { Profile } from '../../models/profile';
 // import { Garage } from '../../models/garage';
 
@@ -20,8 +15,8 @@ import { Profile } from '../../models/profile';
 export class LoginPage {
 
   login = {} as any;
-  profileData:any;
-  x:any;
+  profileData;
+  x;
 
   constructor(public authProvider:AuthProvider, 
     public navCtrl: NavController, 
@@ -34,20 +29,7 @@ export class LoginPage {
 
   ionViewDidLoad() {
   }
-
-  ionViewDidLeave(){
-    if(this.x != null){
-      this.x.unsubscribe();
-      alert('x not null unsubscribed');
-    }     
-    // this.authProvider.userStatus.unsubscribe();
-    alert('ondestroy login unsubscribed');
-  }
-
-  forgotPassword() {
-    this.navCtrl.push("ForgotPasswordPage");
-  }
-
+  
   showToast(message) {
     let toast = this.toastCtrl.create({
       message: message,
@@ -61,7 +43,8 @@ export class LoginPage {
       content: 'Logging In'
 		});
 
-		loading.present(loading).then( () => {
+    loading.present(loading);
+    
       if ((this.login.email != null) || (this.login.password != null)) {
         this.authProvider.loginUser(this.login).then(() => {
 
@@ -73,8 +56,10 @@ export class LoginPage {
               if (data.reg_status === "approved") {
                 if (data.carowner) {
                   this.navCtrl.setRoot("CoHomePage");
+                  this.x.unsubscribe();
                 } else if (data.homeowner) {
                   this.navCtrl.setRoot("HoHomePage");
+                  this.x.unsubscribe();
                 }
               } else if (data.reg_status === "rejected") {
                 this.showToast('Cannot login to application. Account request has been rejected by admin.');
@@ -103,9 +88,12 @@ export class LoginPage {
         this.showToast('Please input email and password');
       }
 
-    });   
   }
 
+  forgotPassword() {
+    this.navCtrl.push("ForgotPasswordPage");
+  }
+  
   register(){
   	this.navCtrl.push("RegisterPage");
   }  
