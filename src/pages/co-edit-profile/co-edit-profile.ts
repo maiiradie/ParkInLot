@@ -29,12 +29,12 @@ import 'rxjs/add/operator/take';
 export class CoEditProfilePage {
   profileData:any;
   userForm:FormGroup;
-  public imgName;
-  public imgUrl;
+  imgName;
+  imgUrl;
+  user;
   private imgPath;
   private userId;
   private imgType;
-  public user;
   private oldEmail;
   profile$: AngularFireObject<any>;
 
@@ -58,15 +58,13 @@ export class CoEditProfilePage {
         'password':[null,Validators.compose([Validators.minLength(6), Validators.maxLength(30)])],
         'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])]
       });
+    this.userId = this.authProvider.setID();
   }
 
   ionViewDidLoad() {
-    this.userId = this.authProvider.setID();
-    
-    this.afdb.object(`/profile/` + this.userId).valueChanges().subscribe( data => {
+    this.afdb.object(`/profile/` + this.userId).valueChanges().take(1).subscribe( data => {
       this.profileData = data;
       this.oldEmail = this.profileData.email;
-
       this.retrieveImg();
     });
   }
@@ -79,7 +77,6 @@ export class CoEditProfilePage {
     })   
   }
 
-  // Create Toast
   showToast(message) {
     let toast = this.toastCtrl.create({
       message: message,

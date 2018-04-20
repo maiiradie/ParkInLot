@@ -49,6 +49,6 @@ export class ComoredetailsPage {
         this.imgName = d;
       }).catch((error)=>{
         alert(JSON.stringify(error));
-      })  
+      });  
   }
 }
