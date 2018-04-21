@@ -256,8 +256,6 @@ export class HoHomePage {
         status: ""
       });
     });
-
-    // this.requestProvider.sendCoTransac(homeID, token, start, end, payment);
   }
 
 }

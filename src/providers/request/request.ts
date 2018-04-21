@@ -33,12 +33,10 @@ export class RequestProvider {
   }
   
   sendRequest(token, coID, hoID) {
-    var x = this.afdb.object<any>('requests/' + hoID).valueChanges().subscribe(data => {
+    this.afdb.object<any>('requests/' + hoID).valueChanges().take(1).subscribe(data => {
       if (data.reqStatus == 'occupied' || data.reqStatus == 'accepted') {
         alert(data.reqStatus);
-        x.unsubscribe();
       } else {
-        x.unsubscribe();
         this.afdb.object('requests/' + hoID).set({
           coID: coID,
           status: "ongoing",
@@ -65,7 +63,7 @@ export class RequestProvider {
 
         this.showToastRequest();
         let options = new HttpHeaders().set('Content-Type', 'application/json');
-        let c = this.http.post("https://fcm.googleapis.com/fcm/send", body, {
+        return this.http.post("https://fcm.googleapis.com/fcm/send", body, {
           headers: options.set('Authorization', this.key),
         }).subscribe();
       }
@@ -97,7 +95,7 @@ export class RequestProvider {
       createdAt: Date.now()
     });
 
-    this.afdb.object<any>('profile/' + coID).valueChanges()
+    this.afdb.object<any>('profile/' + coID).valueChanges().take(1)
       .subscribe(data => {
 
         let body = {
@@ -116,7 +114,7 @@ export class RequestProvider {
           "restricted_package_name": ""
         }
         let options = new HttpHeaders().set('Content-Type', 'application/json');
-        this.http.post("https://fcm.googleapis.com/fcm/send", body, {
+        return this.http.post("https://fcm.googleapis.com/fcm/send", body, {
           headers: options.set('Authorization', this.key),
         }).subscribe();
 
@@ -125,14 +123,14 @@ export class RequestProvider {
   
   acceptRequest(coID, hoID) {
 
-    this.afdb.object<any>('/location/' + hoID).valueChanges()
+    this.afdb.object<any>('/location/' + hoID).valueChanges().take(1)
       .subscribe(data => {
         this.afdb.object('requests/' + hoID).update({
           reqStatus: "accepted",
           motionStatus: "arriving",
           createdAt: Date.now()
         }).then(() => {
-          this.afdb.object<any>('profile/' + coID).valueChanges()
+          this.afdb.object<any>('profile/' + coID).valueChanges().take(1)
             .subscribe(data2 => {
               let body = {
                 "notification": {
@@ -152,7 +150,7 @@ export class RequestProvider {
                 "restricted_package_name": ""
               }
               let options = new HttpHeaders().set('Content-Type', 'application/json');
-              this.http.post("https://fcm.googleapis.com/fcm/send", body, {
+              return this.http.post("https://fcm.googleapis.com/fcm/send", body, {
                 headers: options.set('Authorization', this.key),
               }).subscribe();
             });
@@ -160,33 +158,4 @@ export class RequestProvider {
       });
 
   }
-
-  sendCoTransac(hoID, token, start, end, payment) {
-    // this.afdb.object<any>('profile/' + hoID).valueChanges()
-    //   .subscribe(data2 => {
-    //     let body = {
-    //       "notification": {
-    //         "title": "Transaction completed! C:",
-    //         "body": "Homeowner:" + data2.fname + ' ' + data2.lname + '. Start Time:' + start+ 'End time: ' + end + 'Amount: P' + payment, 
-    //         "sound": "default",
-    //         "click_action": "FCM_PLUGIN_ACTIVITY",
-    //         "icon": "fcm_push_icon"
-    //       },
-    //       "data": {
-
-    //       },
-    //       "to": token,
-    //       "priority": "high",
-    //       "restricted_package_name": ""
-    //     };
-
-    //     this.showToastRequest();
-    //     let options = new HttpHeaders().set('Content-Type', 'application/json');
-    //     this.http.post("https://fcm.googleapis.com/fcm/send", body, {
-    //       headers: options.set('Authorization', this.key),
-    //     }).subscribe();
-    //   });
-  }
-
-
 }

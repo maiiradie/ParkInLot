@@ -141,7 +141,7 @@ export class CoHomePage {
 			for (var i = 0; i < arr.length; i++) {
 
 				var el = document.createElement('div');
-				el.innerHTML = "Marker!";
+				// el.innerHTML = "Marker!";
 				el.id = data[i].key;
 				el.className = "mapmarker";
 

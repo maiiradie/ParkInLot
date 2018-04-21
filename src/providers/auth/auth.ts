@@ -62,6 +62,7 @@ export class AuthProvider {
            carmodel:cForm.carmodel,
            carPic:img,
            profPic:null,
+           status:'offline',
            reg_status:"pending",
            created_at:Date.now()
         });
