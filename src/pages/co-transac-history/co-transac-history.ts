@@ -27,7 +27,6 @@ export class CoTransacHistoryPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad CoTransacHistoryPage');
     this.getTransactions();
   }
 
@@ -50,7 +49,7 @@ export class CoTransacHistoryPage {
           et = new Date(this.transactions[x].endTime);
           this.transactions[x].ste = st.toLocaleString();
           this.transactions[x].ete = et.toLocaleString();
-          this.afdb.object<any>('profile/' + this.transactions[x].hoID).valueChanges().subscribe(name => {
+         this.transacQuery2 = this.afdb.object<any>('profile/' + this.transactions[x].hoID).valueChanges().subscribe(name => {
             this.transactions[x].fullName = name.fname +' ' +name.lname;
           });
         }

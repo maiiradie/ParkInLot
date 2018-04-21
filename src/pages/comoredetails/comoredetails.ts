@@ -24,11 +24,7 @@ export class ComoredetailsPage {
     this.displayInfo();
     this.retrieveImg();
   }
-
-  ngOnDestroy(){
-    alert('this is ngondestroy of comoredetails');
-  }
-
+  
   displayInfo(){
     
     this.afdb.object('profile/'+ this.hoID).snapshotChanges().take(1).subscribe( data => {

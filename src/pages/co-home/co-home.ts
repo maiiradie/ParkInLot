@@ -106,7 +106,6 @@ export class CoHomePage {
 	ngOnDestroy(){
 		this.location.unsubscribe();
 		this.hoMarkers.unsubscribe();
-		alert('ngondestroy cohome');
 	}
 
 	ionViewDidEnter(){
