@@ -1,0 +1,54 @@
+page-est-profile {
+    ion-content {
+        background-image: url('../assets/imgs/LoginBck.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        border-color: transparent;
+      }
+      .content {
+          position: relative;
+          background-image: url("../assets/imgs/RegBck.png");
+          background-size: cover;
+          background-position: center center;
+      }
+      .circular {
+          width: 100px;
+          height: 100px;
+          position: inherit;
+          border-radius: 50%;
+          -webkit-border-radius: 150px;
+          -moz-border-radius: 150px;
+          border: solid white;
+          background-size: 100%;
+          margin-top: -70px;
+          margin-left: auto;
+          margin-right: auto;
+      }
+      .info{
+          margin-top: 70px;
+      }
+      .button {
+        width: 100%;
+        font-size: 0.9em;
+      }
+      ion-item {
+        // border-radius: 30px !important;
+        padding-left: 10px !important;
+        margin-bottom: 10px;
+        background-color: #f6f6f6;
+        opacity: 0.7;
+        font-size: 0.9em;
+      }
+      .button-md {
+      border-radius: 2px;
+      overflow: hidden;
+      height: 3.6rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      color: #fff;
+      background-color: #007897;
+      margin: 0.4rem 0.2rem;
+      padding: 0 1.1em;
+    }
+}

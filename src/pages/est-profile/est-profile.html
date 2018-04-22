@@ -1,0 +1,49 @@
+<ion-content padding class="transparent-header">
+  <ion-header>
+    <ion-navbar>
+      <ion-title>Profile</ion-title>
+    </ion-navbar>
+  </ion-header>
+
+  <div class="content">
+
+    <div class="info">
+
+      <ion-list>
+
+        <ion-item>
+              <ion-label stacked>Name: {{profileData?.name}}</ion-label>
+        </ion-item>
+
+        <ion-item>
+              <ion-label stacked>Email: {{profileData?.email}}</ion-label>
+        </ion-item>
+
+        <ion-item>
+              <ion-label stacked>Capacity: {{profileData?.capacity}}</ion-label>
+        </ion-item>
+
+        <ion-item>
+              <ion-label stacked>Rate: {{profileData?.rate}}</ion-label>
+        </ion-item>
+
+        <ion-item>
+              <ion-label stacked>Regular Price: {{profileData?.regularPrice}}</ion-label>
+        </ion-item>
+
+        <ion-item>
+              <ion-label stacked>Overnight Price: {{profileData?.overnightPrice}}</ion-label>
+        </ion-item>
+
+        <ion-item>
+              <ion-label stacked>Operating Hours: {{profileData?.operatingHours}}</ion-label>
+        </ion-item>
+
+      </ion-list>
+
+            <button ion-button block class="button" (click)='openEditProfile()'>Edit Profile</button>
+    </div>
+
+  </div>
+
+</ion-content>
