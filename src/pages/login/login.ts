@@ -59,9 +59,12 @@ export class LoginPage {
                 } else if (data.homeowner) {
                   this.navCtrl.setRoot("HoHomePage");
                   this.x.unsubscribe();
-                }
+                } 
               } else if (data.reg_status === "rejected") {
                 this.showToast('Cannot login to application. Account request has been rejected by admin.');
+              } else if (data.establishment) {
+                this.navCtrl.setRoot("EstHomePage");
+                this.x.unsubscribe();
               } else {
                 this.showToast('Cannot login to application. Account request has not yet been approved by admin.');
               }

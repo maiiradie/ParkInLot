@@ -46,7 +46,7 @@ export class MyApp {
       splashScreen.hide();
 
       this.menuCtrl.swipeEnable(false);
-      // this.retrieveUser();
+      this.retrieveUser();
     });
   }
   
@@ -60,20 +60,18 @@ export class MyApp {
     }
   }
 
-  // retrieveUser() {
-  //   firebase.auth().onAuthStateChanged(user => {
-  //     if (user) {
-  //       var userId = this.authProvider.setID();
-  //       this.afdb.object(`/profile/` + userId).valueChanges().subscribe( data => {
-  //         this.profileData = data;
-  //         this.retrieveImg();
-  //       });
-  //     } else {
-  //       this.profileData = null;
-  //       this.imgName = "./assets/imgs/avatar.jpg";
-  //     }
-  //   });
-  // }
+  retrieveUser() {
+    if (this.authProvider.userId){
+          var userId = this.authProvider.setID();
+          this.afdb.object(`/profile/` + userId).valueChanges().take(1).subscribe( data => {
+            this.profileData = data;
+            this.retrieveImg();
+          });
+        } else {
+          this.profileData = null;
+          this.imgName = "./assets/imgs/avatar.jpg";
+        }
+  }
 
 
   openMenu(evt) {
