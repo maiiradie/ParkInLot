@@ -5,11 +5,9 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import firebase from 'firebase';
-
 import { File } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
-
 import 'rxjs/add/operator/take';
 
 @IonicPage()
@@ -19,11 +17,11 @@ import 'rxjs/add/operator/take';
 })
 
 export class HoEditGaragePage {
-  userData:any;
-  location:any;
+  userData;
+  location;
   garageForm:FormGroup;
-  public imgName;
-  public imgUrl;
+  imgName;
+  imgUrl;
   private imgPath;
   private userId;
   profile$: AngularFireObject<any>;
@@ -41,25 +39,22 @@ export class HoEditGaragePage {
     private toastCtrl: ToastController) {
       this.garageForm = this.fb.group({
         'address':[null,Validators.compose([Validators.required, Validators.minLength(10)])],
-        // 'capacity':[null,Validators.compose([Validators.required, Validators.minLength(1), Validators.maxLength(4)])],
         'details':['']
      });
+    this.userId = this.authProvider.userId;
   }
 
   ionViewDidLoad() {
-    this.userId = this.authProvider.setID();
-
-    this.afdb.object(`/profile/` + this.userId).valueChanges().subscribe( data => {
+    this.afdb.object(`/profile/` + this.userId).valueChanges().take(1).subscribe( data => {
       this.userData = data;
       this.retrieveImg();
 
-      this.afdb.object(`/location/` + this.userId).valueChanges().subscribe( out => {
+      this.afdb.object(`/location/` + this.userId).valueChanges().take(1).subscribe( out => {
         this.location = out;
       })
     });
   }
 
-  // Create Toast
   showToast() {
     let toast = this.toastCtrl.create({
       message: 'Garage updated successfully.',
@@ -68,9 +63,7 @@ export class HoEditGaragePage {
     toast.present();
   }
 
-  // Retrieve garage picture
   retrieveImg() {
-    this.userId = this.authProvider.setID();
     try{
       firebase.storage().ref().child("images/" + this.userId + "/" + this.userData.garagePic).getDownloadURL().then(d=>{
         this.imgUrl = d;
@@ -96,9 +89,9 @@ export class HoEditGaragePage {
           this.imgPath = dirPath;           
         }).catch((e)=>{
           alert("error " + JSON.stringify(e));
-        })
-      })
-    })
+        });
+      });
+    });
   }
 
   // Upload new garage picture
@@ -109,9 +102,8 @@ export class HoEditGaragePage {
 
       storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
         alert("error: " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
-      })
-    })
-    
+      });
+    });
   }
 
   // Update garage details
@@ -119,18 +111,15 @@ export class HoEditGaragePage {
     const loading = this.loadingCtrl.create({
       content:'Updating garage...'
     });
-  
+
     loading.present(loading);
 
-    // this.afs.authState.take(1).subscribe( auth => {
-      this.afdb.object(`/profile/` + this.userId).update({details: this.garageForm.value['details']}).then(d => {
-        this.afdb.object(`/location/` + this.userId).update({address: this.garageForm.value['address']}).then(d => {
-          this.afdb.object(`/profile/` + this.userId).update({garagePic: this.imgName});
-          this.upload(this.imgPath, this.imgName);
-        })
-      })
-    // })
-
+    this.afdb.object(`/profile/` + this.userId).update({details: this.garageForm.value['details']}).then(d => {
+      this.afdb.object(`/location/` + this.userId).update({address: this.garageForm.value['address']}).then(d => {
+        this.afdb.object(`/profile/` + this.userId).update({garagePic: this.imgName});
+        this.upload(this.imgPath, this.imgName);
+      });
+    });
     loading.dismiss();
     this.showToast();
     this.navCtrl.pop();

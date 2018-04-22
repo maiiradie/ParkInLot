@@ -5,19 +5,10 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import firebase from 'firebase';
-
 import { File, FileEntry, Entry } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
-
 import 'rxjs/add/operator/take';
-
-/**
- * Generated class for the HoEditProfilePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
 
 @IonicPage()
 @Component({
@@ -25,15 +16,15 @@ import 'rxjs/add/operator/take';
   templateUrl: 'ho-edit-profile.html',
 })
 export class HoEditProfilePage {
-  profileData:any;
+  profileData;
   userForm:FormGroup;
-  public imgName;
-  public imgUrl;
-  public gender;
+  imgName;
+  imgUrl;
+  gender;
+  user;
   private imgPath;
   private imgType;
   private userId;
-  public user;
   private oldEmail;
   profile$: AngularFireObject<any>;
 
@@ -57,22 +48,19 @@ export class HoEditProfilePage {
         'password':[null,Validators.compose([Validators.minLength(6), Validators.maxLength(30)])],
         'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])]
       });
+
+    this.userId = this.authProvider.userId;
   }
 
   ionViewDidLoad() {
-    console.log("Edit Profile");
-    this.userId = this.authProvider.setID();
-    
-    this.afdb.object(`/profile/` + this.userId).valueChanges().subscribe( data => {
+    this.afdb.object(`/profile/` + this.userId).valueChanges().take(1).subscribe( data => {
       this.profileData = data;
       this.gender = this.profileData.gender;
       this.oldEmail = this.profileData.email;
-
       this.retrieveImg();
     });
   }
 
-  // Retrieve URL of profile picture
   retrieveImg() {
     firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d=>{
       this.imgUrl = d;
@@ -81,7 +69,6 @@ export class HoEditProfilePage {
     })  
   }
 
-  // Create Toast
   showToast(message) {
     let toast = this.toastCtrl.create({
       message: message,
@@ -99,7 +86,6 @@ export class HoEditProfilePage {
     alert.present();
   }
 
-  // Open File Chooser and select image
   changeImg() {
     this.fileChooser.open().then((url)=>{
       this.filePath.resolveNativePath(url).then((path)=>{
@@ -131,10 +117,8 @@ export class HoEditProfilePage {
     })
   }
 
-  // Upload image to Firebase Storage
   async upload(buffer, name, type) {
       let blob = new Blob([buffer], { type: type });
-
       let storageHere = firebase.storage();
 
       storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
@@ -151,7 +135,6 @@ export class HoEditProfilePage {
     loading.present(loading);
 
     this.user = firebase.auth().currentUser;
-    // success = this.updateEmail();
     if (this.userForm.value['email'] != this.oldEmail) {
       this.user.updateEmail(this.userForm.value['email'])
         .catch((error: "auth/email-already-in-use")=> {
@@ -176,9 +159,9 @@ export class HoEditProfilePage {
               loading.dismiss();
               this.showToast('Profile updated successfully.');
               this.navCtrl.setRoot('HoprofilePage');
-            })
-          })
-        })    
+            });
+          });
+        });    
       } else {
         if (cont) {
           loading.dismiss();
@@ -186,6 +169,6 @@ export class HoEditProfilePage {
           this.navCtrl.setRoot('HoprofilePage');
         }
       }       
-    })
+    });
   }
 }

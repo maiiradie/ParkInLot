@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Platform, AlertController, MenuController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireAuth } from 'angularfire2/auth';
 import firebase from 'firebase';
 
 import { Transaction } from '../../models/transac/transaction.interface';
@@ -21,122 +22,132 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 export class HoHomePage {
 
   carStatus: string = "Parked";
-  isAndroid: boolean = false;
-
   arrivingData: Array<any> = [];
   parkedData: Array<any> = [];
 
-  userData: any;
-  unfiltered: any;
-  filtered: any;
-  userId;
-  arr: any;
+  unfiltered;
+  filtered;
+  arr;
   myId = this.authProvider.setID();
   items: Array<any> = [];
   itemRef: firebase.database.Reference = firebase.database().ref('/transac');
 
   fname;
   lname;
-  
-  constructor(private requestProvider: RequestProvider, private fcm: FCM, public navCtrl: NavController, public navParams: NavParams,
-    private platform: Platform, private afdb: AngularFireDatabase, private authProvider: AuthProvider, private alertCtrl: AlertController,
+  hoProfile;
+
+  constructor(private requestProvider: RequestProvider, 
+    private afAuth:AngularFireAuth,
+    private fcm: FCM,
+    public navCtrl: NavController, 
+    public navParams: NavParams,
+    private platform: Platform, 
+    private afdb: AngularFireDatabase, 
+    private authProvider: AuthProvider, 
+    private alertCtrl: AlertController,
     private menuCtrl: MenuController) {
-    this.isAndroid = platform.is('android');
 
-    platform.ready().then(() => {
-      // this.requestProvider.saveToken();
-
-      // this.fcm.onNotification().subscribe(data => {
-
-      //   this.afdb.object<any>('profile/' + data.coID).valueChanges().subscribe(codata => {          
-      //     var fname, lname, platenumber: any;
-      //     fname = codata.fname;
-      //     lname = codata.lname;
-      //     platenumber = 'ABC-169';
-      //     if (data.wasTapped) {
-
-      //       let confirm = this.alertCtrl.create({
-      //         // add platenumber here
-      //         title: 'You have a parking space request from ' + fname + ' ' + lname,
-      //         enableBackdropDismiss:false,
-      //         buttons: [
-      //           {
-      //             text: 'Decline',
-      //             handler: () => {
-      //               this.requestProvider.declineRequest(data.coID, data.hoID);
-      //             }
-      //           },
-      //           {
-      //             text: 'Accept',
-      //             handler: () => {
-      //               this.requestProvider.acceptRequest(data.coID, data.hoID);                    
-      //             }
-      //           }
-      //         ],
-      //       });
-      //       confirm.present();
-            
-      //     } else {
-
-      //       let confirm = this.alertCtrl.create({
-      //         // add platenumber here
-      //         title: 'You have a parking space request from ' + fname + ' ' + lname ,
-      //         enableBackdropDismiss:false,
-      //         buttons: [
-      //           {
-      //             text: 'Decline',
-      //             handler: () => {
-      //               this.requestProvider.declineRequest(data.coID, data.hoID);
-      //             }
-      //           },
-      //           {
-      //             text: 'Accept',
-      //             handler: () => {
-      //               this.requestProvider.acceptRequest(data.coID, data.hoID);                    
-      //             }
-      //           }
-      //         ],
-      //       });
-      //       confirm.present();
-      //     };
-      //   });
-      // });
-      
+    this.afAuth.auth.onAuthStateChanged(user => {
+      if (user) {
+        this.authProvider.updateStatus('online');
+        this.authProvider.updateOnDisconnect();
+      }
     });
 
-    this.afdb.object(`requests/` +this.myId).snapshotChanges().subscribe(data => {
+    this.requestProvider.saveToken();
+    this.onNotification();
+    menuCtrl.enable(true);
 
+    this.afdb.object(`requests/` +this.myId).snapshotChanges().take(1).subscribe(data => {
       if(data.payload.val().motionStatus == 'arriving'){
         this.arrivingData.push(data);      
-
       } else if(data.payload.val().motionStatus == 'parked'){
         this.parkedData.push(data);
         console.log(data.payload.val().startTime);
       }
 
-      this.afdb.object('profile/' + data.payload.val().coID).valueChanges()
+      this.afdb.object('profile/' + data.payload.val().coID).valueChanges().take(1)
       .subscribe( profileData => {
           this.hoProfile = profileData;
       });
-
     });
 
-
-    menuCtrl.enable(true);
-
   }
 
-  hoProfile;
+  async onNotification(){
+    try {
+      await this.platform.ready();
 
+      this.fcm.onNotification().subscribe(data => {
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad HoHomePage');
+        this.afdb.object<any>('profile/' + data.coID).valueChanges().take(1).subscribe(codata => {
+          var fname, lname, platenumber;
+          fname = codata.fname;
+          lname = codata.lname;
+
+          if (data.wasTapped) {
+
+            let confirm = this.alertCtrl.create({
+              // add platenumber here
+              title: 'You have a parking space request from ' + fname + ' ' + lname,
+              enableBackdropDismiss: false,
+              buttons: [
+                {
+                  text: 'Decline',
+                  handler: () => {
+                    this.requestProvider.declineRequest(data.coID, data.hoID);
+                  }
+                },
+                {
+                  text: 'Accept',
+                  handler: () => {
+                    this.requestProvider.acceptRequest(data.coID, data.hoID);
+                  }
+                }
+              ],
+            });
+            confirm.present();
+          }else{
+
+            let confirm = this.alertCtrl.create({
+              // add platenumber here
+              title: 'You have a parking space request from ' + fname + ' ' + lname,
+              enableBackdropDismiss: false,
+              buttons: [
+                {
+                  text: 'Decline',
+                  handler: () => {
+                    this.requestProvider.declineRequest(data.coID, data.hoID);
+                  }
+                },
+                {
+                  text: 'Accept',
+                  handler: () => {
+                    this.requestProvider.acceptRequest(data.coID, data.hoID);
+                  }
+                }
+              ],
+            });
+            confirm.present();
+          }
+
+        });
+
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
-  getUser(userId: string) {
-    this.afdb.object(`/profile/userId`).valueChanges().take(1).subscribe(data => {
-      this.userData = data;
-    }).unsubscribe();
+  openMenu(evt) {
+    if (evt === "Ho-Menu") {
+      this.menuCtrl.enable(true, 'Ho-Menu');
+      this.menuCtrl.enable(false, 'Co-Menu');
+    } else if (evt === "Co-Menu") {
+      this.menuCtrl.enable(false, 'Ho-Menu');
+      this.menuCtrl.enable(true, 'Co-Menu');
+    }
+    this.menuCtrl.toggle();
   }
 
   showAlert() {
@@ -148,27 +159,15 @@ export class HoHomePage {
     alert.present();
   }
 
-  openMenu(evt) {
-    if(evt === "Ho-Menu"){
-       this.menuCtrl.enable(true, 'Ho-Menu');
-       this.menuCtrl.enable(false, 'Co-Menu');
-    }else if(evt === "Co-Menu"){
-       this.menuCtrl.enable(false, 'Ho-Menu');
-       this.menuCtrl.enable(true, 'Co-Menu');
-    }
-    this.menuCtrl.toggle();
-  }
 
   toParked(transacId: string) {
-    
     this.afdb.object('requests/' +this.myId).update({ 
       motionStatus: "parked"
     });
     // this.transacData = [];
     this.arrivingData=[];
-
-
   }
+  
   startTimer() {
     this.afdb.object('requests/' + this.myId).update({
       startTime: Date.now()
@@ -186,7 +185,7 @@ export class HoHomePage {
     var computedHours;
     var payment;
     //query to database
-    var x = this.afdb.object<any>('requests/' + this.myId).valueChanges().subscribe(data => {
+    this.afdb.object<any>('requests/' + this.myId).valueChanges().take(1).subscribe(data => {
       startDate = data.startTime;
       //to date of start date
       var startDateH = new Date(startDate);
@@ -209,7 +208,6 @@ export class HoHomePage {
         }
       }
       // push database
-      x.unsubscribe();
       var startTimeF = startDateH.toLocaleTimeString();
       var endTimeF = endDateH.toLocaleTimeString();
       
@@ -245,10 +243,9 @@ export class HoHomePage {
 
   transfer(hoID, start, end, payment ){
     var temp ;
-    var x = this.afdb.object<any>('requests/' + this.myId).valueChanges().subscribe(data => {
+    this.afdb.object<any>('requests/' + this.myId).valueChanges().take(1).subscribe(data => {
       temp = data;
       temp.hoID = hoID;
-      x.unsubscribe();
       this.afdb.list('transactions/').push(temp);
       this.afdb.object<any>('requests/' + this.myId).set({
         coId: "",

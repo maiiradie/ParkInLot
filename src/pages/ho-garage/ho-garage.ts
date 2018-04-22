@@ -4,7 +4,6 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
 import firebase from 'firebase';
-
 import 'rxjs/add/operator/take';
 
 @IonicPage()
@@ -13,10 +12,11 @@ import 'rxjs/add/operator/take';
   templateUrl: 'ho-garage.html',
 })
 export class HoGaragePage {
-  userData:any;
-  location:any;
-  public imgName;
-  private userId;
+  userData;
+  location;
+  imgName;
+  private userId = this.authProvider.userId;
+  
 
   constructor(private afdb:AngularFireDatabase,
     private afs:AngularFireAuth,
@@ -26,24 +26,17 @@ export class HoGaragePage {
   }
 
   ionViewDidLoad() {
-    this.afs.authState.take(1).subscribe( auth => {
-      this.afdb.object(`/profile/${auth.uid}`).valueChanges().subscribe( data => {
+      this.afdb.object(`profile/` + this.userId).valueChanges().take(1).subscribe( data => {
         this.userData = data;
         this.retrieveImg();
 
-        this.afdb.object(`/location/${auth.uid}`).valueChanges().subscribe( out => {
+        this.afdb.object(`location/` + this.userId).valueChanges().take(1).subscribe( out => {
           this.location = out;
-        })
+        });
       });
-    });
   }
 
-  editGarage() {
-    this.navCtrl.push("HoEditGaragePage");
-  }
-
-  retrieveImg() {
-    this.userId = this.authProvider.setID();
+  retrieveImg() { 
       firebase.storage().ref().child("images/" + this.userId + "/" + this.userData.garagePic).getDownloadURL().then(d=>{
         this.imgName = d;
       }).catch((error)=>{
@@ -51,4 +44,7 @@ export class HoGaragePage {
       })  
   }
 
+  editGarage() {
+    this.navCtrl.push("HoEditGaragePage");
+  }
 }

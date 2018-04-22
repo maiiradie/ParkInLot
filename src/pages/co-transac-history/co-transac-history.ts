@@ -22,8 +22,12 @@ export class CoTransacHistoryPage {
 
   transacQuery1;
   transacQuery2;
+  id = this.afs.auth.currentUser.uid;
 
-  constructor(private afs: AngularFireAuth, private afdb: AngularFireDatabase, public navCtrl: NavController, public navParams: NavParams) {
+  constructor(private afs: AngularFireAuth, 
+    private afdb: AngularFireDatabase, 
+    public navCtrl: NavController, 
+    public navParams: NavParams) {
   }
 
   ionViewDidLoad() {
@@ -33,12 +37,10 @@ export class CoTransacHistoryPage {
   ngOnDestroy(){
     this.transacQuery1.unsubscribe();
     this.transacQuery2.unsubscribe();
-    alert('transac history ondestroy');
   }
 
   getTransactions() {
-    var id = this.afs.auth.currentUser.uid;
-    this.transacQuery1 = this.afdb.list('transactions', ref => ref.orderByChild('coID').equalTo(id)).valueChanges()
+    this.transacQuery1 = this.afdb.list('transactions', ref => ref.orderByChild('coID').equalTo(this.id)).valueChanges()
       .subscribe(data => {
 
         var st, et;
