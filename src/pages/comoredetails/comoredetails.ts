@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 
 import { RequestProvider } from '../../providers/request/request';
+import * as firebase from 'firebase/app';
 
 @IonicPage()
 @Component({

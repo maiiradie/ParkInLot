@@ -43,8 +43,7 @@ export class LoginPage {
       content: 'Logging In'
 		});
 
-    loading.present(loading);
-    
+    loading.present(loading).then( () => {
       if ((this.login.email != null) || (this.login.password != null)) {
         this.authProvider.loginUser(this.login).then(() => {
 
@@ -88,6 +87,7 @@ export class LoginPage {
         this.showToast('Please input email and password');
       }
 
+    });
   }
 
   forgotPassword() {

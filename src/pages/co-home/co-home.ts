@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, LoadingController, ActionSheetController, IonicPage, Platform, AlertController, MenuController } from 'ionic-angular';
+import { NavController, LoadingController, ActionSheetController, IonicPage, Platform,MenuController } from 'ionic-angular';
 import * as mapboxgl from 'mapbox-gl';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Observable } from 'rxjs/Observable';
@@ -11,9 +11,6 @@ import { FCM } from '@ionic-native/fcm';
 import { RequestProvider } from '../../providers/request/request';
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireAuth } from 'angularfire2/auth';
-import * as firebase from 'firebase/app';
-
-declare var FCMPlugin;
 
 @IonicPage()
 @Component({
@@ -34,7 +31,6 @@ export class CoHomePage {
 		private afdb: AngularFireDatabase,
 		private authProvider:AuthProvider,
 		private requestProvider: RequestProvider,
-		private alertCtrl: AlertController,
 		private fcm: FCM,
 		public platform: Platform,
 		public actionSheetCtrl: ActionSheetController,
@@ -101,6 +97,7 @@ export class CoHomePage {
 
 	ionViewDidLoad() {
 		this.map = this.initMap();
+		this.setDirections(null);
 	}
 
 	ngOnDestroy(){
@@ -111,7 +108,6 @@ export class CoHomePage {
 	ionViewDidEnter(){
 		this.location = this.getCurrentLocation()
 		.subscribe(location => {
-			this.setDirections(location);
 			this.centerLocation(location);
 			this.setMarkers();
 		});
@@ -182,7 +178,7 @@ export class CoHomePage {
 			accessToken: mapboxgl.accessToken,
 			interactive: false,
 			controls: {
-				inputs: true,
+				// inputs: true,
 				profileSwitcher: false,
 				instructions: false
 			}
