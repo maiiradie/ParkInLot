@@ -39,6 +39,7 @@ export class ComoredetailsPage {
   sendRequest(HoToken){
     let coID = this.requestProvider.setID();   
     this.requestProvider.sendRequest(HoToken, coID, this.hoID);
+
   }
 
   retrieveImg() {

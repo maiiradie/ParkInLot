@@ -103,9 +103,8 @@ export class CoHomePage {
 			this.location = this.getCurrentLocation()
 				.subscribe(location => {
 					this.centerLocation(location);
-					this.setDestination(location);
+					// this.setDestination(location);
 					this.setMarkers();
-					
 			});
 		});
 
