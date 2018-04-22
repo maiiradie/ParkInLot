@@ -11,10 +11,7 @@
           </ion-header>
       <div class="header-image"></div>
       <div class="main-content" text-wrap text-center>
-          <!-- <div class="circular" id="default" *ngIf="!imgUrl"></div>
-          <div class="circular" *ngIf="imgUrl" [ngStyle]="{'background-image': 'url(' + imgUrl + ')'}"></div> -->
-          <img [src]="imgName" class="circular" *ngIf="imgName">
-          <img src="./assets/imgs/avatar.jpg" class="circular" *ngIf="!imgName">
+          <img *ngIf="imgName" [src]="imgName" class="circular">
       
           <h2>{{profileData?.fname}} {{profileData?.lname}}</h2>
           <hr>

@@ -146,7 +146,6 @@ export class CoEditProfilePage {
     loading.present(loading);
 
     this.user = firebase.auth().currentUser;
-    // success = this.updateEmail();
     if (this.userForm.value['email'] != this.oldEmail) {
       this.user.updateEmail(this.userForm.value['email'])
         .catch((error: "auth/email-already-in-use")=> {

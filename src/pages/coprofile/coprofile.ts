@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
-
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
 import firebase from 'firebase';
-
 import 'rxjs/add/operator/take';
 
 @IonicPage()
@@ -27,10 +25,10 @@ export class CoprofilePage {
   }
 
   ionViewDidLoad() {
-	      this.afdb.object(`profile/` + this.userId).valueChanges().take(1).subscribe( data => {
-	        this.profileData = data;
-	        this.retrieveImg();
-	      });
+		this.afdb.object(`profile/` + this.userId).valueChanges().take(1).subscribe( data => {
+			this.profileData = data;
+			this.retrieveImg();
+		});
   }
 
   retrieveImg() {
@@ -38,7 +36,7 @@ export class CoprofilePage {
 	      this.imgName = d;
 	    }).catch((error) => {
 				this.imgName = "./assets/imgs/avatar.jpg";
-	    })
+	    });
  	}
 
  editProfile(){

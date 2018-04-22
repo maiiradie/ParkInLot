@@ -7,7 +7,7 @@
   
   <div class="bg"></div>
   <div padding class="info">
-    <img [src]="imgUrl" class="circular">
+    <img  *ngIf="imgUrl" [src]="imgUrl" class="circular">
     <button type="button" ion-button block clear (click)="changeImg()">Change Photo</button>
     <br>
       

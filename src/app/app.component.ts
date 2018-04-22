@@ -60,20 +60,20 @@ export class MyApp {
     }
   }
 
-  retrieveUser() {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        var userId = this.authProvider.setID();
-        this.afdb.object(`/profile/` + userId).valueChanges().subscribe( data => {
-          this.profileData = data;
-          this.retrieveImg();
-        });
-      } else {
-        this.profileData = null;
-        this.imgName = "./assets/imgs/avatar.jpg";
-      }
-    });
-  }
+  // retrieveUser() {
+  //   firebase.auth().onAuthStateChanged(user => {
+  //     if (user) {
+  //       var userId = this.authProvider.setID();
+  //       this.afdb.object(`/profile/` + userId).valueChanges().subscribe( data => {
+  //         this.profileData = data;
+  //         this.retrieveImg();
+  //       });
+  //     } else {
+  //       this.profileData = null;
+  //       this.imgName = "./assets/imgs/avatar.jpg";
+  //     }
+  //   });
+  // }
 
 
   openMenu(evt) {
