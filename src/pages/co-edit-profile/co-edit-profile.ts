@@ -58,7 +58,7 @@ export class CoEditProfilePage {
         'password':[null,Validators.compose([Validators.minLength(6), Validators.maxLength(30)])],
         'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])]
       });
-    this.userId = this.authProvider.setID();
+    this.userId = this.authProvider.userId;
   }
 
   ionViewDidLoad() {
@@ -170,17 +170,17 @@ export class CoEditProfilePage {
             await this.upload(buffer, this.imgName, this.imgType).then(() => {
               loading.dismiss();
               this.showToast('Profile updated successfully.');
-              this.navCtrl.setRoot('HoprofilePage');
-            })
-          })
-        })    
+              this.navCtrl.setRoot('CoprofilePage');
+            });
+          });
+        });    
       } else {
         if (cont) {
           loading.dismiss();
           this.showToast('Profile updated successfully.');
-          this.navCtrl.setRoot('HoprofilePage');
+          this.navCtrl.setRoot('CoprofilePage');
         }
       }       
-    })
+    });
   }
 }

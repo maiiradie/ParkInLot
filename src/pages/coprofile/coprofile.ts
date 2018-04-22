@@ -8,13 +8,6 @@ import firebase from 'firebase';
 
 import 'rxjs/add/operator/take';
 
-/**
- * Generated class for the CoprofilePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
   selector: 'page-coprofile',

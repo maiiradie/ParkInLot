@@ -2,10 +2,14 @@ import { Component, ViewChild } from '@angular/core';
 import { Platform, Nav, MenuController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
-// import { LoginPage } from '../pages/login/login';
-// import { CoregisterPage } from '../pages/coregister/coregister';
-// import { HoregisterPage } from '../pages/horegister/horegister';
-// import { ProfilePage } from '../pages/profile/profile';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireAuth } from 'angularfire2/auth';
+import { AuthProvider } from '../providers/auth/auth';
+import firebase from 'firebase';
+import 'rxjs/add/operator/take';
+
+import { Profile } from '../models/profile';
+import { LoginPage } from '../pages/login/login';
 
 import { HoHomePage }  from '../pages/ho-home/ho-home';
 import { HoprofilePage }  from '../pages/hoprofile/hoprofile';
@@ -17,31 +21,16 @@ import { CoEditProfilePage } from '../pages/co-edit-profile/co-edit-profile';
 import { CoCarPage } from '../pages/co-car/co-car';
 import { CoTransacHistoryPage } from '../pages/co-transac-history/co-transac-history';
 
-import { AngularFireDatabase } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
-import { AuthProvider } from '../providers/auth/auth';
-import firebase from 'firebase';
-
-import 'rxjs/add/operator/take';
-
-import { Profile } from '../models/profile';
-import { LoginPage } from '../pages/login/login';
-
-// import { EditProfilePage } from '../pages/edit-profile/edit-profile';
-// import { GaragePage } from '../pages/garage/garage';
-// import { TransacHistoryPage } from '../pages/transac-history/transac-history';
-
 @Component({
   templateUrl: 'app.html'
 })
 export class MyApp {
 
   rootPage: any = "LoginPage";
-  // rootPage: any = "MenuPage";
   @ViewChild(Nav) nav: Nav;
 
-  profileData: any;
-  public imgName;
+  profileData;
+  imgName;
   private userId;
   private loggedIn;
 

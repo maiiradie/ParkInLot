@@ -7,15 +7,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Geolocation } from '@ionic-native/geolocation';
 import { MyApp } from './app.component';
-// import { LoginPage } from '../pages/login/login';
-// import { CoregisterPage } from '../pages/coregister/coregister';
-// import { HoregisterPage } from '../pages/horegister/horegister';
 import { FCM } from '@ionic-native/fcm';
-
-// import { EditProfilePage } from '../pages/edit-profile/edit-profile';
-// import { GaragePage } from '../pages/garage/garage';
-// import { TransacHistoryPage } from '../pages/transac-history/transac-history';
-
 import { FIREBASE_CONFIG } from './app.firebase.config';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
@@ -27,16 +19,10 @@ import { FileTransfer } from '@ionic-native/file-transfer';
 
 import { AuthProvider } from '../providers/auth/auth'; 
 import { RequestProvider } from '../providers/request/request'; 
+
 @NgModule({
   declarations: [
     MyApp,
-    // LoginPage,
-    // CoregisterPage,
-    // HoregisterPage
-
-    // EditProfilePage,
-    // GaragePage,
-    // TransacHistoryPage
   ],
   imports: [
     BrowserModule,
@@ -55,26 +41,21 @@ import { RequestProvider } from '../providers/request/request';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    // LoginPage,
-    // CoregisterPage,
-    // HoregisterPage
-    // EditProfilePage,
-    // GaragePage,
-    // TransacHistoryPage
   ],
   providers: [
     StatusBar,
     SplashScreen,
-  File,
+    File,
     FileChooser,
     FilePath,
     FileTransfer,
     FCM,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
-AuthProvider,
+    AuthProvider,
     Geolocation,
     AuthProvider,
     RequestProvider,
   ]
 })
+
 export class AppModule {}
