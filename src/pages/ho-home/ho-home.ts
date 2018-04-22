@@ -32,9 +32,11 @@ export class HoHomePage {
   items: Array<any> = [];
   itemRef: firebase.database.Reference = firebase.database().ref('/transac');
 
+  userId= this.authProvider.userId;
   fname;
   lname;
   hoProfile;
+  request;
 
   constructor(private requestProvider: RequestProvider,
     private afAuth: AngularFireAuth,
@@ -57,21 +59,26 @@ export class HoHomePage {
     this.requestProvider.saveToken();
     this.onNotification();
     menuCtrl.enable(true);
+  }
 
-    this.afdb.object('requests/' + this.myId).snapshotChanges().take(1).subscribe(data => {
+  ionViewDidLoad(){
+
+    this.request = this.afdb.object('requests/' + this.myId).snapshotChanges().subscribe(data => {
       if (data.payload.val().motionStatus == 'arriving') {
         this.arrivingData.push(data);
       } else if (data.payload.val().motionStatus == 'parked') {
         this.parkedData.push(data);
-        console.log(data.payload.val().startTime);
       }
-
-      this.afdb.object('profile/' + data.payload.val().coID).valueChanges().take(1)
-        .subscribe(profileData => {
-          this.hoProfile = profileData;
-        });
     });
 
+    this.afdb.object('profile/' + this.userId).valueChanges().take(1)
+      .subscribe(profileData => {
+        this.hoProfile = profileData;
+    });
+  }
+
+  ngOnDestroy() {
+    this.request.unsubscribe();
   }
 
   async onNotification() {
@@ -170,7 +177,6 @@ export class HoHomePage {
     this.afdb.object('requests/' + this.myId).update({
       startTime: Date.now()
     });
-    // this.transacData = [];s
     this.parkedData = [];
   }
 
@@ -190,7 +196,7 @@ export class HoHomePage {
       //get the hours of the start date
       var startHour = startDateH.getHours();
       //compute for time
-      computedHours = endHour - startHour;
+      computedHours = endHour - startHour;``
       // start time minutes
       var startMin = startDateH.getMinutes();
       //end time minutes
@@ -217,7 +223,6 @@ export class HoHomePage {
 
     });
 
-    // this.transacData = [];
     this.parkedData = [];
 
   }
