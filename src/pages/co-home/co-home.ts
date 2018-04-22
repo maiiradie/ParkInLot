@@ -220,7 +220,7 @@ export class CoHomePage {
 		});
 
 		let options = {
-			timeout: 20000,
+			timeout: 30000,
 			enableHighAccuracy: true
 		};
 
@@ -238,7 +238,7 @@ export class CoHomePage {
 						loading.dismiss();
 
 					}).catch(error => {
-						console.log('Error getting location', error);
+						alert('Error getting location, please try again');
 						loading.dismiss();
 					});
 			});

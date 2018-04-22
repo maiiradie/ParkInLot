@@ -121,9 +121,9 @@ export class CoEditProfilePage {
           })       
         }).catch((error)=>{
           console.log("error in resolving picture url: " + JSON.stringify(error));
-        })
-      })
-    })
+        });
+      });
+    });
   }
 
   // Upload image to Firebase Storage
@@ -153,7 +153,7 @@ export class CoEditProfilePage {
           loading.dismiss();
           this.showToast('Cannot update email. Email already taken or used.');
           cont = false;
-      })
+      });
     }
 
     if (this.userForm.value['password'] != null) {
