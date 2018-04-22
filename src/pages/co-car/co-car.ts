@@ -20,30 +20,27 @@ import 'rxjs/add/operator/take';
   templateUrl: 'co-car.html',
 })
 export class CoCarPage {
-  userData: any;
-  public imgName;
-  private userId;
+  userData;
+  imgName;
+  userId;
 
   constructor(private afdb:AngularFireDatabase, private afs:AngularFireAuth, private authProvider:AuthProvider, public navCtrl: NavController, public navParams: NavParams) {
+    this.userId = this.authProvider.setID();
   }
 
   ionViewDidLoad() {
-    this.afs.authState.take(1).subscribe(auth => {
-      this.afdb.object(`/profile/${auth.uid}`).valueChanges().subscribe(data => {
+      this.afdb.object(`profile/` + this.userId).valueChanges().take(1).subscribe(data => {
         this.userData = data;
         this.retrieveImg();
-      })
-    })
+      });
   }
 
   retrieveImg() {
-    this.userId = this.authProvider.setID();
     firebase.storage().ref().child("images/" + this.userId + "/" + this.userData.carPic).getDownloadURL().then(d => {
       this.imgName = d;
-      console.log(this.imgName);
     }).catch((error) => {
       alert(JSON.stringify(error));
-    })
+    });
   }
 
 }

@@ -8,13 +8,6 @@ import firebase from 'firebase';
 
 import 'rxjs/add/operator/take';
 
-/**
- * Generated class for the CoprofilePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
-
 @IonicPage()
 @Component({
   selector: 'page-coprofile',
@@ -22,30 +15,27 @@ import 'rxjs/add/operator/take';
 })
 export class CoprofilePage {
 	profileData:any;
-  	public imgName;
-  	private userId;
+  imgName;
+	userId;
 
   constructor(public navCtrl: NavController, 
   				public navParams: NavParams, 
   				private afdb:AngularFireDatabase,
   				private afs: AngularFireAuth,
   				private authProvider: AuthProvider) {
+		this.userId = this.authProvider.setID();
   }
 
   ionViewDidLoad() {
-    this.afs.authState.take(1).subscribe( auth => {
-	      this.afdb.object(`/profile/${auth.uid}`).valueChanges().subscribe( data => {
+	      this.afdb.object(`profile/` + this.userId).valueChanges().take(1).subscribe( data => {
 	        this.profileData = data;
 	        this.retrieveImg();
 	      });
-	    });
   }
 
   retrieveImg() {
-	this.userId = this.authProvider.setID();
 	    firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d => {
 	      this.imgName = d;
-	      console.log(this.imgName);
 	    }).catch((error) => {
 				this.imgName = "./assets/imgs/avatar.jpg";
 	    })

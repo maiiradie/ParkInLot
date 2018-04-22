@@ -20,18 +20,27 @@ export class CoTransacHistoryPage {
   transactions = [];
   profileName = [];
 
+  transacQuery1;
+  transacQuery2;
+  id = this.afs.auth.currentUser.uid;
 
-  constructor(private afs: AngularFireAuth, private afdb: AngularFireDatabase, public navCtrl: NavController, public navParams: NavParams) {
+  constructor(private afs: AngularFireAuth, 
+    private afdb: AngularFireDatabase, 
+    public navCtrl: NavController, 
+    public navParams: NavParams) {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad CoTransacHistoryPage');
     this.getTransactions();
   }
 
+  ngOnDestroy(){
+    this.transacQuery1.unsubscribe();
+    this.transacQuery2.unsubscribe();
+  }
+
   getTransactions() {
-    var id = this.afs.auth.currentUser.uid;
-    var u = this.afdb.list('transactions', ref => ref.orderByChild('coID').equalTo(id)).valueChanges()
+    this.transacQuery1 = this.afdb.list('transactions', ref => ref.orderByChild('coID').equalTo(this.id)).valueChanges()
       .subscribe(data => {
 
         var st, et;
@@ -42,8 +51,7 @@ export class CoTransacHistoryPage {
           et = new Date(this.transactions[x].endTime);
           this.transactions[x].ste = st.toLocaleString();
           this.transactions[x].ete = et.toLocaleString();
-          u.unsubscribe();
-          this.afdb.object<any>('profile/' + this.transactions[x].hoID).valueChanges().subscribe(name => {
+         this.transacQuery2 = this.afdb.object<any>('profile/' + this.transactions[x].hoID).valueChanges().subscribe(name => {
             this.transactions[x].fullName = name.fname +' ' +name.lname;
           });
         }

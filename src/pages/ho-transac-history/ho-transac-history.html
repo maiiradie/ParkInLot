@@ -12,10 +12,8 @@
           </button>
         </ion-buttons>
       <ion-title>Transactions</ion-title>
-    </ion-navbar>
-  
-  </ion-header>
-  
+    </ion-navbar>  
+</ion-header>
 
   <ion-content padding>
   
@@ -23,7 +21,6 @@
         <ion-item *ngFor="let item of transactions">
 
           <div *ngIf="item.status == 'ongoing'; else declined ">
-
               <h6>{{item?.fullName}}</h6>
               <p>startTime: {{item?.ste}}</p>
               <p>endTime: {{item?.ete}}</p>

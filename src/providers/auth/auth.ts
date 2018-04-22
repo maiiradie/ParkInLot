@@ -6,57 +6,31 @@ import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
 import * as firebase from 'firebase/app';
-import { FCM } from '@ionic-native/fcm';
 
 @Injectable()
 export class AuthProvider {
 
-  //Current ID
+  //Logged in user ID
   userId: any;
 
-  constructor(private FCM: FCM, private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
-    this.afs.auth.onAuthStateChanged(user => {
-      if (user) {
-        this.updateOnConnect();
-        this.updateOnDisconnect();
-      } else {
-        //debug
-        console.log('currently logged out');
-      }
-    });
-
-    this.afdb.list('/location');
+  constructor(private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
   }
 
+  //run onlogin
   setID() {
     return this.userId = this.afs.auth.currentUser.uid;
   }
 
   getUser() {
-    return this.afdb.object<any>('profile/' + this.userId).valueChanges();
+    return this.afdb.object<any>('profile/' + this.userId).valueChanges().take(1);
   }
 
   updateOnDisconnect() {
     firebase.database().ref().child('profile/' + this.userId)
       .onDisconnect()
-      .update({ status: 'offline' })
+      .update({ status: 'offline' });
   }
 
-  updateOnConnect() {
-    return this.afdb.object('.info/connected').valueChanges()
-      .subscribe(connected => {
-        if (connected) {
-          this.getUser().subscribe(data => {
-            if (data.reg_status === "approved") {
-              status = 'online';
-              this.updateStatus(status);
-              console.log("user status: " + status);
-            }
-          })
-        }
-      });
-  }
-  //Status helper
   updateStatus(status) {
     return this.afdb.object('profile/' + this.userId)
       .update({ 
@@ -64,21 +38,14 @@ export class AuthProvider {
       });
   }
 
-  //location helper / for markers
-  getHO() {
-  }
-
   loginUser(login) {
     return this.afs.auth.signInWithEmailAndPassword(login.email, login.password);
   }
 
   logoutUser() {
-    // return this.updateStatus('offline').then( () =>{
-   return this.afs.auth.signOut();
-    // });
-      // .then(() => {
-      //   this.updateStatus('offline');
-      // });
+    return this.updateStatus('offline').then( () => {
+        this.afs.auth.signOut();
+    });
   }
 
   registerCarOwner(uForm, cForm, img){
@@ -94,12 +61,12 @@ export class AuthProvider {
            carmodel:cForm.carmodel,
            carPic:img,
            profPic:null,
+           status:'offline',
            reg_status:"pending",
            created_at:Date.now()
         });
      })
    }
- 
 
   locateHO() {
     let options = {

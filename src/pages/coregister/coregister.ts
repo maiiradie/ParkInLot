@@ -21,10 +21,10 @@ export class CoregisterPage {
   files: any;
   userForm: FormGroup;
   carForm: FormGroup;
-  public imgName;
-  public fileName;
-  public caption = "Choose a Photo";
-  public captionFile = "Choose a File";
+  imgName;
+  fileName;
+  caption = "Choose a Photo";
+  captionFile = "Choose a File";
   private imgUrl;
   private fileUrl;
   private imgPath;
@@ -83,7 +83,6 @@ export class CoregisterPage {
           handler: () => {
             var index = this.files.indexOf(file);
             this.files.splice(index, 1);
-            // console.log('Remove clicked');
           }
         },
         {
@@ -223,8 +222,8 @@ export class CoregisterPage {
           loading.dismiss();
           this.showToast();
           this.navCtrl.setRoot("LoginPage");
-			  })
-		  })
+			  });
+		  });
 	  }).catch((error) => {
       loading.dismiss();
       if (error.code === "auth/email-already-in-use") {
@@ -233,6 +232,6 @@ export class CoregisterPage {
       } else if (error.code === "auth/network-request-failed") {
         this.showAlert('No Connection', 'No internet connection detected. Please connect and try again.');
       }
-    })
+    });
   }
 }
