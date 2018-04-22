@@ -97,22 +97,24 @@ export class CoHomePage {
 
 	ionViewDidLoad() {
 		this.map = this.initMap();
-		this.setDirections(null);
+		
+		this.map.on('load', () => {
+			this.setDirections(null);
+			
+			this.location = this.getCurrentLocation()
+				.subscribe(location => {
+					this.centerLocation(location);
+					this.setMarkers();
+			});
+		});
+
 	}
 
 	ngOnDestroy(){
 		this.location.unsubscribe();
 		this.hoMarkers.unsubscribe();
 	}
-
-	ionViewDidEnter(){
-		this.location = this.getCurrentLocation()
-		.subscribe(location => {
-			this.centerLocation(location);
-			this.setMarkers();
-		});
-	}
-
+	
 	openMenu(evt) {
 		if (evt === "Ho-Menu") {
 			this.menuCtrl.enable(true, 'Ho-Menu');
@@ -137,7 +139,7 @@ export class CoHomePage {
 			for (var i = 0; i < arr.length; i++) {
 
 				var el = document.createElement('div');
-				// el.innerHTML = "Marker!";
+				el.innerHTML = "Marker";
 				el.id = data[i].key;
 				el.className = "mapmarker";
 
@@ -178,7 +180,6 @@ export class CoHomePage {
 			accessToken: mapboxgl.accessToken,
 			interactive: false,
 			controls: {
-				// inputs: true,
 				profileSwitcher: false,
 				instructions: false
 			}
@@ -216,7 +217,7 @@ export class CoHomePage {
 		});
 
 		let options = {
-			// timeout: 100000,
+			timeout: 20000,
 			enableHighAccuracy: true
 		};
 
