@@ -97,14 +97,15 @@ export class CoHomePage {
 
 	ionViewDidLoad() {
 		this.map = this.initMap();
-		
-		this.map.on('load', () => {
-			this.setDirections(null);
-			
+		this.setDirections();
+
+		this.map.on('load', () => {			
 			this.location = this.getCurrentLocation()
 				.subscribe(location => {
 					this.centerLocation(location);
+					this.setDestination(location);
 					this.setMarkers();
+					
 			});
 		});
 
@@ -114,7 +115,7 @@ export class CoHomePage {
 		this.location.unsubscribe();
 		this.hoMarkers.unsubscribe();
 	}
-	
+
 	openMenu(evt) {
 		if (evt === "Ho-Menu") {
 			this.menuCtrl.enable(true, 'Ho-Menu');
@@ -175,7 +176,7 @@ export class CoHomePage {
 
 	}
 
-	setDirections(location) {
+	setDirections() {
 		this.directions = new MapboxDirections({
 			accessToken: mapboxgl.accessToken,
 			interactive: false,
@@ -184,11 +185,13 @@ export class CoHomePage {
 				instructions: false
 			}
 		});
-
 		this.map.addControl(this.directions, 'top-left');
-
-		// this.directions.setOrigin(location.lng + ',' + location.lat);
 	}
+
+	setDestination(location){
+		this.directions.setOrigin(location.lng + ',' + location.lat);
+	}
+
 
 	setDest(lang, latt) {
 		this.directions.setDestination(lang + ',' + latt);
@@ -204,7 +207,7 @@ export class CoHomePage {
 			container: 'map',
 			style: 'mapbox://styles/mapbox/streets-v10',
 			center: location,
-			zoom: 16,
+			zoom: 14,
 			attributionControl: false,
 		});
 

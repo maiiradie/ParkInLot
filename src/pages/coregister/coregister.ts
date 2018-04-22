@@ -222,8 +222,8 @@ export class CoregisterPage {
           loading.dismiss();
           this.showToast();
           this.navCtrl.setRoot("LoginPage");
-			  })
-		  })
+			  });
+		  });
 	  }).catch((error) => {
       loading.dismiss();
       if (error.code === "auth/email-already-in-use") {
@@ -232,6 +232,6 @@ export class CoregisterPage {
       } else if (error.code === "auth/network-request-failed") {
         this.showAlert('No Connection', 'No internet connection detected. Please connect and try again.');
       }
-    })
+    });
   }
 }

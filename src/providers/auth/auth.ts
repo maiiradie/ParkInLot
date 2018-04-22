@@ -6,7 +6,6 @@ import { Observable } from 'rxjs/Observable';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
 import * as firebase from 'firebase/app';
-import { FCM } from '@ionic-native/fcm';
 
 @Injectable()
 export class AuthProvider {
@@ -14,7 +13,7 @@ export class AuthProvider {
   //Logged in user ID
   userId: any;
 
-  constructor(private FCM: FCM, private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
+  constructor(private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
   }
 
   //run onlogin
@@ -23,7 +22,7 @@ export class AuthProvider {
   }
 
   getUser() {
-    return this.afdb.object<any>('profile/' + this.userId).valueChanges();
+    return this.afdb.object<any>('profile/' + this.userId).valueChanges().take(1);
   }
 
   updateOnDisconnect() {
