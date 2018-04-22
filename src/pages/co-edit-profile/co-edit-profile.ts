@@ -52,10 +52,10 @@ export class CoEditProfilePage {
     private filePath: FilePath,
     private toastCtrl: ToastController) {
       this.userForm = this.fb.group({
-        'fname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
-        'lname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
+        'fname':[null,Validators.compose([Validators.required])],
+        'lname':[null,Validators.compose([Validators.required])],
         'email':[null,Validators.compose([Validators.required, Validators.email])],
-        'password':[null,Validators.compose([Validators.minLength(6), Validators.maxLength(30)])],
+        'password':[null,Validators.compose([Validators.minLength(6)])],
         'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])]
       });
     this.userId = this.authProvider.userId;
