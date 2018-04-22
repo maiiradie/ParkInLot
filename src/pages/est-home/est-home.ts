@@ -45,6 +45,7 @@ export class EstHomePage {
 
 updateStat(){
     this.afdb.object('profile/' + this.userId).update({availability: this.toggleValue})
+    
 }
 
 openEstbProfile(){

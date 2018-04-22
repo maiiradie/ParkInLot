@@ -23,8 +23,8 @@ export class EstProfilePage {
     public authProvider:AuthProvider) {
   }
 
-  ionViewDidLoad() {
-    this.afdb.object(`/profile/`+ this.userId).valueChanges().take(1).subscribe( data => {
+  ionViewDidEnter() {
+    this.afdb.object('profile/'+ this.userId).valueChanges().take(1).subscribe( data => {
       this.profileData = data;
     });
   }

@@ -74,6 +74,9 @@ export class MyApp {
   }
 
 
+  
+
+
   openMenu(evt) {
     if(evt === "Ho-Menu"){
        this.menuCtrl.enable(true, 'Ho-Menu');
