@@ -44,13 +44,13 @@ export class CoregisterPage {
  		private filePath: FilePath,
  		private transfer: FileTransfer,
 		private toastCtrl: ToastController) {
-     	this.userForm = this.fb.group({
-	 	    'fname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30), Validators.pattern('[a-zA-Z ]*')])],
-	 	    'lname':[null,Validators.compose([Validators.required, Validators.minLength(2), Validators.maxLength(30), Validators.pattern('[a-zA-Z ]*')])],
-	 	    'email':[null,Validators.compose([Validators.required, Validators.email])],
-	 	    'password':[null,Validators.compose([Validators.required, Validators.minLength(6)])],
-	 	    'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11), Validators.pattern('[0-9]*')])]
-	    });
+      this.userForm = this.fb.group({
+        'fname':[null,Validators.compose([Validators.required, Validators.pattern('[^0-9]*')])],
+        'lname':[null,Validators.compose([Validators.required, Validators.pattern('[^0-9]*')])],
+        'email':[null,Validators.compose([Validators.required, Validators.email])],
+        'password':[null,Validators.compose([Validators.minLength(6)])],
+        'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11), Validators.pattern('^09[0-9]*')])]
+      });
 
 	    this.carForm = this.fb.group({
 		    'plateno':[null,Validators.compose([Validators.required, Validators.minLength(6), Validators.maxLength(8), Validators.pattern('[a-zA-Z]{3}[0-9]{3,4}')])],
@@ -216,7 +216,6 @@ export class CoregisterPage {
 				  for(var i = 0; i < this.files.length; i++) {
 					  this.uploadFile(this.files[i].path, this.files[i].name, this.files[i].type);
           }
-
           await this.authProvider.logoutUser();
           
           loading.dismiss();

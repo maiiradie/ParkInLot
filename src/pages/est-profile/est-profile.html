@@ -12,33 +12,39 @@
       <ion-list>
 
         <ion-item>
-              <ion-label stacked>Name: {{profileData?.name}}</ion-label>
+            <p>Name of Establishment</p> 
+            <span>{{profileData?.name}}</span>
         </ion-item>
 
         <ion-item>
-              <ion-label stacked>Email: {{profileData?.email}}</ion-label>
+            <p>Email</p> 
+            <span>{{profileData?.email}}</span>
         </ion-item>
 
         <ion-item>
-              <ion-label stacked>Capacity: {{profileData?.capacity}}</ion-label>
+            <p>Capacity</p> 
+            <span>{{profileData?.capacity}}</span>
+        </ion-item>
+
+        <ion-item *ngIf="profileData?.rate">
+            <p>Rate Per Hour</p> 
+            <span>{{profileData?.rate}}</span>
         </ion-item>
 
         <ion-item>
-              <ion-label stacked>Rate: {{profileData?.rate}}</ion-label>
+            <p>Regular Price</p> 
+            <span>{{profileData?.regularPrice}}</span>  
         </ion-item>
 
         <ion-item>
-              <ion-label stacked>Regular Price: {{profileData?.regularPrice}}</ion-label>
+            <p>Overnight Price</p> 
+            <span>{{profileData?.overnightPrice}}</span>
         </ion-item>
 
         <ion-item>
-              <ion-label stacked>Overnight Price: {{profileData?.overnightPrice}}</ion-label>
+            <p>Operating Hours</p> 
+            <span>{{profileData?.openingTime}} - {{profileData?.closingTime}}</span>
         </ion-item>
-
-        <ion-item>
-              <ion-label stacked>Operating Hours: {{profileData?.operatingHours}}</ion-label>
-        </ion-item>
-
       </ion-list>
 
             <button ion-button block class="button" (click)='openEditProfile()'>Edit Profile</button>

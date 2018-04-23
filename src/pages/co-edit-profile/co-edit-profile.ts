@@ -35,7 +35,6 @@ export class CoEditProfilePage {
   private imgPath;
   private userId;
   private imgType;
-  private oldEmail;
   profile$: AngularFireObject<any>;
 
   constructor(private afdb: AngularFireDatabase, 
@@ -52,11 +51,11 @@ export class CoEditProfilePage {
     private filePath: FilePath,
     private toastCtrl: ToastController) {
       this.userForm = this.fb.group({
-        'fname':[null,Validators.compose([Validators.required])],
-        'lname':[null,Validators.compose([Validators.required])],
+        'fname':[null,Validators.compose([Validators.required, Validators.pattern('[^0-9]*')])],
+        'lname':[null,Validators.compose([Validators.required, Validators.pattern('[^0-9]*')])],
         'email':[null,Validators.compose([Validators.required, Validators.email])],
         'password':[null,Validators.compose([Validators.minLength(6)])],
-        'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])]
+        'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11), Validators.pattern('^09[0-9]*')])]
       });
     this.userId = this.authProvider.userId;
   }
@@ -64,7 +63,6 @@ export class CoEditProfilePage {
   ionViewDidLoad() {
     this.afdb.object(`/profile/` + this.userId).valueChanges().take(1).subscribe( data => {
       this.profileData = data;
-      this.oldEmail = this.profileData.email;
       this.retrieveImg();
     });
   }
@@ -137,7 +135,7 @@ export class CoEditProfilePage {
     })
   }
 
-  editProfile() {
+  async editProfile() {
     var cont = true;
     const loading = this.loadingCtrl.create({
       content:'Updating profile...'
@@ -146,8 +144,8 @@ export class CoEditProfilePage {
     loading.present(loading);
 
     this.user = firebase.auth().currentUser;
-    if (this.userForm.value['email'] != this.oldEmail) {
-      this.user.updateEmail(this.userForm.value['email'])
+    if (this.userForm.value['email'] != this.profileData.email) {
+      await this.user.updateEmail(this.userForm.value['email'])
         .catch((error: "auth/email-already-in-use")=> {
           loading.dismiss();
           this.showToast('Cannot update email. Email already taken or used.');
@@ -155,31 +153,30 @@ export class CoEditProfilePage {
       });
     }
 
-    if (this.userForm.value['password'] != null) {
-      this.user.updatePassword(this.userForm.value['password']);
-    }
-
-    // Update profile values
-    this.afdb.object(`/profile/` + this.userId).update(this.userForm.value).then(d => {
-
-      // Update profile picture
-      if (this.imgName != undefined) {
-        this.afdb.object(`/profile/` + this.userId).update({profPic: this.imgName}).then(() => {
+    if (cont) {
+      if (this.userForm.value['password'] != null) {
+        this.user.updatePassword(this.userForm.value['password']);
+      }
+      
+      // Update profile values
+      this.afdb.object(`/profile/` + this.userId).update(this.userForm.value).then(d => {
+        // Update profile picture
+        if (this.imgName != undefined) {
           this.file.readAsArrayBuffer(this.imgPath, this.imgName).then(async (buffer)=>{
-            await this.upload(buffer, this.imgName, this.imgType).then(() => {
+            await this.upload(buffer, this.imgName, this.imgType);
+
+            this.afdb.object(`/profile/` + this.userId).update({profPic: this.imgName}).then(() => {  
               loading.dismiss();
               this.showToast('Profile updated successfully.');
-              this.navCtrl.setRoot('CoprofilePage');
+              this.navCtrl.setRoot('CoprofilePage');    
             });
-          });
-        });    
-      } else {
-        if (cont) {
+          });    
+        } else {
           loading.dismiss();
           this.showToast('Profile updated successfully.');
           this.navCtrl.setRoot('CoprofilePage');
-        }
-      }       
-    });
+        }       
+      })
+    }
   }
 }

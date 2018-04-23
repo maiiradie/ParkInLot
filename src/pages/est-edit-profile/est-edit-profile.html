@@ -6,43 +6,69 @@
     </ion-navbar>
   </ion-header>
 
-        <form [formGroup]='userForm' (ngSubmit)="editProfile()">
-        	<div class="info">
-				<ion-list>
-					<ion-item>
-			        	<ion-label stacked>Email</ion-label>
-						<ion-input type="email" formControlName = 'email' value="{{profileData?.email}}"></ion-input>
-			        </ion-item>
+  <form [formGroup]='userForm' (ngSubmit)="editProfile()">
+   	<div class="info">
+			<ion-list>
+				<ion-item>
+	     		<ion-label stacked>Email</ion-label>
+					<ion-input type="email" formControlName = 'email' value="{{profileData?.email}}"></ion-input>
+				</ion-item>
+				<p class="invalidMsg" *ngIf="!userForm.controls.email.valid  && (userForm.controls.email.touched || submitAttempt)">
+					Please enter a valid email.
+				</p>
 
-		            <ion-item>
-		            	<ion-label stacked>Capacity</ion-label>
-						<ion-input type="number" formControlName = 'capacity' value="{{profileData?.capacity}}"></ion-input>
-					</ion-item>	
+	      <ion-item>
+	       	<ion-label stacked>Capacity</ion-label>
+					<ion-input type="number" formControlName = 'capacity' value="{{profileData?.capacity}}"></ion-input>
+				</ion-item>
+				<p class="invalidMsg" *ngIf="!userForm.controls.capacity.valid  && (userForm.controls.capacity.touched || submitAttempt)">
+					Please enter an input.
+				</p>	
 
-		            <ion-item>
-		            	<ion-label stacked>Rate</ion-label>
-						<ion-input type="number" formControlName = 'rate' value="{{profileData?.rate}}"></ion-input>
-					</ion-item>
+	      <ion-item>
+	       	<ion-label stacked>Rate Per Hour (Optional)</ion-label>
+					<ion-input type="number" formControlName = 'rate' value="{{profileData?.rate}}"></ion-input>
+				</ion-item>
+				<p class="invalidMsg" *ngIf="!userForm.controls.rate.valid  && (userForm.controls.rate.touched || submitAttempt)">
+					Please enter an input.
+				</p>
 
-		            <ion-item>
-		            	<ion-label stacked>Regular Price</ion-label>
-						<ion-input type="number" formControlName = 'regularPrice' value="{{profileData?.regularPrice}}"></ion-input>
-					</ion-item>
+	      <ion-item>
+	       	<ion-label stacked>Regular Price</ion-label>
+					<ion-input type="number" formControlName = 'regularPrice' value="{{profileData?.regularPrice}}"></ion-input>
+				</ion-item>
+				<p class="invalidMsg" *ngIf="!userForm.controls.regularPrice.valid  && (userForm.controls.regularPrice.touched || submitAttempt)">
+					Please enter an input.
+				</p>
 
-		            <ion-item>
-		            	<ion-label stacked>Overnight Price</ion-label>
-						<ion-input type="number" formControlName = 'overnightPrice' value="{{profileData?.overnightPrice}}"></ion-input>
-					</ion-item>
+	      <ion-item>
+	       	<ion-label stacked>Overnight Price</ion-label>
+					<ion-input type="number" formControlName = 'overnightPrice' value="{{profileData?.overnightPrice}}"></ion-input>
+				</ion-item>
+				<p class="invalidMsg" *ngIf="!userForm.controls.overnightPrice.valid  && (userForm.controls.overnightPrice.touched || submitAttempt)">
+					Please enter an input.
+				</p>
 
-		            <ion-item>
-		            	<ion-label stacked>Operating Hours</ion-label>
-						<ion-input type="string" formControlName = 'operatingHours' value="{{profileData?.operatingHours}}"></ion-input>
-					</ion-item>
-				</ion-list>
-			</div>
-              <button ion-button block type="submit" class="button">Save Changes</button>
-        </form>
+	      <ion-item>
+	       	<ion-label stacked>Opening Time</ion-label>
+					<!-- <ion-input type="string" formControlName = 'operatingHours' value="{{profileData?.operatingHours}}"></ion-input> -->
+					<ion-datetime displayFormat="hh:mm a" formControlName = 'openingTime' [(ngModel)] = 'opening'></ion-datetime>
+				</ion-item>
+				<p class="invalidMsg" *ngIf="!userForm.controls.openingTime.valid  && (userForm.controls.openingTime.touched || submitAttempt)">
+					Opening time must be before closing time.
+				</p>
 
-
+				<ion-item>
+					<ion-label stacked>Closing Time</ion-label>
+				 <!-- <ion-input type="string" formControlName = 'operatingHours' value="{{profileData?.operatingHours}}"></ion-input> -->
+				 <ion-datetime displayFormat="hh:mm a" formControlName = 'closingTime' [(ngModel)] = 'closing'></ion-datetime>
+			 </ion-item>
+			 <p class="invalidMsg" *ngIf="!userForm.controls.closingTime.valid  && (userForm.controls.closingTime.touched || submitAttempt)">
+					Closing time must be after opening time.
+				</p>
+			</ion-list>
+		</div>
+    <button ion-button block type="submit" [disabled]='!userForm.valid' class="button">Save Changes</button>
+  </form>
 </ion-content>
   
