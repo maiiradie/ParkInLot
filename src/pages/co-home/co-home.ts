@@ -98,15 +98,15 @@ export class CoHomePage {
 	ionViewDidLoad() {
 		this.map = this.initMap();
 		this.setDirections();
-
+		
 		this.map.on('load', () => {			
 			this.location = this.getCurrentLocation()
-				.subscribe(location => {
-					this.centerLocation(location);
-					// this.setDestination(location);
-					this.setMarkers();
+			.subscribe(location => {
+				this.centerLocation(location);
+				// this.setDestination(location);
+				this.setMarkers();
+				});
 			});
-		});
 
 	}
 

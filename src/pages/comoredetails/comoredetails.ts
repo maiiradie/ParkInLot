@@ -16,10 +16,11 @@ export class ComoredetailsPage {
   profileData:any;
   userData:any;
   imgName;
-
+  hown: boolean = true;
+  
   constructor(private requestProvider:RequestProvider, private afdb:AngularFireDatabase,public navCtrl: NavController, public navParams: NavParams) {
   }
-
+  
   ionViewDidLoad() { 
     this.hoID = this.navParams.get('key');
     this.displayInfo();
@@ -30,10 +31,14 @@ export class ComoredetailsPage {
     
     this.afdb.object('profile/'+ this.hoID).snapshotChanges().take(1).subscribe( data => {
       this.profileData = data.payload.val();
+      if(this.profileData.establishment == true) {
+        this.hown = false;
+      }
     });
     this.afdb.object('location/'+ this.hoID).snapshotChanges().take(1).subscribe( data => {
       this.userData = data.payload.val();
     });
+
   }
 
   sendRequest(HoToken){
