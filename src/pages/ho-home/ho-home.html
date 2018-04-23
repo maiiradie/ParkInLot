@@ -25,15 +25,10 @@
 <ion-content>
 
   <div [ngSwitch]="carStatus">
-    <!-- <div *ngFor="let transac of transacData"> -->
-      <!-- arriving -->
       <ion-list *ngSwitchCase="'arriving'" class="margin-bottom-0">
-        <!-- <ion-item-sliding *ngIf="transac.payload.val().motionStatus == 'arriving'"> -->
         <div *ngFor="let arrive of arrivingData">
             <ion-item-sliding >
-          
                 <ion-item>
-
                   <h2 ion-start>
                     {{hoProfile?.fname}}
                     {{hoProfile?.lname}}

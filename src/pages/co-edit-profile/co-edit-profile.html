@@ -7,7 +7,7 @@
   
   <div class="bg"></div>
   <div padding class="info">
-    <img [src]="imgUrl" class="circular">
+    <img  *ngIf="imgUrl" [src]="imgUrl" class="circular">
     <button type="button" ion-button block clear (click)="changeImg()">Change Photo</button>
     <br>
       
@@ -21,16 +21,25 @@
           <ion-label stacked>First Name</ion-label>  
           <ion-input type="text" formControlName = 'fname' value="{{profileData?.fname}}"></ion-input>
         </ion-item>
+        <p class="invalidMsg" *ngIf="!userForm.controls.fname.valid  && (userForm.controls.fname.touched || submitAttempt)">
+          Please enter a valid first name.
+        </p>
   
         <ion-item>
           <ion-label stacked>Last Name</ion-label> 
           <ion-input type="text" formControlName = 'lname' value="{{profileData?.lname}}"></ion-input>
-        </ion-item>   
+        </ion-item>  
+        <p class="invalidMsg" *ngIf="!userForm.controls.lname.valid  && (userForm.controls.lname.touched || submitAttempt)">
+          Please enter a valid last name.
+        </p> 
   
         <ion-item>
           <ion-label stacked>Mobile Number</ion-label>
           <ion-input type="number" formControlName = 'mobile' value="{{profileData?.mobile}}"></ion-input>
         </ion-item> 
+        <p class="invalidMsg" *ngIf="!userForm.controls.mobile.valid  && (userForm.controls.mobile.touched || submitAttempt)">
+          Please enter a valid mobile number.
+        </p>
         <br>
         <br>
   

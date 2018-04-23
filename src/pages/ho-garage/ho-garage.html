@@ -11,7 +11,7 @@
     </ion-header>
   <div class="header-image"></div>
   <div class="main-content" text-wrap text-center>
-      <img [src]="imgName" class="rec">
+      <img *ngIf="imgName" [src]="imgName" class="rec">
       <hr>
       <ion-list no-lines text-wrap>
         <ion-item>

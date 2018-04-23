@@ -103,9 +103,8 @@ export class CoHomePage {
 			this.location = this.getCurrentLocation()
 				.subscribe(location => {
 					this.centerLocation(location);
-					this.setDestination(location);
+					// this.setDestination(location);
 					this.setMarkers();
-					
 			});
 		});
 
@@ -140,7 +139,7 @@ export class CoHomePage {
 			for (var i = 0; i < arr.length; i++) {
 
 				var el = document.createElement('div');
-				el.innerHTML = "Marker";
+				// el.innerHTML = "Marker";
 				el.id = data[i].key;
 				el.className = "mapmarker";
 

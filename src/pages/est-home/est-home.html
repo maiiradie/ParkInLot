@@ -1,0 +1,41 @@
+  <ion-content padding class="transparent-header">
+      <ion-header>
+          <ion-navbar>
+            <ion-title>ParkInLot</ion-title>
+            <div class="buttons">
+              <button ion-button icon-left icon-only color="secondary" (click)='openEstbProfile()'>
+                  <ion-icon name='contact' is-active="false"></ion-icon>
+              </button>
+              <button ion-button  icon-right icon-only color="danger" (click)='logout()'>
+                  <ion-icon name='power' is-active="false"></ion-icon>
+              </button>
+            </div>
+          </ion-navbar>
+            
+        </ion-header>
+
+
+
+    <div class="center" text-center>
+      <span *ngIf="OnOff == 'Available'; else off">
+        <div class="glow-b">
+          <h1>
+            <span ion-text>{{OnOff}}</span> 
+          </h1>
+        </div>
+      </span>  
+      <ng-template #off>
+        <div class="glow-r">
+          <h1>
+            <span ion-text>{{OnOff}}</span> 
+          </h1>
+        </div>
+      </ng-template>
+    </div> 
+
+    <ion-item clear> 
+      <ion-label>Availability</ion-label>
+      <ion-toggle color="secondary" [checked]="myStatus" (ionChange)="updateStat()" [(ngModel)]="toggleValue"></ion-toggle>
+    </ion-item>
+  </ion-content>
+  

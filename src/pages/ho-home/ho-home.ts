@@ -32,18 +32,20 @@ export class HoHomePage {
   items: Array<any> = [];
   itemRef: firebase.database.Reference = firebase.database().ref('/transac');
 
+  userId= this.authProvider.userId;
   fname;
   lname;
   hoProfile;
+  request;
 
-  constructor(private requestProvider: RequestProvider, 
-    private afAuth:AngularFireAuth,
+  constructor(private requestProvider: RequestProvider,
+    private afAuth: AngularFireAuth,
     private fcm: FCM,
-    public navCtrl: NavController, 
+    public navCtrl: NavController,
     public navParams: NavParams,
-    private platform: Platform, 
-    private afdb: AngularFireDatabase, 
-    private authProvider: AuthProvider, 
+    private platform: Platform,
+    private afdb: AngularFireDatabase,
+    private authProvider: AuthProvider,
     private alertCtrl: AlertController,
     private menuCtrl: MenuController) {
 
@@ -57,36 +59,39 @@ export class HoHomePage {
     this.requestProvider.saveToken();
     this.onNotification();
     menuCtrl.enable(true);
-
-    this.afdb.object(`requests/` +this.myId).snapshotChanges().take(1).subscribe(data => {
-      if(data.payload.val().motionStatus == 'arriving'){
-        this.arrivingData.push(data);      
-      } else if(data.payload.val().motionStatus == 'parked'){
-        this.parkedData.push(data);
-        console.log(data.payload.val().startTime);
-      }
-
-      this.afdb.object('profile/' + data.payload.val().coID).valueChanges().take(1)
-      .subscribe( profileData => {
-          this.hoProfile = profileData;
-      });
-    });
-
   }
 
-  async onNotification(){
+  ionViewDidLoad(){
+
+    this.request = this.afdb.object('requests/' + this.myId).snapshotChanges().subscribe(data => {
+      if (data.payload.val().motionStatus == 'arriving') {
+        this.arrivingData.push(data);
+      } else if (data.payload.val().motionStatus == 'parked') {
+        this.parkedData.push(data);
+      }
+    });
+
+    this.afdb.object('profile/' + this.userId).valueChanges().take(1)
+      .subscribe(profileData => {
+        this.hoProfile = profileData;
+    });
+  }
+
+  ngOnDestroy() {
+    this.request.unsubscribe();
+  }
+
+  async onNotification() {
     try {
       await this.platform.ready();
 
       this.fcm.onNotification().subscribe(data => {
-
         this.afdb.object<any>('profile/' + data.coID).valueChanges().take(1).subscribe(codata => {
           var fname, lname, platenumber;
           fname = codata.fname;
           lname = codata.lname;
 
           if (data.wasTapped) {
-
             let confirm = this.alertCtrl.create({
               // add platenumber here
               title: 'You have a parking space request from ' + fname + ' ' + lname,
@@ -106,9 +111,9 @@ export class HoHomePage {
                 }
               ],
             });
-            confirm.present();
-          }else{
 
+            confirm.present();
+          } else {  
             let confirm = this.alertCtrl.create({
               // add platenumber here
               title: 'You have a parking space request from ' + fname + ' ' + lname,
@@ -161,18 +166,17 @@ export class HoHomePage {
 
 
   toParked(transacId: string) {
-    this.afdb.object('requests/' +this.myId).update({ 
+    this.afdb.object('requests/' + this.myId).update({
       motionStatus: "parked"
     });
     // this.transacData = [];
-    this.arrivingData=[];
+    this.arrivingData = [];
   }
-  
+
   startTimer() {
     this.afdb.object('requests/' + this.myId).update({
       startTime: Date.now()
     });
-    // this.transacData = [];s
     this.parkedData = [];
   }
 
@@ -192,7 +196,7 @@ export class HoHomePage {
       //get the hours of the start date
       var startHour = startDateH.getHours();
       //compute for time
-      computedHours = endHour - startHour;
+      computedHours = endHour - startHour;``
       // start time minutes
       var startMin = startDateH.getMinutes();
       //end time minutes
@@ -210,39 +214,38 @@ export class HoHomePage {
       // push database
       var startTimeF = startDateH.toLocaleTimeString();
       var endTimeF = endDateH.toLocaleTimeString();
-      
+
       this.showPayment(startTimeF, endTimeF, payment)
       this.afdb.object('requests/' + this.myId).update({
         endTime: endDate,
         payment: payment
       });
-      
+
     });
-    
-    // this.transacData = [];
+
     this.parkedData = [];
 
   }
   //showPayment
-  showPayment(start, end, payment){
-    let confirm = this.alertCtrl.create({    
-      title: 'Payment',  
+  showPayment(start, end, payment) {
+    let confirm = this.alertCtrl.create({
+      title: 'Payment',
       subTitle: 'Start time: ' + start + '<br>End time: ' + end + '<br>Amount: P' + payment,
       enableBackdropDismiss: false,
-      buttons: [                {
+      buttons: [{
         text: 'Finish',
         handler: () => {
-          this.transfer(this.myId, start,end,payment);
+          this.transfer(this.myId, start, end, payment);
         }
       },]
-  });
-  confirm.present();
-  // this.transacData = [];
-  this.parkedData = [];
+    });
+    confirm.present();
+    // this.transacData = [];
+    this.parkedData = [];
   }
 
-  transfer(hoID, start, end, payment ){
-    var temp ;
+  transfer(hoID, start, end, payment) {
+    var temp;
     this.afdb.object<any>('requests/' + this.myId).valueChanges().take(1).subscribe(data => {
       temp = data;
       temp.hoID = hoID;
