@@ -51,8 +51,13 @@ export class CoTransacHistoryPage {
           et = new Date(this.transactions[x].endTime);
           this.transactions[x].ste = st.toLocaleString();
           this.transactions[x].ete = et.toLocaleString();
-         this.transacQuery2 = this.afdb.object<any>('profile/' + this.transactions[x].hoID).valueChanges().subscribe(name => {
-            this.transactions[x].fullName = name.fname +' ' +name.lname;
+        }
+
+        this.transactions.reverse();
+
+        for (let a = 0; a < this.transactions.length; a++) {
+          this.transacQuery2 = this.afdb.object<any>('profile/' + this.transactions[a].coID).valueChanges().subscribe(name => {
+            this.transactions[a].fullName = name.fname + ' ' + name.lname;
           });
         }
 
