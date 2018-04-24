@@ -32,7 +32,7 @@ export class RequestProvider {
     });
   }
   
-  sendRequest(token, coID, hoID) {
+  sendRequest(token,coID, hoID) {
     this.afdb.object<any>('requests/' + hoID).valueChanges().take(1).subscribe(data => {
       if (data.reqStatus == 'occupied' || data.reqStatus == 'accepted') {
         alert('The request is currently '+data.reqStatus);

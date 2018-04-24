@@ -45,9 +45,8 @@ export class CoHomePage {
 				this.authProvider.updateOnDisconnect();
 			}
 		});
-
 		this.requestProvider.saveToken();
-		this.onNotification();
+		// this.onNotification();
 		menuCtrl.enable(true);
 	}
 
@@ -95,8 +94,10 @@ export class CoHomePage {
 		}
 	}
 
+	
 	ionViewDidLoad() {
 		this.map = this.initMap();
+		this.setMarkers();	
 		this.setDirections();
 		
 		this.map.on('load', () => {			
@@ -104,7 +105,6 @@ export class CoHomePage {
 			.subscribe(location => {
 				this.centerLocation(location);
 				// this.setDestination(location);
-				this.setMarkers();
 				});
 			});
 
