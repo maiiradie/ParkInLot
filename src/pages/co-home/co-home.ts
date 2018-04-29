@@ -11,6 +11,7 @@ import { FCM } from '@ionic-native/fcm';
 import { RequestProvider } from '../../providers/request/request';
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireAuth } from 'angularfire2/auth';
+import  MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
 @IonicPage()
 @Component({
@@ -99,7 +100,8 @@ export class CoHomePage {
 		this.map = this.initMap();
 		this.setMarkers();	
 		this.setDirections();
-		
+		this.destination();
+
 		this.map.on('load', () => {
 			this.location = this.getCurrentLocation()
 			.subscribe(location => {
@@ -123,6 +125,13 @@ export class CoHomePage {
 			this.menuCtrl.enable(true, 'Co-Menu');
 		}
 		this.menuCtrl.toggle();
+	}
+
+	destination(){
+		var geocoder = new MapboxGeocoder({
+    		accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og'
+		});
+		document.getElementById('geocoder').appendChild(geocoder.onAdd(this.map));
 	}
 
 	setMarkers() {
@@ -179,6 +188,7 @@ export class CoHomePage {
 			accessToken: mapboxgl.accessToken,
 			interactive: false,
 			controls: {
+				inputs:false,
 				profileSwitcher: false,
 				instructions: false
 			}

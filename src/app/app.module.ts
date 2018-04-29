@@ -19,6 +19,7 @@ import { FileTransfer } from '@ionic-native/file-transfer';
 
 import { AuthProvider } from '../providers/auth/auth'; 
 import { RequestProvider } from '../providers/request/request'; 
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
 @NgModule({
   declarations: [
