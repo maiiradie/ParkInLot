@@ -35,32 +35,38 @@ export class CoTransacHistoryPage {
   }
 
   ngOnDestroy(){
-    this.transacQuery1.unsubscribe();
-    this.transacQuery2.unsubscribe();
+    if (this.transacQuery1) {
+      this.transacQuery1.unsubscribe();
+      if (this.transacQuery2) {
+        this.transacQuery2.unsubscribe();
+      }
+    }
   }
 
   getTransactions() {
     this.transacQuery1 = this.afdb.list('transactions', ref => ref.orderByChild('coID').equalTo(this.id)).valueChanges()
       .subscribe(data => {
 
-        var st, et;
+        if (data.length != 0) {  
+          var st, et;
 
-        for (let x = 0; x < data.length; x++) {
-          this.transactions.push(data[x]);
-          st = new Date(this.transactions[x].startTime);
-          et = new Date(this.transactions[x].endTime);
-          this.transactions[x].ste = st.toLocaleString();
-          this.transactions[x].ete = et.toLocaleString();
+          for (let x = 0; x < data.length; x++) {
+            this.transactions.push(data[x]);
+            st = new Date(this.transactions[x].startTime);
+            et = new Date(this.transactions[x].endTime);
+            this.transactions[x].ste = st.toLocaleString();
+            this.transactions[x].ete = et.toLocaleString();
+          }
+
+          this.transactions.reverse();
+
+          for (let a = 0; a < this.transactions.length; a++) {
+            this.transacQuery2 = this.afdb.object<any>('profile/' + this.transactions[a].coID).valueChanges().subscribe(name => {
+              this.transactions[a].fullName = name.fname + ' ' + name.lname;
+            });
+          }
         }
-
-        this.transactions.reverse();
-
-        for (let a = 0; a < this.transactions.length; a++) {
-          this.transacQuery2 = this.afdb.object<any>('profile/' + this.transactions[a].coID).valueChanges().subscribe(name => {
-            this.transactions[a].fullName = name.fname + ' ' + name.lname;
-          });
-        }
-
+        
       });
   }
 

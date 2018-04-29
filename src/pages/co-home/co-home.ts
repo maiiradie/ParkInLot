@@ -100,14 +100,13 @@ export class CoHomePage {
 		this.setMarkers();	
 		this.setDirections();
 		
-		this.map.on('load', () => {			
+		this.map.on('load', () => {
 			this.location = this.getCurrentLocation()
 			.subscribe(location => {
 				this.centerLocation(location);
 				// this.setDestination(location);
-				});
+				});			
 			});
-
 	}
 
 	ngOnDestroy(){
@@ -241,7 +240,6 @@ export class CoHomePage {
 						loading.dismiss();
 					});
 			});
-			
 			return locationsObs;
 	}
 

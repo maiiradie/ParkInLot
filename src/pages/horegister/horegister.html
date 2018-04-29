@@ -85,7 +85,7 @@
 						<p>Upload an image of your garage.</p> 
 						<p>(File size limit: 5MB)</p>
 						<button ion-button block type="button" (click)="choose()">{{caption}}</button>
-						<img [src]="imgName" *ngIf="imgName" id="selImg"/>
+						<img *ngIf="imgName" [src]="imgName" id="selImg"/>
 					</ion-item>
 
 					<button ion-button block type="submit" [disabled]="!garageForm.valid || !imgName">Next</button>
