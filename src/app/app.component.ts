@@ -51,7 +51,13 @@ export class MyApp {
   }
   
   openPage(page: string){
-    this.nav.setRoot(page);
+    if(page == 'CoHomePage') {
+      console.log(page);
+      this.nav.popToRoot();
+    } else {
+      console.log(page);
+      this.nav.push(page);
+    }
   }
 
   isActive(page: string){
