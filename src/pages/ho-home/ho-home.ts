@@ -38,6 +38,10 @@ export class HoHomePage {
   hoProfile;
   request;
 
+  //for toggle of availability
+  toggleValue:boolean;
+  myStatus: boolean;
+
   //button toggle for notification
   isEnabled:boolean = false;
   requestAlrtCtrl;
@@ -274,6 +278,39 @@ export class HoHomePage {
         status: ""
       });
     });
+  }
+
+  
+  doConfirm() {
+    let alert = this.alertCtrl.create({
+      title: 'Are you sure?',
+      message: 'Turning Off you availability will make you not appear in the map and you will not receive any requeasts.',
+      buttons: [
+        {
+          text: 'Disagree',
+          handler: () => {
+            this.toggleValue = this.myStatus;
+          }
+        },
+        {
+          text: 'Agree',
+          handler: () => {
+            this.updateToggle(this.toggleValue);
+          }
+        }
+      ],
+      enableBackdropDismiss: false
+    });
+
+    alert.present();
+  }
+
+  updateToggle(stat){
+    if(stat){
+      this.afdb.object('profile/' + this.myId).update({status: 'online'})
+    }else{
+      this.afdb.object('profile/' + this.myId).update({status: 'offline'}) 
+    }
   }
 
 }
