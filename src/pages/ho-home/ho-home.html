@@ -10,7 +10,9 @@
   </ion-navbar>
   <ion-item clear> 
     <ion-label>Availability</ion-label>
-    <ion-toggle color="secondary" [checked]="myStatus" [(ngModel)]="toggleValue" (ionChange)="updateStatus()"></ion-toggle>
+     <!-- [(ngModel)]="toggleValue" (ionChange)="updateStatus()" -->
+
+    <ion-toggle color="secondary" [(ngModel)]="toggleValue" (ionChange)="doConfirm()"></ion-toggle>
   </ion-item>
   <ion-toolbar no-border-top>
     

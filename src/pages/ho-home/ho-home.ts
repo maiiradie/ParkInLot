@@ -39,8 +39,7 @@ export class HoHomePage {
   request;
 
   //for toggle of availability
-  toggleValue:boolean;
-  myStatus: boolean;
+  toggleValue = true;
 
   //button toggle for notification
   isEnabled:boolean = false;
@@ -280,37 +279,33 @@ export class HoHomePage {
     });
   }
 
-  
   doConfirm() {
-    let alert = this.alertCtrl.create({
-      title: 'Are you sure?',
-      message: 'Turning Off you availability will make you not appear in the map and you will not receive any requeasts.',
-      buttons: [
-        {
-          text: 'Disagree',
-          handler: () => {
-            this.toggleValue = this.myStatus;
-          }
-        },
-        {
-          text: 'Agree',
-          handler: () => {
-            this.updateToggle(this.toggleValue);
-          }
-        }
-      ],
-      enableBackdropDismiss: false
-    });
-
-    alert.present();
-  }
-
-  updateToggle(stat){
-    if(stat){
-      this.afdb.object('profile/' + this.myId).update({status: 'online'})
+    if (this.toggleValue) {
+          this.authProvider.updateStatus('online');
     }else{
-      this.afdb.object('profile/' + this.myId).update({status: 'offline'}) 
-    }
-  }
+      let alert = this.alertCtrl.create({
+        title: 'Are you sure?',
+        message: 'Turning Off you availability will make you not appear in the map and you will not receive any requeasts.',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+              this.toggleValue = true;
+            }
+          },
+          {
+            text: 'Agree',
+            handler: () => {
+              this.authProvider.updateStatus('offline');
+            }
+          }
+        ],
+        enableBackdropDismiss: false
+      });
 
+      alert.present();
+    }
+
+  }
 }
