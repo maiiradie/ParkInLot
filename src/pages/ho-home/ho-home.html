@@ -8,7 +8,10 @@
     </ion-buttons>
     <ion-title>Home Owner</ion-title>
   </ion-navbar>
-
+  <ion-item clear> 
+    <ion-label>Availability</ion-label>
+    <ion-toggle color="secondary" [checked]="myStatus" [(ngModel)]="toggleValue" (ionChange)="updateStatus()"></ion-toggle>
+  </ion-item>
   <ion-toolbar no-border-top>
     
     <!-- notification button -->
