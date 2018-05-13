@@ -16,7 +16,11 @@ export class RequestProvider {
   coID: any;
   private key = "key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM";
 
-  constructor(private toastCtrl: ToastController, private afAuth: AngularFireAuth, private fcm: FCM, public http: HttpClient, private afdb: AngularFireDatabase) {
+  constructor(private toastCtrl: ToastController, 
+              private afAuth: AngularFireAuth, 
+              private fcm: FCM, 
+              public http: HttpClient, 
+              private afdb: AngularFireDatabase) {
     this.setID();
   }
 

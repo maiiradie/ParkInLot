@@ -109,8 +109,14 @@ export class HoHomePage {
           handler: () => {
             this.afdb.object("requests/" +this.userId).set({
               coID: "",
-              reqStatus: "pending",
-              status:"pending"
+              reqStatus: "declined",
+              status:""
+            })
+
+            this.afdb.object("requests/" +this.userId).set({
+              coID: "",
+              reqStatus: "",
+              status:""
             })
           }
         },

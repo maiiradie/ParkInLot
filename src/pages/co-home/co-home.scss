@@ -36,6 +36,17 @@ page-co-home {
         left:25%;
         margin-left:-25%;
         top:20px;
-    }
+	}
+	.status_container{
+		background-color:white;
+        position:absolute;
+		z-index:1000;
+		margin-left:1%;
+        width:98%;        
+		bottom:0px;
+		min-height: 10%;
+		border-radius: 10px 10px 0px 0px;
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	}
     .mapboxgl-ctrl-geocoder { min-width:100%; }
 }
