@@ -122,7 +122,6 @@ export class ComoredetailsPage {
             buttons: ['OK']
           });
           alert.present();
-        
           this.returnStatus.unsubscribe();    
       }
     });

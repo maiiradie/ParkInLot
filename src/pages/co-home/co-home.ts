@@ -20,7 +20,7 @@ import  MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 })
 
 export class CoHomePage {
-	transactionStatus = "empty";
+	transactionStatus = "emptys";
 	map;
 	marker;
 	directions;

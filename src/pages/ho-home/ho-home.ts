@@ -31,7 +31,7 @@ export class HoHomePage {
   myId = this.authProvider.setID();
   items: Array<any> = [];
   itemRef: firebase.database.Reference = firebase.database().ref('/transac');
-
+  flagAlrtCtrl:boolean = false;
   userId= this.authProvider.userId;
   fname;
   lname;
@@ -94,6 +94,7 @@ export class HoHomePage {
     this.afdb.object<any>("requests/" + this.userId).valueChanges().subscribe(data=>{
       if(data.reqStatus == "occupied"){
         this.isEnabled = true;    
+        this.closeAlrtCtrlOnTimeout();
       }else{
         this.isEnabled = false;
       }
@@ -111,28 +112,46 @@ export class HoHomePage {
               coID: "",
               reqStatus: "declined",
               status:""
-            })
+            });
 
             this.afdb.object("requests/" +this.userId).set({
               coID: "",
               reqStatus: "",
               status:""
-            })
+            });
+            this.flagAlrtCtrl = false;
           }
         },
         {
         text: 'Accept',
            handler: () => {
-            this.afdb.object("requests/" +this.userId).set({
+            this.afdb.object("requests/" +this.userId).update({
               reqStatus: "accepted",
               motionStatus: "arriving",
               createdAt: Date.now()
-            })
+            });
+            this.flagAlrtCtrl = false;
          }
         }
       ],
      });
-     this.requestAlrtCtrl.present();
+     if(!this.flagAlrtCtrl){
+       console.log(this.flagAlrtCtrl);
+      this.requestAlrtCtrl.present();
+      this.flagAlrtCtrl = true;
+     }
+     
+  }
+
+  closeAlrtCtrlOnTimeout(){
+    let temp = this.afdb.object<any>("requests/" + this.userId).valueChanges().subscribe(data=>{
+      if(data.coID == "" && data.reqStatus == "" && data.status == ""){
+        if(this.flagAlrtCtrl){
+          this.requestAlrtCtrl.dismiss();
+          temp.unsubscribe();
+        }
+      }    
+    });
   }
 
   async onNotification() {
