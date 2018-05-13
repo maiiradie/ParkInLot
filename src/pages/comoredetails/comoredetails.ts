@@ -21,6 +21,7 @@ export class ComoredetailsPage {
   hown: boolean = true;
   cancel
   myTimeout;
+  returnStatus;
   
   private key = "key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM";
   constructor(private requestProvider:RequestProvider, 
@@ -107,9 +108,8 @@ export class ComoredetailsPage {
   }
   //function listener for accept decline 
   statusListener(){
-    let temp = this.afdb.object<any>("requests/" + this.hoID).valueChanges().subscribe(data=>{
+    this.returnStatus = this.afdb.object<any>("requests/" + this.hoID).valueChanges().subscribe(data=>{        
       if(data.reqStatus == "accepted" || data.reqStatus == "declined"){
-        temp.unsubscribe();      
         clearTimeout(this.myTimeout);
         if(this.actrlFlag){
           this.cancel.dismiss();
@@ -123,7 +123,7 @@ export class ComoredetailsPage {
           });
           alert.present();
         
-        
+          this.returnStatus.unsubscribe();    
       }
     });
   } 
@@ -143,6 +143,10 @@ export class ComoredetailsPage {
               reqStatus: "",
               status:""
             });
+            this.returnStatus.unsubscribe();
+            if(this.actrlFlag){
+              this.actrlFlag = false;
+            }       
           }
         },
       ]
@@ -171,6 +175,7 @@ export class ComoredetailsPage {
         buttons: ['OK']
       });
       alert.present();
+      this.returnStatus.unsubscribe();
      }, 5000);  
   }
 }
