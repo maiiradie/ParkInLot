@@ -29,9 +29,11 @@
     </ion-row>
   </div>
 
-  <div *ngIf="transactionStatus != 'empty' ">
+  <div *ngIf="testing">
       <div class="status_container">
-          <p>Status</p>
+          <div *ngIf="navAddress">
+          {{navAddress}}
+          </div>
       </div>
   </div>
 

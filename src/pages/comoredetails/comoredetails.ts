@@ -61,7 +61,8 @@ export class ComoredetailsPage {
     this.afdb.object<any>('requests/' + this.hoID).valueChanges().take(1).subscribe(data => {
       if (data.reqStatus == 'occupied' || data.reqStatus == 'accepted') {
         alert('The homeowner is on an ongoin transaction at the moment');
-      } else {
+      } 
+      else {
         this.showConfirm();
         
         this.afdb.object('requests/' + this.hoID).set({
@@ -110,7 +111,7 @@ export class ComoredetailsPage {
   //function listener for accept decline 
   statusListener(){
     this.returnStatus = this.afdb.object<any>("requests/" + this.hoID).valueChanges().subscribe(data=>{        
-      if(data.reqStatus == "accepted" || data.reqStatus == "declined"){
+      if(data.reqStatus == "declined"){
         clearTimeout(this.myTimeout);
         if(this.actrlFlag){
           this.cancel.dismiss();
@@ -124,6 +125,28 @@ export class ComoredetailsPage {
           });
           alert.present();
           this.returnStatus.unsubscribe();    
+      }else if (data.reqStatus == "accepted"){
+        clearTimeout(this.myTimeout);
+        if(this.actrlFlag){
+          this.cancel.dismiss();
+          this.actrlFlag = false;
+
+          let alert = this.alertCtrl.create({
+            title: 'Request',
+            subTitle: 'Request has been ' + data.reqStatus,
+            buttons: [
+              {
+                text: 'OK',
+                handler: () => {
+                  //put code here redirecting to cohome passing parameters of the homeowner
+                  this.navCtrl.setRoot("CoHomePage", { key: this.hoID });
+                }
+              }
+            ]
+          });
+          alert.present();
+          this.returnStatus.unsubscribe();  
+        }
       }
     });
   } 

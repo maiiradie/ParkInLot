@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, LoadingController, ActionSheetController, IonicPage, Platform,MenuController } from 'ionic-angular';
+import { NavController, AlertController, LoadingController, NavParams, ActionSheetController, IonicPage, Platform,MenuController } from 'ionic-angular';
 import * as mapboxgl from 'mapbox-gl';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Observable } from 'rxjs/Observable';
@@ -20,15 +20,17 @@ import  MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 })
 
 export class CoHomePage {
-	transactionStatus = "emptys";
+	testing;
 	map;
 	marker;
 	directions;
 	hoMarkers;
 	location;
 	userId = this.authProvider.userId;
-
+	navAddress;
 	constructor(private afAuth: AngularFireAuth,
+		public alertCtrl: AlertController,
+		public navParams: NavParams,
 		private afdb: AngularFireDatabase,
 		private authProvider:AuthProvider,
 		private requestProvider: RequestProvider,
@@ -97,6 +99,12 @@ export class CoHomePage {
 
 	
 	ionViewDidLoad() {
+		this.testing = this.navParams.get('key');
+		if(this.testing){
+			this.requestNodeListener();
+			//add code here to start a listener on request node(database)
+			console.log(this.testing);
+		}
 		this.map = this.initMap();
 		this.setMarkers();	
 		this.setDirections();
@@ -109,6 +117,35 @@ export class CoHomePage {
 				// this.setDestination(location);
 				});			
 			});
+	}
+	requestNodeListener(){
+		let temp = this.afdb.object<any>('requests/' + this.testing).valueChanges().subscribe(data=>{
+			if(data.motionStatus){
+				console.log(data.motionStatus);
+				if(data.motionStatus == "arriving"){
+					this.navAddress = "Please navigate";
+				}else if (data.motionStatus == "parked"){
+					this.navAddress = "You have arrived";	
+				}				
+			}if (data.endTime){
+				let confirm = this.alertCtrl.create({
+					title: 'Payment',
+					subTitle: 'Transaction Completed',
+					enableBackdropDismiss: false,
+					buttons: [{
+					  text: 'Finish',
+					  handler: () => {
+						this.testing = undefined;		
+					  }
+					},]
+				  });
+				  confirm.present();
+				
+				temp.unsubscribe();
+			}if (data.startTime){
+				this.navAddress = "Timer started at: " + data.startTime
+			}
+		});
 	}
 
 	ngOnDestroy(){
