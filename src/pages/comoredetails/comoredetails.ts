@@ -13,6 +13,7 @@ import * as firebase from 'firebase/app';
 })
 
 export class ComoredetailsPage {
+  timeoutFlag: Boolean = false;
   actrlFlag: Boolean = false;
   hoID;
   profileData:any;
@@ -171,9 +172,20 @@ export class ComoredetailsPage {
       let alert = this.alertCtrl.create({
         title: 'Request',
         subTitle: 'Request Timeout',
-        buttons: ['OK']
+        buttons: [          
+          {
+          text: 'Ok',
+          handler: () => {
+          this.timeoutFlag = false;
+        }
+      }
+        ]
       });
-      alert.present();
+      if(!this.timeoutFlag){
+        alert.present();
+        this.timeoutFlag = true;
+      }
+      
       this.returnStatus.unsubscribe();
      }, 5000);  
   }

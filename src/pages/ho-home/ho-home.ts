@@ -148,6 +148,7 @@ export class HoHomePage {
       if(data.coID == "" && data.reqStatus == "" && data.status == ""){
         if(this.flagAlrtCtrl){
           this.requestAlrtCtrl.dismiss();
+          this.flagAlrtCtrl = false;
           temp.unsubscribe();
         }
       }    
