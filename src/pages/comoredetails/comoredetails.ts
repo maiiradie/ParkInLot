@@ -61,7 +61,7 @@ export class ComoredetailsPage {
 
   sendRequest(HoToken){
     let coID = this.requestProvider.setID();   
-    this.afdb.object<any>('requests/' + this.hoID).valueChanges().take(1).subscribe(data => {
+    let temp = this.afdb.object<any>('requests/' + this.hoID).valueChanges().take(1).subscribe(data => {
       if (data.reqStatus == 'occupied' || data.reqStatus == 'accepted') {
         alert('The homeowner is on an ongoin transaction at the moment');
       } 
@@ -97,7 +97,7 @@ export class ComoredetailsPage {
         }).subscribe();
         
       }
-      
+      temp.unsubscribe();
     });
     
     //this.requestProvider.sendRequest(HoToken,coID, this.hoID);
@@ -113,7 +113,7 @@ export class ComoredetailsPage {
   }
   //function listener for accept decline 
   statusListener(){
-    this.returnStatus = this.afdb.object<any>("requests/" + this.hoID).valueChanges().subscribe(data=>{        
+    this.returnStatus = this.afdb.object<any>("requests/" + this.hoID).valueChanges().take(3).subscribe(data=>{        
       if(data.reqStatus == "declined"){
         clearTimeout(this.myTimeout);
         if(this.actrlFlag){
@@ -137,7 +137,6 @@ export class ComoredetailsPage {
             alert.present();   
             this.reqFlag = true 
           }                 
-          this.returnStatus.unsubscribe();    
 
       }else if (data.reqStatus == "accepted"){
         clearTimeout(this.myTimeout);
@@ -180,7 +179,6 @@ export class ComoredetailsPage {
               reqStatus: "",
               status:""
             });
-            this.returnStatus.unsubscribe();
             if(this.actrlFlag){
               this.actrlFlag = false;
             }       
@@ -221,9 +219,7 @@ export class ComoredetailsPage {
       if(!this.timeoutFlag){
         alert.present();
         this.timeoutFlag = true;
-      }
-      
-      this.returnStatus.unsubscribe();
+      }      
      }, 5000);  
   }
 }
