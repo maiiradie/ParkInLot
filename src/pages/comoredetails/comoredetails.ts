@@ -13,6 +13,7 @@ import * as firebase from 'firebase/app';
 })
 
 export class ComoredetailsPage {
+  reqFlag: Boolean = false;
   timeoutFlag: Boolean = false;
   actrlFlag: Boolean = false;
   hoID;
@@ -41,7 +42,9 @@ export class ComoredetailsPage {
     this.displayInfo();
     this.retrieveImg();
   }
-  
+  ionViewDidLeave(){
+    this.returnStatus.unsubscribe();    
+  }
   displayInfo(){
     
     this.afdb.object('profile/'+ this.hoID).snapshotChanges().take(1).subscribe( data => {
@@ -121,10 +124,21 @@ export class ComoredetailsPage {
           let alert = this.alertCtrl.create({
             title: 'Request',
             subTitle: 'Request has been ' + data.reqStatus,
-            buttons: ['OK']
+            buttons: [
+              {
+              text: 'Ok',
+              handler: () => {
+                  this.reqFlag = false;
+              }
+            }
+          ]
           });
-          alert.present();
+          if(!this.reqFlag){
+            alert.present();   
+            this.reqFlag = true 
+          }                 
           this.returnStatus.unsubscribe();    
+
       }else if (data.reqStatus == "accepted"){
         clearTimeout(this.myTimeout);
         if(this.actrlFlag){

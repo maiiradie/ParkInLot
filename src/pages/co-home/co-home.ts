@@ -20,6 +20,7 @@ import  MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 })
 
 export class CoHomePage {
+	reqListenerSub;
 	testing;
 	map;
 	marker;
@@ -48,7 +49,7 @@ export class CoHomePage {
 				this.authProvider.updateOnDisconnect();
 			}
 		});
-		this.requestProvider.saveToken();
+		//this.requestProvider.saveToken();
 		// this.onNotification();
 		menuCtrl.enable(true);
 	}
@@ -119,36 +120,44 @@ export class CoHomePage {
 			});
 	}
 	requestNodeListener(){
-		let temp = this.afdb.object<any>('requests/' + this.testing).valueChanges().subscribe(data=>{
+		var start;
+		var end;
+		this.reqListenerSub= this.afdb.object<any>('requests/' + this.testing).valueChanges().take(4).subscribe(data=>{	
 			if(data.motionStatus){
 				console.log(data.motionStatus);
-				if(data.motionStatus == "arriving"){
+				if(data.motionStatus == "arriving"){					
 					this.navAddress = "Please navigate";
 				}else if (data.motionStatus == "parked"){
-					this.navAddress = "You have arrived";	
+					this.navAddress = "You have arrived";
 				}				
 			}if (data.endTime){
-				let confirm = this.alertCtrl.create({
-					title: 'Payment',
-					subTitle: 'Transaction Completed',
-					enableBackdropDismiss: false,
-					buttons: [{
-					  text: 'Finish',
-					  handler: () => {
-						this.testing = undefined;		
-					  }
-					},]
-				  });
-				  confirm.present();
-				
-				temp.unsubscribe();
+				let secTemp = this.afdb.object<any>('requests/' + this.testing).valueChanges().subscribe(data=>{
+					var e = new Date(data.endTime);
+					end = e.toString();
+					let confirm = this.alertCtrl.create({
+						title: 'Payment',
+						subTitle: 'Start time: ' + start + '<br>End time: ' + end + '<br>Amount: P' + data.payment,
+						enableBackdropDismiss: false,
+						buttons: [{
+						  text: 'Finish',
+						  handler: () => {
+							this.testing = undefined;		
+						  }
+						},]
+					  });
+					  confirm.present();
+					  secTemp.unsubscribe();
+				});				
 			}if (data.startTime){
-				this.navAddress = "Timer started at: " + data.startTime
+				var d = new Date(data.startTime);
+				start = d.toDateString();
+				this.navAddress = "Timer started at: " + d.toString();
 			}
 		});
 	}
 
 	ngOnDestroy(){
+		
 		this.location.unsubscribe();
 		this.hoMarkers.unsubscribe();
 	}

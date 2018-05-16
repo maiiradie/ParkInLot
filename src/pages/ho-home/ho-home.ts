@@ -64,8 +64,8 @@ export class HoHomePage {
       }
     });
 
-    this.requestProvider.saveToken();
-    this.onNotification();
+    //this.requestProvider.saveToken();
+    //this.onNotification();
     menuCtrl.enable(true);
   }
 
@@ -125,11 +125,24 @@ export class HoHomePage {
         {
         text: 'Accept',
            handler: () => {
-            this.afdb.object("requests/" +this.userId).update({
-              reqStatus: "accepted",
-              motionStatus: "arriving",
-              createdAt: Date.now()
-            });
+             //check if data is not blank
+             this.afdb.object<any>("requests/" + this.userId).valueChanges().take(1).subscribe(data=>{
+               //if data is blank then notify that the request has timedout
+              if(data.coID == "" && data.reqStatus == ""){
+                let alertTimeout = this.alertCtrl.create({
+                  title: 'Request has timed out',
+                  buttons:['OK']                  
+                });
+              }else{
+                this.afdb.object("requests/" +this.userId).update({
+                  reqStatus: "accepted",
+                  motionStatus: "arriving",
+                  createdAt: Date.now()
+                });
+              }
+             })
+             
+             // else accept the request
             this.flagAlrtCtrl = false;
          }
         }
@@ -270,7 +283,7 @@ export class HoHomePage {
 
     });
 
-    this.parkedData = [];
+    this.parkedData = []; 
 
   }
   //showPayment
