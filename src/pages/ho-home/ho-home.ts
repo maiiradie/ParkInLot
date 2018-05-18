@@ -20,11 +20,10 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   templateUrl: 'ho-home.html',
 })
 export class HoHomePage {
-
-  carStatus: string = "Parked";
-  arrivingData: Array<any> = [];
-  parkedData: Array<any> = [];
-
+  start;
+  startTime:boolean = false;
+  arriving: boolean = false;
+  parked: boolean = false;
   unfiltered;
   filtered;
   arr;
@@ -73,9 +72,11 @@ export class HoHomePage {
     this.notificationListener();
     this.request = this.afdb.object('requests/' + this.myId).snapshotChanges().subscribe(data => {
       if (data.payload.val().motionStatus == 'arriving') {
-        this.arrivingData.push(data);
+        this.arriving = true;
+        this.parked =  false;
       } else if (data.payload.val().motionStatus == 'parked') {
-        this.parkedData.push(data);
+        this.arriving = false;
+        this.parked = true;
       }
     });
 
@@ -100,6 +101,7 @@ export class HoHomePage {
       }
     });
   }
+
   showNotif(){
     this.requestAlrtCtrl = this.alertCtrl.create({
       title: 'You have a parking space request',
@@ -122,7 +124,7 @@ export class HoHomePage {
             this.flagAlrtCtrl = false;
           }
         },
-        {
+        { 
         text: 'Accept',
            handler: () => {
              //check if data is not blank
@@ -140,7 +142,8 @@ export class HoHomePage {
                   createdAt: Date.now()
                 });
               }
-             })
+             });
+             this.arriving = true;              
              
              // else accept the request
             this.flagAlrtCtrl = false;
@@ -149,7 +152,6 @@ export class HoHomePage {
       ],
      });
      if(!this.flagAlrtCtrl){
-       console.log(this.flagAlrtCtrl);
       this.requestAlrtCtrl.present();
       this.flagAlrtCtrl = true;
      }
@@ -225,23 +227,28 @@ export class HoHomePage {
   }
 
 
-  toParked(transacId: string) {
+  toParked() {
     this.afdb.object('requests/' + this.myId).update({
       motionStatus: "parked"
     });
-    // this.transacData = [];
-    this.arrivingData = [];
+    this.arriving = false;
+    this.parked = true;
   }
 
   startTimer() {
+    
+    this.startTime = true;
+    var startTemp = Date.now();
+    var tempD = new Date(startTemp);
+    this.start = tempD.toLocaleTimeString();
     this.afdb.object('requests/' + this.myId).update({
-      startTime: Date.now()
-    });
-    this.parkedData = [];
+      startTime: startTemp
+    });    
   }
 
   stopTimer() {
-    //kunin si stopTime
+    this.startTime
+    //get stopTime
     var endDate = Date.now();
     var endDateH = new Date(endDate);
     var endHour = endDateH.getHours();
@@ -280,10 +287,9 @@ export class HoHomePage {
         endTime: endDate,
         payment: payment
       });
-
+      
     });
 
-    this.parkedData = []; 
 
   }
   //showPayment
@@ -300,8 +306,6 @@ export class HoHomePage {
       },]
     });
     confirm.present();
-    // this.transacData = [];
-    this.parkedData = [];
   }
 
   transfer(hoID, start, end, payment) {
@@ -315,6 +319,9 @@ export class HoHomePage {
         reqStatus: "",
         status: ""
       });
+      this.arriving = false;
+      this.parked = false;
+      this.startTime = false;
     });
   }
 

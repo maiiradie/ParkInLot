@@ -8,96 +8,57 @@
     </ion-buttons>
     <ion-title>Home Owner</ion-title>
   </ion-navbar>
+
   <ion-item clear> 
-    <ion-label>Availability</ion-label>
-     <!-- [(ngModel)]="toggleValue" (ionChange)="updateStatus()" -->
-
-    <ion-toggle color="secondary" [(ngModel)]="toggleValue" (ionChange)="doConfirm()"></ion-toggle>
-  </ion-item>
-  <ion-toolbar no-border-top>
-    
-    <!-- notification button -->
-
-
-    <ion-segment [(ngModel)]="carStatus">
-      <ion-segment-button value="arriving">
-        Arriving
-      </ion-segment-button>
-      <ion-segment-button value="Parked">
-        Parked
-      </ion-segment-button>
-    </ion-segment>
-  </ion-toolbar>
-  
-  
+      <ion-label>Availability</ion-label>
+      <ion-toggle color="secondary" [(ngModel)]="toggleValue" (ionChange)="doConfirm()"></ion-toggle>
+    </ion-item>
 </ion-header>
 
 <ion-content>
-
-  <div [ngSwitch]="carStatus">
-      <ion-list *ngSwitchCase="'arriving'" class="margin-bottom-0">
-        <div *ngFor="let arrive of arrivingData">
-            <ion-item-sliding >
-                <ion-item>
-                  <h2 ion-start>
-                    {{hoProfile?.fname}}
-                    {{hoProfile?.lname}}
-                  </h2>
-                </ion-item>
-                <ion-item-options side="right">
-      
-                  <!--parked button-->
-      
-                  <button ion-button color="secondary" (click)="toParked(arrive?.key)">
-                    <ion-icon name="car"></ion-icon>
-                    arrived
-                    <!-- <ng-template #parking> -->
-                  </button>
-                </ion-item-options>
-              </ion-item-sliding>
-        </div>
-
-        <div *ngIf="arrivingData.length == 0">
-            <div class="noArriving"></div>
-          
-          </div>
-  
-      </ion-list>
-
-      <ion-list *ngSwitchCase="'Parked'" class="margin-bottom-0">
-
-        <!-- <div *ngIf="transac?.payload.val().motionStatus == 'parked'"> -->
-        <div *ngIf="parkedData.length == 0">
-          <div class="noParked"></div>
-        </div>
-        <div *ngFor="let park of parkedData">
-          <ion-item>
-            <h2 ion-start>
-              {{hoProfile?.fname}}
-              {{hoProfile?.lname}}
-            </h2>
-            <div *ngIf="park?.payload.val().startTime == undefined; else stop">
-                <button ion-button block color="secondary" (click)="startTimer()">Start Timer</button>
-
-            </div>
-
-            <ng-template #stop>
-              <div *ngIf="park?.payload.val().endTime == undefined; else elseTemplate">
-                <button ion-button block color="danger" (click)="stopTimer()">Stop Timer</button>            
-                
-              </div>
-            
-            </ng-template>
-          
-          </ion-item>
-          <ng-template #elseTemplate>
-              <div class="noParked"></div>
-          </ng-template>
-        </div>
-      </ion-list>
-    <!-- </div> -->
+  <div *ngIf="arriving || parked">
+    <div class="co_details">
+      <br>
+      <br>
+      <h3 ion-start>On-going Transaction</h3>
+      <br>
+      <p ion-start>Carowner: {{hoProfile?.fname}} {{hoProfile?.lname}}</p>
+    </div>
   </div>
- 
+<hr>
+    <div *ngIf="!arriving && !parked">
+        <div class="noParked"></div>
+    </div>
+
+    <div *ngIf="arriving && !parked ">
+      <button block ion-button  (tap)="toParked()">Arrived</button>
+    </div> 
+
+    <div *ngIf="!arriving && parked">
+        <div *ngIf="!startTime">
+          <button block ion-button color="secondary"  (tap)="startTimer()"> Start Timer </button>
+        </div>
+        <div *ngIf="startTime">
+            <button block ion-button color="danger"  (tap)="stopTimer()"> Stop Timer </button>
+        </div>
+    </div>
+    <hr>
+    <!-- notes for homeowner -->
+    <div class="notes_container">
+      <div *ngIf="arriving && !parked ">
+          <p ion-start>Click the button once {{hoProfile?.fname}} arrives your place</p>
+      </div> 
+
+      <div *ngIf="!arriving && parked">
+          <div *ngIf="!startTime">
+              <p ion-start>Click to Start the timer</p>
+          </div>
+          <div *ngIf="startTime">
+              <p ion-start>Timer Started at: {{start}}</p>
+          </div>
+      </div>
+  </div>
+  <!-- Notification button -->
   <div class="notif">
       <ion-row>
         <ion-col>

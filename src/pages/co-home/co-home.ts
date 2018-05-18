@@ -101,7 +101,7 @@ export class CoHomePage {
 	
 	ionViewDidLoad() {
 		this.testing = this.navParams.get('key');
-		if(this.testing){
+		if(this.testing){	
 			this.requestNodeListener();
 			//add code here to start a listener on request node(database)
 			console.log(this.testing);
@@ -132,11 +132,13 @@ export class CoHomePage {
 				}				
 			}if (data.endTime){
 				let secTemp = this.afdb.object<any>('requests/' + this.testing).valueChanges().subscribe(data=>{
+					var s = new Date(data.startTime);
+					start = s.toLocaleTimeString();
 					var e = new Date(data.endTime);
-					end = e.toString();
+					end = e.toLocaleTimeString();
 					let confirm = this.alertCtrl.create({
 						title: 'Payment',
-						subTitle: 'Start time: ' + start + '<br>End time: ' + end + '<br>Amount: P' + data.payment,
+						subTitle: 'Start time: ' + start+ '<br>End time: ' + end + '<br>Amount: P' + data.payment,
 						enableBackdropDismiss: false,
 						buttons: [{
 						  text: 'Finish',
@@ -146,12 +148,14 @@ export class CoHomePage {
 						},]
 					  });
 					  confirm.present();
+					  console.log("this is unsubscribed");
 					  secTemp.unsubscribe();
 				});				
 			}if (data.startTime){
+				
 				var d = new Date(data.startTime);
-				start = d.toDateString();
-				this.navAddress = "Timer started at: " + d.toString();
+				start = d.toLocaleTimeString();
+				this.navAddress = "Timer started at: " + start;
 			}
 		});
 	}

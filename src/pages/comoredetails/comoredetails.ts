@@ -61,11 +61,13 @@ export class ComoredetailsPage {
 
   sendRequest(HoToken){
     let coID = this.requestProvider.setID();   
-    let temp = this.afdb.object<any>('requests/' + this.hoID).valueChanges().take(1).subscribe(data => {
+    let temp = this.afdb.object<any>('requests/' + this.hoID).valueChanges().subscribe(data => {
       if (data.reqStatus == 'occupied' || data.reqStatus == 'accepted') {
         alert('The homeowner is on an ongoin transaction at the moment');
+        temp.unsubscribe();
       } 
       else {
+        temp.unsubscribe();
         this.showConfirm();
         
         this.afdb.object('requests/' + this.hoID).set({
@@ -113,9 +115,10 @@ export class ComoredetailsPage {
   }
   //function listener for accept decline 
   statusListener(){
-    this.returnStatus = this.afdb.object<any>("requests/" + this.hoID).valueChanges().take(3).subscribe(data=>{        
+    this.returnStatus = this.afdb.object<any>("requests/" + this.hoID).valueChanges().subscribe(data=>{        
       if(data.reqStatus == "declined"){
         clearTimeout(this.myTimeout);
+        this.returnStatus.unsubscribe();  
         if(this.actrlFlag){
           this.cancel.dismiss();
           this.actrlFlag = false;
@@ -137,7 +140,7 @@ export class ComoredetailsPage {
             alert.present();   
             this.reqFlag = true 
           }                 
-
+    
       }else if (data.reqStatus == "accepted"){
         clearTimeout(this.myTimeout);
         if(this.actrlFlag){
@@ -212,6 +215,7 @@ export class ComoredetailsPage {
           text: 'Ok',
           handler: () => {
           this.timeoutFlag = false;
+          this.returnStatus.unsubscribe();  
         }
       }
         ]
