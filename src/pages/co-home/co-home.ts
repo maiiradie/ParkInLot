@@ -105,6 +105,10 @@ export class CoHomePage {
 			this.requestNodeListener();
 			//add code here to start a listener on request node(database)
 			console.log(this.testing);
+			this.afdb.object<any>('location/' + this.testing).valueChanges().take(1)
+			.subscribe( data => {
+				this.setDestination(data.lng,data.lat);					
+			});
 		}
 		this.map = this.initMap();
 		this.setMarkers();
@@ -113,13 +117,14 @@ export class CoHomePage {
 
 		this.map.on('load', () => {
 			this.location = this.getCurrentLocation()
-				.subscribe(location => {
-					this.centerLocation(location);
-					// this.setDestination(location);
-				});
-		});
+			.subscribe(location => {
+				this.centerLocation(location);
+				this.setOrigin(location);
+				});			
+			});
 	}
-	requestNodeListener() {
+
+	requestNodeListener(){
 		var start;
 		var end;
 		this.reqListenerSub = this.afdb.object<any>('requests/' + this.testing).valueChanges().take(4).subscribe(data => {
@@ -141,10 +146,12 @@ export class CoHomePage {
 						subTitle: 'Start time: ' + start + '<br>End time: ' + end + '<br>Amount: P' + data.payment,
 						enableBackdropDismiss: false,
 						buttons: [{
-							text: 'Finish',
-							handler: () => {
-								this.testing = undefined;
-							}
+						  text: 'Finish',
+						  handler: () => {
+							this.testing = undefined;	
+							this.setDestination(null,null);
+							this.setMarkers();
+						  }
 						},]
 					});
 					confirm.present();
@@ -164,6 +171,7 @@ export class CoHomePage {
 
 		this.location.unsubscribe();
 		this.hoMarkers.unsubscribe();
+		this.setDestination(null, null);
 	}
 
 	openMenu(evt) {
@@ -185,14 +193,32 @@ export class CoHomePage {
 	}
 
 	currentMarkers = [];
+	setHoMarkers = [];
 
 	setMarkers() {
+		console.log('set markers run!');
 		var arr = [];
 		var map = this.map;
 		var markers = [];
 
 
+		// var map = this.map;
+		if (this.testing) {
+			//remove markers
+			for (var i = 0; i < this.setHoMarkers.length - 1; i++) {
+				this.setHoMarkers[i].remove();
+			}
 
+			this.afdb.object<any>('location/' + this.testing).valueChanges().take(1)
+			.subscribe(data => {
+				var el = document.createElement('div');
+				el.className = "mapmarker";
+				new mapboxgl.Marker(el, { offset: [-25, -25] })
+					.setLngLat([data.lng, data.lat])
+					.addTo(this.map);
+			});
+
+		}else {
 		this.hoMarkers = this.afdb.list('location').snapshotChanges().subscribe(data => {
 
 			for (var a = 0; a < data.length; a++) {
@@ -231,10 +257,19 @@ export class CoHomePage {
 				var el = document.createElement('div');
 				el.id = arr[i].key;
 				el.className = "mapmarker";
+				// el.innerHTML = "Marker";
+				el.id = data[i].key;
+				if (arr[i].payload.val().establishment) {
+					el.className = "estabMarker";
+				}else{
+					el.className = "mapmarker";
+				}
+				
 
 				var coords = new mapboxgl.LngLat(arr[i].payload.val().lng, arr[i].payload.val().lat);
 
-				this.currentMarkers[arr[i].key] = new mapboxgl.Marker(el, { offset: [-25, -25] })
+				// this.currentMarkers[arr[i].key] = new mapboxgl.Marker(el, { offset: [-25, -25] })
+				this.setHoMarkers[i] = new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)
 					.addTo(this.map);
 
@@ -262,7 +297,7 @@ export class CoHomePage {
 				});
 			}
 		});
-
+		}
 	}
 
 	setDirections() {
@@ -276,19 +311,16 @@ export class CoHomePage {
 			}
 		});
 		this.map.addControl(this.directions, 'top-left');
+		
 	}
 
-	setDestination(location) {
+	setOrigin(location){
 		this.directions.setOrigin(location.lng + ',' + location.lat);
 	}
 
 
-	setDest(lang, latt) {
+	setDestination(lang, latt) {
 		this.directions.setDestination(lang + ',' + latt);
-		this.marker.remove();
-		var hoMarker = new mapboxgl.LngLat(lang, latt);
-
-		this.addMarker(hoMarker);
 	}
 
 	initMap(location = new mapboxgl.LngLat(120.5960, 16.4023)) {
@@ -300,7 +332,7 @@ export class CoHomePage {
 			zoom: 14,
 			attributionControl: false,
 		});
-
+		
 		return map;
 	}
 

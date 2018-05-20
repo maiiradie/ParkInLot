@@ -20,6 +20,15 @@ page-co-home {
 		cursor: pointer;
 	}
 
+	.estabMarker{
+		background-image: url('../assets/imgs/est_open.png');
+
+		background-size: 35px 48px;
+		width: 35px;
+		height: 48px; 
+		cursor: pointer;
+	}
+
 	.carmarker{
 		background-image: url('../assets/imgs/car.png');
 
