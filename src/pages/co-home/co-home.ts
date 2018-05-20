@@ -12,7 +12,6 @@ import { RequestProvider } from '../../providers/request/request';
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireAuth } from 'angularfire2/auth';
 import  MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import { NgModuleLoader } from 'ionic-angular/util/ng-module-loader';
 
 @IonicPage()
 @Component({
@@ -107,7 +106,7 @@ export class CoHomePage {
 			console.log(this.testing);
 			this.afdb.object<any>('location/' + this.testing).valueChanges().take(1)
 			.subscribe( data => {
-				this.setDest(data.lng,data.lat);					
+				this.setDestination(data.lng,data.lat);					
 			});
 		}
 		this.map = this.initMap();
@@ -119,7 +118,7 @@ export class CoHomePage {
 			this.location = this.getCurrentLocation()
 			.subscribe(location => {
 				this.centerLocation(location);
-				this.setDestination(location);
+				this.setOrigin(location);
 				});			
 			});
 	}
@@ -149,7 +148,7 @@ export class CoHomePage {
 						  text: 'Finish',
 						  handler: () => {
 							this.testing = undefined;	
-							this.setDest(null,null);
+							this.setDestination(null,null);
 							this.setMarkers();
 						  }
 						},]
@@ -170,7 +169,7 @@ export class CoHomePage {
 	ngOnDestroy(){
 		this.location.unsubscribe();
 		this.hoMarkers.unsubscribe();
-		this.setDest(null, null);
+		this.setDestination(null, null);
 	}
 
 	openMenu(evt) {
@@ -224,7 +223,12 @@ export class CoHomePage {
 				var el = document.createElement('div');
 				// el.innerHTML = "Marker";
 				el.id = data[i].key;
-				el.className = "mapmarker";
+				if (arr[i].payload.val().establishment) {
+					el.className = "estabMarker";
+				}else{
+					el.className = "mapmarker";
+				}
+				
 
 				var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
 
@@ -272,14 +276,13 @@ export class CoHomePage {
 		
 	}
 
-	setDestination(location){
+	setOrigin(location){
 		this.directions.setOrigin(location.lng + ',' + location.lat);
 	}
 
 
-	setDest(lang, latt) {
+	setDestination(lang, latt) {
 		this.directions.setDestination(lang + ',' + latt);
-
 	}
 
 	initMap(location = new mapboxgl.LngLat(120.5960, 16.4023)) {
