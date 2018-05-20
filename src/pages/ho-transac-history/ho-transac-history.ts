@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
+import { query } from '@angular/core/src/animation/dsl';
 
 @IonicPage()
 @Component({
@@ -27,8 +28,12 @@ export class HoTransacHistoryPage {
       private authProvider: AuthProvider) {   
   }
   ngOnDestroy() {
-    this.transacQuery1.unsubscribe();
-    this.transacQuery2.unsubscribe();
+    if (this.transacQuery1) {
+      this.transacQuery1.unsubscribe();
+      if (this.transacQuery2) {
+        this.transacQuery2.unsubscribe();  
+      }
+    }
   }
 
   ionViewDidLoad() {
@@ -39,19 +44,26 @@ export class HoTransacHistoryPage {
     this.transacQuery1 = this.afdb.list('transactions', ref => ref.orderByChild('hoID').equalTo(this.userId)).valueChanges()
       .subscribe(data => {
         
-        var st, et;
+        if (data.length != 0) {        
+          var st, et;
+            for (let x = 0; x < data.length; x++) {
+              this.transactions.push(data[x]);
 
-        for (let x = 0; x < data.length; x++) {
-          this.transactions.push(data[x]);
-          st = new Date(this.transactions[x].startTime);
-          et = new Date(this.transactions[x].endTime);
-          this.transactions[x].ste = st.toLocaleString();
-          this.transactions[x].ete = et.toLocaleString();
+              st = new Date(this.transactions[x].startTime);
+              et = new Date(this.transactions[x].endTime);
+              this.transactions[x].ste = st.toLocaleString();
+              this.transactions[x].ete = et.toLocaleString();
+            }
+        
+          this.transactions.reverse();
 
-          this.transacQuery2 = this.afdb.object<any>('profile/' + this.transactions[x].coID).valueChanges().subscribe(name => {
-            this.transactions[x].fullName = name.fname +' ' +name.lname;
-          });
-        }
+          for (let a = 0;  a < this.transactions.length; a++) {
+            this.transacQuery2 = this.afdb.object<any>('profile/' + this.transactions[a].coID).valueChanges().subscribe(name => {
+              this.transactions[a].fullName = name.fname + ' ' + name.lname;
+            });
+          }
+      }
+
       });
   }
 }

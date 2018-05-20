@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Platform, AlertController, MenuController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Platform, AlertController, MenuController, ToastController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import firebase from 'firebase';
@@ -20,26 +20,33 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   templateUrl: 'ho-home.html',
 })
 export class HoHomePage {
-
-  carStatus: string = "Parked";
-  arrivingData: Array<any> = [];
-  parkedData: Array<any> = [];
-
+  start;
+  startTime:boolean = false;
+  arriving: boolean = false;
+  parked: boolean = false;
   unfiltered;
   filtered;
   arr;
   myId = this.authProvider.setID();
   items: Array<any> = [];
   itemRef: firebase.database.Reference = firebase.database().ref('/transac');
-
+  flagAlrtCtrl:boolean = false;
   userId= this.authProvider.userId;
   fname;
   lname;
   hoProfile;
   request;
 
+  //for toggle of availability
+  toggleValue = true;
+
+  //button toggle for notification
+  isEnabled:boolean = false;
+  requestAlrtCtrl;
+
   constructor(private requestProvider: RequestProvider,
     private afAuth: AngularFireAuth,
+    private toastCtrl: ToastController,
     private fcm: FCM,
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -51,23 +58,25 @@ export class HoHomePage {
 
     this.afAuth.auth.onAuthStateChanged(user => {
       if (user) {
-        this.authProvider.updateStatus('online');
-        this.authProvider.updateOnDisconnect();
+        this.authProvider.updateHOStatus('online');
+        this.authProvider.updateHOOnDisconnect();
       }
     });
 
-    this.requestProvider.saveToken();
-    this.onNotification();
+    //this.requestProvider.saveToken();
+    //this.onNotification();
     menuCtrl.enable(true);
   }
 
   ionViewDidLoad(){
-
+    this.notificationListener();
     this.request = this.afdb.object('requests/' + this.myId).snapshotChanges().subscribe(data => {
       if (data.payload.val().motionStatus == 'arriving') {
-        this.arrivingData.push(data);
+        this.arriving = true;
+        this.parked =  false;
       } else if (data.payload.val().motionStatus == 'parked') {
-        this.parkedData.push(data);
+        this.arriving = false;
+        this.parked = true;
       }
     });
 
@@ -81,6 +90,86 @@ export class HoHomePage {
     this.request.unsubscribe();
   }
 
+  //listens for incoming requests
+  notificationListener(){
+    this.afdb.object<any>("requests/" + this.userId).valueChanges().subscribe(data=>{
+      if(data.reqStatus == "occupied"){
+        this.isEnabled = true;    
+        this.closeAlrtCtrlOnTimeout();
+      }else{
+        this.isEnabled = false;
+      }
+    });
+  }
+
+  showNotif(){
+    this.requestAlrtCtrl = this.alertCtrl.create({
+      title: 'You have a parking space request',
+      enableBackdropDismiss: false,
+      buttons: [
+        {
+           text: 'Decline',
+          handler: () => {
+            this.afdb.object("requests/" +this.userId).set({
+              coID: "",
+              reqStatus: "declined",
+              status:""
+            });
+
+            this.afdb.object("requests/" +this.userId).set({
+              coID: "",
+              reqStatus: "",
+              status:""
+            });
+            this.flagAlrtCtrl = false;
+          }
+        },
+        { 
+        text: 'Accept',
+           handler: () => {
+             //check if data is not blank
+             this.afdb.object<any>("requests/" + this.userId).valueChanges().take(1).subscribe(data=>{
+               //if data is blank then notify that the request has timedout
+              if(data.coID == "" && data.reqStatus == ""){
+                let alertTimeout = this.alertCtrl.create({
+                  title: 'Request has timed out',
+                  buttons:['OK']                  
+                });
+              }else{
+                this.afdb.object("requests/" +this.userId).update({
+                  reqStatus: "accepted",
+                  motionStatus: "arriving",
+                  createdAt: Date.now()
+                });
+              }
+             });
+             this.arriving = true;              
+             
+             // else accept the request
+            this.flagAlrtCtrl = false;
+         }
+        }
+      ],
+     });
+     if(!this.flagAlrtCtrl){
+      this.requestAlrtCtrl.present();
+      this.flagAlrtCtrl = true;
+     }
+     
+  }
+
+  closeAlrtCtrlOnTimeout(){
+    let temp = this.afdb.object<any>("requests/" + this.userId).valueChanges().subscribe(data=>{
+      if(data.coID == "" && data.reqStatus == "" && data.status == ""){
+        if(this.flagAlrtCtrl){
+          this.requestAlrtCtrl.dismiss();
+          this.flagAlrtCtrl = false;
+          temp.unsubscribe();
+        }
+      }    
+    });
+  }
+
   async onNotification() {
     try {
       await this.platform.ready();
@@ -92,48 +181,21 @@ export class HoHomePage {
           lname = codata.lname;
 
           if (data.wasTapped) {
-            let confirm = this.alertCtrl.create({
-              // add platenumber here
-              title: 'You have a parking space request from ' + fname + ' ' + lname,
-              enableBackdropDismiss: false,
-              buttons: [
-                {
-                  text: 'Decline',
-                  handler: () => {
-                    this.requestProvider.declineRequest(data.coID, data.hoID);
-                  }
-                },
-                {
-                  text: 'Accept',
-                  handler: () => {
-                    this.requestProvider.acceptRequest(data.coID, data.hoID);
-                  }
-                }
-              ],
+            //toast Controller
+            let toast = this.toastCtrl.create({
+              message: 'You have a parkint request from ' + fname + ' ' + lname,
+              duration: 4000,
+              position: 'top'
             });
-
-            confirm.present();
+            toast.present();
           } else {  
-            let confirm = this.alertCtrl.create({
-              // add platenumber here
-              title: 'You have a parking space request from ' + fname + ' ' + lname,
-              enableBackdropDismiss: false,
-              buttons: [
-                {
-                  text: 'Decline',
-                  handler: () => {
-                    this.requestProvider.declineRequest(data.coID, data.hoID);
-                  }
-                },
-                {
-                  text: 'Accept',
-                  handler: () => {
-                    this.requestProvider.acceptRequest(data.coID, data.hoID);
-                  }
-                }
-              ],
+            //toast Controller
+            let toast = this.toastCtrl.create({
+              message: 'You have a parkint request from ' + fname + ' ' + lname,
+              duration: 4000,
+              position: 'top'
             });
-            confirm.present();
+            toast.present();
           }
 
         });
@@ -165,23 +227,28 @@ export class HoHomePage {
   }
 
 
-  toParked(transacId: string) {
+  toParked() {
     this.afdb.object('requests/' + this.myId).update({
       motionStatus: "parked"
     });
-    // this.transacData = [];
-    this.arrivingData = [];
+    this.arriving = false;
+    this.parked = true;
   }
 
   startTimer() {
+    
+    this.startTime = true;
+    var startTemp = Date.now();
+    var tempD = new Date(startTemp);
+    this.start = tempD.toLocaleTimeString();
     this.afdb.object('requests/' + this.myId).update({
-      startTime: Date.now()
-    });
-    this.parkedData = [];
+      startTime: startTemp
+    });    
   }
 
   stopTimer() {
-    //kunin si stopTime
+    this.startTime
+    //get stopTime
     var endDate = Date.now();
     var endDateH = new Date(endDate);
     var endHour = endDateH.getHours();
@@ -220,10 +287,9 @@ export class HoHomePage {
         endTime: endDate,
         payment: payment
       });
-
+      
     });
 
-    this.parkedData = [];
 
   }
   //showPayment
@@ -240,8 +306,6 @@ export class HoHomePage {
       },]
     });
     confirm.present();
-    // this.transacData = [];
-    this.parkedData = [];
   }
 
   transfer(hoID, start, end, payment) {
@@ -255,7 +319,39 @@ export class HoHomePage {
         reqStatus: "",
         status: ""
       });
+      this.arriving = false;
+      this.parked = false;
+      this.startTime = false;
     });
   }
 
+  doConfirm() {
+    if (this.toggleValue) {
+      this.authProvider.updateHOStatus('online');
+    }else{
+      let alert = this.alertCtrl.create({
+        title: 'Are you sure?',
+        message: 'Turning Off you availability will make you not appear in the map and you will not receive any requeasts.',
+        buttons: [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+              this.toggleValue = true;
+            }
+          },
+          {
+            text: 'Agree',
+            handler: () => {
+              this.authProvider.updateHOStatus('offline');
+            }
+          }
+        ],
+        enableBackdropDismiss: false
+      });
+
+      alert.present();
+    }
+
+  }
 }

@@ -1,44 +1,88 @@
 <ion-content parallax-header no-bounce class="bg-modal transparent-header">
-    <ion-header>
-        <ion-navbar>
-            <ion-buttons start left>
-                <button ion-button menuToggle>
-                  <ion-icon name="menu"></ion-icon>
-                </button>
-            </ion-buttons>
-            <ion-title>More Details</ion-title>
-        </ion-navbar>
-      </ion-header>
-    <div class="header-image"></div>
-    <div class="main-content" text-wrap text-center>
-      <!-- <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="!imgName"> -->
-        <img [src]="imgName" class="rec" *ngIf="imgName">
-        <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="!imgName">
-        <h2>{{profileData?.fname}} {{profileData?.lname}}</h2>
-        <hr>
-        <ion-list no-lines text-wrap>
-          <ion-item>
-            <ion-icon name="pin" color="secondary"  item-start></ion-icon>
-            <p>Address</p>
-            <span>{{userData?.address}}</span>
-          </ion-item>
-      
-          <ion-item>
-            <ion-icon name="paper" color="secondary" item-start></ion-icon>
-            <p>Details</p>
-            <span>{{profileData?.details}}</span>
-          </ion-item>
-
-          <ion-item>
-              <ion-icon name="call" color="secondary"  item-start></ion-icon>
-              <p>Mobile</p>
-              <span>{{profileData?.mobile}}</span>
-            </ion-item>
-        </ion-list>
-    
-        <button ion-button block color="secondary" (click)="sendRequest(profileData?.token)">
-          Request
+  <ion-header>
+    <ion-navbar>
+      <ion-buttons start left>
+        <button ion-button menuToggle>
+          <ion-icon name="menu"></ion-icon>
         </button>
-    </div>
-  </ion-content>
+      </ion-buttons>
+      <ion-title>More Details</ion-title>
+    </ion-navbar>
+  </ion-header>
+  <div class="header-image">
 
+  </div>
+
+  <div class="main-content" text-wrap text-center>
+    <!-- <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="!imgName"> -->
+    <div *ngIf="hown == true; else establishment">
+      <img [src]="imgName" class="rec" *ngIf="imgName">
+      <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="!imgName">
+      <h2>{{profileData?.fname}} {{profileData?.lname}}</h2>
+      <h2 *ngIf="profileData?.fname==null"> {{profileData?.name}} </h2>
+      <hr>
+
+      <ion-list no-lines text-wrap>
+        <ion-item>
+          <ion-icon name="pin" color="secondary" item-start></ion-icon>
+          <p>Capacity</p>
+          <!-- <p *ngIf="profileData?.address == null">Address</p> -->
+          <span>{{userData?.address}}</span>
+          <!-- <span *ngIf="profileData?.address ==null">{{profileData?.capacity}}</span> -->
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="paper" color="secondary" item-start></ion-icon>
+          <p>Details</p>
+          <p *ngIf="profileData?.details == null">Address</p>
+          <span>{{profileData?.details}}</span>
+          <span *ngIf="profileData?.details ==null">{{userData?.address}}</span>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="call" color="secondary" item-start></ion-icon>
+          <p>Mobile</p>
+          <span>{{profileData?.mobile}}</span>
+        </ion-item>
+      </ion-list>
+          <button ion-button block color="secondary" (click)="sendRequest(profileData?.token)">
+            Request
+          </button>
+    </div>
+
+    <ng-template #establishment>
+      <img [src]="imgName" class="rec" *ngIf="imgName">
+      <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="!imgName">
+      <h2>{{profileData?.name}}</h2>
+      <hr>
+
+      <ion-list no-lines text-wrap>
+        <ion-item>
+          <ion-icon name="car" color="secondary" item-start></ion-icon>
+          <h3 id = 'available'*ngIf="profileData?.availability == false; else novacant">Available</h3>
+          <ng-template #novacant>
+            <h3 id = 'full'>Full</h3>
+          </ng-template>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="car" color="secondary" item-start></ion-icon>
+          <p>Rate</p>
+          <span>₱{{profileData?.rate}}</span>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="paper" color="secondary" item-start></ion-icon>
+          <p>Operating Hours</p>
+          <span>{{profileData?.openingTime}} : {{profileData?.closingTime}}</span>
+        </ion-item>
+
+        <ion-item>
+          <ion-icon name="call" color="secondary" item-start></ion-icon>
+          <p>Overnight Price</p>
+          <span>₱{{profileData?.overnightPrice}}</span>
+        </ion-item>
+      </ion-list>
+    </ng-template>
+  </div>
+</ion-content>

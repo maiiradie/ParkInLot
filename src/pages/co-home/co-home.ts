@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, LoadingController, ActionSheetController, IonicPage, Platform,MenuController } from 'ionic-angular';
+import { NavController, AlertController, LoadingController, NavParams, ActionSheetController, IonicPage, Platform, MenuController } from 'ionic-angular';
 import * as mapboxgl from 'mapbox-gl';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Observable } from 'rxjs/Observable';
@@ -11,6 +11,7 @@ import { FCM } from '@ionic-native/fcm';
 import { RequestProvider } from '../../providers/request/request';
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireAuth } from 'angularfire2/auth';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
 @IonicPage()
 @Component({
@@ -19,17 +20,20 @@ import { AngularFireAuth } from 'angularfire2/auth';
 })
 
 export class CoHomePage {
-
+	reqListenerSub;
+	testing;
 	map;
 	marker;
 	directions;
 	hoMarkers;
 	location;
 	userId = this.authProvider.userId;
-
+	navAddress;
 	constructor(private afAuth: AngularFireAuth,
+		public alertCtrl: AlertController,
+		public navParams: NavParams,
 		private afdb: AngularFireDatabase,
-		private authProvider:AuthProvider,
+		private authProvider: AuthProvider,
 		private requestProvider: RequestProvider,
 		private fcm: FCM,
 		public platform: Platform,
@@ -45,13 +49,12 @@ export class CoHomePage {
 				this.authProvider.updateOnDisconnect();
 			}
 		});
-
-		this.requestProvider.saveToken();
-		this.onNotification();
+		//this.requestProvider.saveToken();
+		// this.onNotification();
 		menuCtrl.enable(true);
 	}
 
-	async onNotification(){
+	async onNotification() {
 		try {
 			await this.platform.ready();
 
@@ -86,7 +89,7 @@ export class CoHomePage {
 					}
 
 				};
-			},(error) => {
+			}, (error) => {
 				console.log(error);
 			});
 
@@ -95,24 +98,80 @@ export class CoHomePage {
 		}
 	}
 
+
 	ionViewDidLoad() {
-		this.map = this.initMap();
-		this.setDirections();
-
-		this.map.on('load', () => {			
-			this.location = this.getCurrentLocation()
-				.subscribe(location => {
-					this.centerLocation(location);
-					// this.setDestination(location);
-					this.setMarkers();
+		this.testing = this.navParams.get('key');
+		if (this.testing) {
+			this.requestNodeListener();
+			//add code here to start a listener on request node(database)
+			console.log(this.testing);
+			this.afdb.object<any>('location/' + this.testing).valueChanges().take(1)
+			.subscribe( data => {
+				this.setDestination(data.lng,data.lat);					
 			});
-		});
+		}
+		this.map = this.initMap();
+		this.setMarkers();
+		this.setDirections();
+		this.destination();
 
+		this.map.on('load', () => {
+			this.location = this.getCurrentLocation()
+			.subscribe(location => {
+				this.centerLocation(location);
+				this.setOrigin(location);
+				});			
+			});
 	}
 
-	ngOnDestroy(){
+	requestNodeListener(){
+		var start;
+		var end;
+		this.reqListenerSub = this.afdb.object<any>('requests/' + this.testing).valueChanges().take(4).subscribe(data => {
+			if (data.motionStatus) {
+				console.log(data.motionStatus);
+				if (data.motionStatus == "arriving") {
+					this.navAddress = "Please navigate";
+				} else if (data.motionStatus == "parked") {
+					this.navAddress = "You have arrived";
+				}
+			} if (data.endTime) {
+				let secTemp = this.afdb.object<any>('requests/' + this.testing).valueChanges().subscribe(data => {
+					var s = new Date(data.startTime);
+					start = s.toLocaleTimeString();
+					var e = new Date(data.endTime);
+					end = e.toLocaleTimeString();
+					let confirm = this.alertCtrl.create({
+						title: 'Payment',
+						subTitle: 'Start time: ' + start + '<br>End time: ' + end + '<br>Amount: P' + data.payment,
+						enableBackdropDismiss: false,
+						buttons: [{
+						  text: 'Finish',
+						  handler: () => {
+							this.testing = undefined;	
+							this.setDestination(null,null);
+							this.setMarkers();
+						  }
+						},]
+					});
+					confirm.present();
+					console.log("this is unsubscribed");
+					secTemp.unsubscribe();
+				});
+			} if (data.startTime) {
+
+				var d = new Date(data.startTime);
+				start = d.toLocaleTimeString();
+				this.navAddress = "Timer started at: " + start;
+			}
+		});
+	}
+
+	ngOnDestroy() {
+
 		this.location.unsubscribe();
 		this.hoMarkers.unsubscribe();
+		this.setDestination(null, null);
 	}
 
 	openMenu(evt) {
@@ -126,29 +185,95 @@ export class CoHomePage {
 		this.menuCtrl.toggle();
 	}
 
+	destination() {
+		var geocoder = new MapboxGeocoder({
+			accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og'
+		});
+		document.getElementById('geocoder').appendChild(geocoder.onAdd(this.map));
+	}
+
+	currentMarkers = [];
+	setHoMarkers = [];
+
 	setMarkers() {
+		console.log('set markers run!');
 		var arr = [];
 		var map = this.map;
+		var markers = [];
 
+
+		// var map = this.map;
+		if (this.testing) {
+			//remove markers
+			for (var i = 0; i < this.setHoMarkers.length - 1; i++) {
+				this.setHoMarkers[i].remove();
+			}
+
+			this.afdb.object<any>('location/' + this.testing).valueChanges().take(1)
+			.subscribe(data => {
+				var el = document.createElement('div');
+				el.className = "mapmarker";
+				new mapboxgl.Marker(el, { offset: [-25, -25] })
+					.setLngLat([data.lng, data.lat])
+					.addTo(this.map);
+			});
+
+		}else {
 		this.hoMarkers = this.afdb.list('location').snapshotChanges().subscribe(data => {
 
 			for (var a = 0; a < data.length; a++) {
-				arr.push(data[a]);
+				console.log(data[a].payload.val().status);
+				if (data[a].payload.val().status == "offline") {
+					
+					if (this.currentMarkers[data[a].key] != undefined) {
+						this.currentMarkers[data[a].key].remove();
+						
+						console.log('current marker: ' + data[a].key);
+					}
+					
+				} else if (data[a].payload.val().status == "online") {
+
+					console.log("detah:" + data[a].key);
+					arr.push(data[a]);
+
+					console.log('arr: ' + arr);
+
+				} else if (data[a].payload.val().status == undefined) {
+
+					// alert('Loginin mo muna yung HO!!! :) ')
+
+				} else {
+
+					alert('Something went wrong in retrieving the markers');
+				}
 			}
 
+	
 			for (var i = 0; i < arr.length; i++) {
+				console.log('nagrun for loop');
+				console.log(arr[i].payload.val().address);
+
 
 				var el = document.createElement('div');
+				el.id = arr[i].key;
+				el.className = "mapmarker";
 				// el.innerHTML = "Marker";
 				el.id = data[i].key;
-				el.className = "mapmarker";
+				if (arr[i].payload.val().establishment) {
+					el.className = "estabMarker";
+				}else{
+					el.className = "mapmarker";
+				}
+				
 
-				var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
+				var coords = new mapboxgl.LngLat(arr[i].payload.val().lng, arr[i].payload.val().lat);
 
-				new mapboxgl.Marker(el, { offset: [-25, -25] })
+				// this.currentMarkers[arr[i].key] = new mapboxgl.Marker(el, { offset: [-25, -25] })
+				this.setHoMarkers[i] = new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)
-					.addTo(map);
+					.addTo(this.map);
 
+					console.log('arr key: '+arr[i].key);
 				el.addEventListener('click', (e) => {
 					var tmp = e.srcElement.id;
 					let actionSheet = this.actionSheetCtrl.create({
@@ -172,7 +297,7 @@ export class CoHomePage {
 				});
 			}
 		});
-
+		}
 	}
 
 	setDirections() {
@@ -180,24 +305,22 @@ export class CoHomePage {
 			accessToken: mapboxgl.accessToken,
 			interactive: false,
 			controls: {
+				inputs: false,
 				profileSwitcher: false,
 				instructions: false
 			}
 		});
 		this.map.addControl(this.directions, 'top-left');
+		
 	}
 
-	setDestination(location){
+	setOrigin(location){
 		this.directions.setOrigin(location.lng + ',' + location.lat);
 	}
 
 
-	setDest(lang, latt) {
+	setDestination(lang, latt) {
 		this.directions.setDestination(lang + ',' + latt);
-		this.marker.remove();
-		var hoMarker = new mapboxgl.LngLat(lang, latt);
-
-		this.addMarker(hoMarker);
 	}
 
 	initMap(location = new mapboxgl.LngLat(120.5960, 16.4023)) {
@@ -209,7 +332,7 @@ export class CoHomePage {
 			zoom: 14,
 			attributionControl: false,
 		});
-
+		
 		return map;
 	}
 
@@ -225,24 +348,23 @@ export class CoHomePage {
 
 		loading.present(loading);
 
-			let locationsObs = Observable.create(observable => {
-				this.geolocation.getCurrentPosition(options)
-					.then(resp => {
-						let lat = resp.coords.latitude;
-						let lng = resp.coords.longitude;
+		let locationsObs = Observable.create(observable => {
+			this.geolocation.getCurrentPosition(options)
+				.then(resp => {
+					let lat = resp.coords.latitude;
+					let lng = resp.coords.longitude;
 
-						let location = new mapboxgl.LngLat(lng, lat);
+					let location = new mapboxgl.LngLat(lng, lat);
 
-						observable.next(location);
-						loading.dismiss();
+					observable.next(location);
+					loading.dismiss();
 
-					}).catch(error => {
-						alert('Error getting location, please try again');
-						loading.dismiss();
-					});
-			});
-			
-			return locationsObs;
+				}).catch(error => {
+					alert('Error getting location, please try again');
+					loading.dismiss();
+				});
+		});
+		return locationsObs;
 	}
 
 	centerLocation(location) {

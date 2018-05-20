@@ -4,8 +4,9 @@ import { IonicPage, NavController, NavParams , LoadingController, ToastControlle
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import firebase from 'firebase';
+import moment from 'moment';
 import 'rxjs/add/operator/take';
 
 @IonicPage()
@@ -19,6 +20,8 @@ export class EstEditProfilePage {
   userForm:FormGroup;
   userId = this.authProvider.userId;
   profile$: AngularFireObject<any>;
+  opening:any;
+  closing:any;
 
   constructor(private afdb:AngularFireDatabase,
     private afs:AngularFireAuth,
@@ -29,20 +32,67 @@ export class EstEditProfilePage {
     private authProvider: AuthProvider,
     private fb:FormBuilder) {
       this.userForm = this.fb.group({
-        'estbname':[null,Validators.compose([Validators.required, Validators.minLength(2)])],
         'email':[null,Validators.compose([Validators.required, Validators.email])],
-    		'capacity':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])],
-    		'rate':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])],
-    		'regularPrice':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])],
-    		'overnightPrice':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11)])],
-        'operatingHours':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(20)])],
+    		'capacity':[null,Validators.compose([Validators.required])],
+    		'rate':[''],
+    		'regularPrice':[null,Validators.compose([Validators.required])],
+    		'overnightPrice':[null,Validators.compose([Validators.required])],
+        'openingTime':[null,Validators.compose([Validators.required, this.isBeforeClosing('closingTime')])],
+        'closingTime':[null,Validators.compose([Validators.required, this.isAfterOpening('openingTime')])]
      });
   }
 
   ionViewDidLoad(){
       this.afdb.object(`/profile/` + this.userId).valueChanges().take(1).subscribe( data => {
         this.profileData = data;
+        this.opening = this.profileData.openingTime; 
+        this.closing = this.profileData.closingTime;
+        console.log(this.opening + " " + this.closing);
       });
+  }
+
+  isAfterOpening(field): ValidatorFn {
+    return (control: AbstractControl): {[key: string]: any} => {
+      try {
+        var closeH = parseInt(control.value.substring(0, control.value.indexOf(":")));
+        var openH = parseInt(control.root.value[field].substring(0, control.root.value[field].indexOf(":")));
+        var closeM = parseInt(control.value.substring(control.value.indexOf(":") + 1));
+        var openM = parseInt(control.root.value[field].substring(control.root.value[field].indexOf(":") + 1));
+            
+        if ((closeH > openH) || ((closeH == openH) && (closeM > openM))) {
+          console.log("true");
+          return null;
+        } else {
+          console.log("false");
+          return {'isAfterOpening': false};
+        }
+      } catch (e) {
+        console.log("null");
+        return null;
+      }
+    }
+  }
+
+  isBeforeClosing(field): ValidatorFn {
+    return (control: AbstractControl): {[key: string]: any} => {
+      try {
+        var openH = parseInt(control.value.substring(0, control.value.indexOf(":")));
+        var closeH = parseInt(control.root.value[field].substring(0, control.root.value[field].indexOf(":")));
+        var openM = parseInt(control.value.substring(control.value.indexOf(":") + 1));
+        var closeM = parseInt(control.root.value[field].substring(control.root.value[field].indexOf(":") + 1));
+            
+        if ((closeH > openH) || ((closeH == openH) && (closeM > openM))) {
+          console.log("true");
+          return null;
+        } else {
+          console.log("false");
+          return {'isBeforeClosing': false};
+        }
+      } catch (e) {
+        console.log("null");
+        return null;
+      }
+    }
   }
 
   showToast(message) {

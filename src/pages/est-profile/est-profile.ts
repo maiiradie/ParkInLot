@@ -4,6 +4,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import 'rxjs/add/operator/take';
 import { AuthProvider } from '../../providers/auth/auth';
+import moment from 'moment';
 
 @IonicPage()
 @Component({
@@ -26,6 +27,8 @@ export class EstProfilePage {
   ionViewDidEnter() {
     this.afdb.object('profile/'+ this.userId).valueChanges().take(1).subscribe( data => {
       this.profileData = data;
+      this.profileData.openingTime = moment(this.profileData.openingTime, ["h:mm"]).format("hh:mm a");
+      this.profileData.closingTime = moment(this.profileData.closingTime, ["h:mm"]).format("hh:mm a");
     });
   }
 

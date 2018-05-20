@@ -20,6 +20,15 @@ page-co-home {
 		cursor: pointer;
 	}
 
+	.estabMarker{
+		background-image: url('../assets/imgs/est_open.png');
+
+		background-size: 35px 48px;
+		width: 35px;
+		height: 48px; 
+		cursor: pointer;
+	}
+
 	.carmarker{
 		background-image: url('../assets/imgs/car.png');
 
@@ -28,4 +37,34 @@ page-co-home {
 		height: 30px; 
 		cursor: pointer;
 	}
+	
+    .geocoder {
+        position:absolute;
+        // z-index:1;
+        width:80%;
+        left:25%;
+        margin-left:-25%;
+        top:20px;
+	}
+	.status_container{
+		background-color:white;
+        position:absolute;
+		z-index:1000;
+		margin-left:1%;
+        width:98%;        
+		bottom:0px;
+		min-height: 10%;
+		border-radius: 10px 10px 0px 0px;
+		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+	}
+	.status_text{
+		font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+		margin: auto;
+		width: 90%;
+		padding: 10px;
+		padding-top: 25px;
+		font-size: large;
+		text-align: center;
+	}	
+    .mapboxgl-ctrl-geocoder { min-width:100%; }
 }
