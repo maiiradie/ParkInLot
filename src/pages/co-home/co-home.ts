@@ -12,6 +12,7 @@ import { RequestProvider } from '../../providers/request/request';
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireAuth } from 'angularfire2/auth';
 import  MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import { NgModuleLoader } from 'ionic-angular/util/ng-module-loader';
 
 @IonicPage()
 @Component({
@@ -98,13 +99,16 @@ export class CoHomePage {
 		}
 	}
 
-	
 	ionViewDidLoad() {
 		this.testing = this.navParams.get('key');
 		if(this.testing){	
 			this.requestNodeListener();
 			//add code here to start a listener on request node(database)
 			console.log(this.testing);
+			this.afdb.object<any>('location/' + this.testing).valueChanges().take(1)
+			.subscribe( data => {
+				this.setDest(data.lng,data.lat);					
+			});
 		}
 		this.map = this.initMap();
 		this.setMarkers();	
@@ -115,10 +119,11 @@ export class CoHomePage {
 			this.location = this.getCurrentLocation()
 			.subscribe(location => {
 				this.centerLocation(location);
-				// this.setDestination(location);
+				this.setDestination(location);
 				});			
 			});
 	}
+
 	requestNodeListener(){
 		var start;
 		var end;
@@ -143,7 +148,9 @@ export class CoHomePage {
 						buttons: [{
 						  text: 'Finish',
 						  handler: () => {
-							this.testing = undefined;		
+							this.testing = undefined;	
+							this.setDest(null,null);
+							this.setMarkers();
 						  }
 						},]
 					  });
@@ -161,9 +168,9 @@ export class CoHomePage {
 	}
 
 	ngOnDestroy(){
-		
 		this.location.unsubscribe();
 		this.hoMarkers.unsubscribe();
+		this.setDest(null, null);
 	}
 
 	openMenu(evt) {
@@ -184,10 +191,28 @@ export class CoHomePage {
 		document.getElementById('geocoder').appendChild(geocoder.onAdd(this.map));
 	}
 
-	setMarkers() {
-		var arr = [];
-		var map = this.map;
+	setHoMarkers = [];
 
+	setMarkers() {
+		console.log('set markers run!');
+		var arr = [];
+		// var map = this.map;
+		if (this.testing) {
+			//remove markers
+			for (var i = 0; i < this.setHoMarkers.length - 1; i++) {
+				this.setHoMarkers[i].remove();
+			}
+
+			this.afdb.object<any>('location/' + this.testing).valueChanges().take(1)
+			.subscribe(data => {
+				var el = document.createElement('div');
+				el.className = "mapmarker";
+				new mapboxgl.Marker(el, { offset: [-25, -25] })
+					.setLngLat([data.lng, data.lat])
+					.addTo(this.map);
+			});
+
+		}else {
 		this.hoMarkers = this.afdb.list('location').snapshotChanges().subscribe(data => {
 
 			for (var a = 0; a < data.length; a++) {
@@ -203,9 +228,9 @@ export class CoHomePage {
 
 				var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
 
-				new mapboxgl.Marker(el, { offset: [-25, -25] })
+				this.setHoMarkers[i] = new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)
-					.addTo(map);
+					.addTo(this.map);
 
 				el.addEventListener('click', (e) => {
 					var tmp = e.srcElement.id;
@@ -230,7 +255,7 @@ export class CoHomePage {
 				});
 			}
 		});
-
+		}
 	}
 
 	setDirections() {
@@ -244,6 +269,7 @@ export class CoHomePage {
 			}
 		});
 		this.map.addControl(this.directions, 'top-left');
+		
 	}
 
 	setDestination(location){
@@ -253,10 +279,7 @@ export class CoHomePage {
 
 	setDest(lang, latt) {
 		this.directions.setDestination(lang + ',' + latt);
-		this.marker.remove();
-		var hoMarker = new mapboxgl.LngLat(lang, latt);
 
-		this.addMarker(hoMarker);
 	}
 
 	initMap(location = new mapboxgl.LngLat(120.5960, 16.4023)) {
@@ -268,7 +291,7 @@ export class CoHomePage {
 			zoom: 14,
 			attributionControl: false,
 		});
-
+		
 		return map;
 	}
 

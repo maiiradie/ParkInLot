@@ -150,6 +150,7 @@ export class ComoredetailsPage {
           let alert = this.alertCtrl.create({
             title: 'Request',
             subTitle: 'Request has been ' + data.reqStatus,
+            enableBackdropDismiss: false,
             buttons: [
               {
                 text: 'OK',
