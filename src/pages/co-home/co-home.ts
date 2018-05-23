@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController, AlertController, LoadingController, NavParams, ActionSheetController, IonicPage, Platform,MenuController } from 'ionic-angular';
+import { NavController, AlertController, LoadingController, NavParams, ActionSheetController, IonicPage, Platform, MenuController } from 'ionic-angular';
 import * as mapboxgl from 'mapbox-gl';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Observable } from 'rxjs/Observable';
@@ -11,8 +11,7 @@ import { FCM } from '@ionic-native/fcm';
 import { RequestProvider } from '../../providers/request/request';
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireAuth } from 'angularfire2/auth';
-import  MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-import { NgModuleLoader } from 'ionic-angular/util/ng-module-loader';
+import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
 @IonicPage()
 @Component({
@@ -37,7 +36,7 @@ export class CoHomePage {
 		public alertCtrl: AlertController,
 		public navParams: NavParams,
 		private afdb: AngularFireDatabase,
-		private authProvider:AuthProvider,
+		private authProvider: AuthProvider,
 		private requestProvider: RequestProvider,
 		private fcm: FCM,
 		public platform: Platform,
@@ -58,8 +57,7 @@ export class CoHomePage {
 		menuCtrl.enable(true);
 	}
 
-	//push notification
-	async onNotification(){
+	async onNotification() {
 		try {
 			await this.platform.ready();
 
@@ -73,7 +71,7 @@ export class CoHomePage {
 						alert('Your request has been accepted.');
 						this.navCtrl.pop()
 							.then(() => {
-								this.setDest(data.lang, data.latt);
+								this.setDestination(data.lang, data.latt);
 							});
 					} else {
 						alert('Something went wrong with the request.')
@@ -87,14 +85,14 @@ export class CoHomePage {
 						alert('Your request has been accepted.');
 						this.navCtrl.pop()
 							.then(() => {
-								this.setDest(data.lang, data.latt);
+								this.setDestination(data.lang, data.latt);
 							});
 					} else {
 						alert('Something went wrong with the request.')
 					}
 
 				};
-			},(error) => {
+			}, (error) => {
 				console.log(error);
 			});
 		} catch (e) {
@@ -102,20 +100,21 @@ export class CoHomePage {
 		}
 	}
 
+
 	ionViewDidLoad() {
 		this.checkOnGoingTransaction();
 
 		
 		//initialize map
 		this.map = this.initMap();
-		this.setMarkers();	
+		this.setMarkers();
 		this.setDirections();
 		this.destination();
 		this.map.on('load', () => {
 			this.location = this.getCurrentLocation()
 			.subscribe(location => {
 				this.centerLocation(location);
-				this.setDestination(location);
+			
 				});			
 			});
 	}
@@ -124,10 +123,13 @@ export class CoHomePage {
 		if(this.tempHoID && status == "arriving"){	
 			this.initListener();
 			//marker setup
-			this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
-			.subscribe( data => {
-				this.setDest(data.lng,data.lat);					
-			});
+			if (this.tempHoID) {
+				this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
+				.subscribe( data => {
+						this.setOrigin(location);
+						this.setDestination(data.lng,data.lat);					
+				});
+			}	
 		}else if(this.tempHoID && status == "parked"){
 			console.log("executed with parked" + this.tempHoID + " "+ status);
 			this.initParkedListener();	
@@ -250,7 +252,12 @@ export class CoHomePage {
 			this._initParked.unsubscribe();
 		}if(this._parked){
 			this._parked.unsubscribe();
+		}if(this.location){
+			this.location.unsubscribe
+		}if(this.hoMarkers){
+			this.hoMarkers.unsubscribe();
 		}
+		
 	}
 
 	openMenu(evt) {
@@ -264,19 +271,20 @@ export class CoHomePage {
 		this.menuCtrl.toggle();
 	}
 
-	destination(){
+	destination() {
 		var geocoder = new MapboxGeocoder({
-			accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og',			
+			accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og'
 		});
 		document.getElementById('geocoder').appendChild(geocoder.onAdd(this.map));
 	}
 
+	currentMarkers = [];
 	setHoMarkers = [];
 
 	setMarkers() {
-		console.log('set markers run!');
 		var arr = [];
 		// var map = this.map;
+		var markers = [];
 		if (this.tempHoID) {
 			//remove markers
 			for (var i = 0; i < this.setHoMarkers.length - 1; i++) {
@@ -295,17 +303,23 @@ export class CoHomePage {
 		}else {
 		this.hoMarkers = this.afdb.list('location').snapshotChanges().subscribe(data => {
 
-			for (var a = 0; a < data.length; a++) {
+			for (var a = 0; a < data.length-1; a++) {
 				arr.push(data[a]);
 			}
 
-			for (var i = 0; i < arr.length; i++) {
-				var el = document.createElement('div');
-				// el.innerHTML = "Marker";
-				el.id = data[i].key;
-				el.className = "mapmarker";
+			for (var i = 0; i < arr.length-1; i++) {
 
-				var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
+				var el = document.createElement('div');
+				el.id = arr[i].key;
+
+				if (arr[i].payload.val().establishment) {
+					el.className = "estabMarker";
+				}else{
+					el.className = "mapmarker";
+				}
+				
+				var coords = new mapboxgl.LngLat(arr[i].payload.val().lng, arr[i].payload.val().lat);
+
 				this.setHoMarkers[i] = new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)
 					.addTo(this.map);
@@ -341,21 +355,21 @@ export class CoHomePage {
 			accessToken: mapboxgl.accessToken,
 			interactive: false,
 			controls: {
-				inputs:false,
+				inputs: false,
 				profileSwitcher: false,
 				instructions: false
 			}
 		});
 		this.map.addControl(this.directions, 'top-left');
-		
 	}
-	setDestination(location){
+
+	setOrigin(location){
 		this.directions.setOrigin(location.lng + ',' + location.lat);
 	}
 
-	setDest(lang, latt) {
-		this.directions.setDestination(lang + ',' + latt);
 
+	setDestination(lang, latt) {
+		this.directions.setDestination(lang + ',' + latt);
 	}
 
 	initMap(location = new mapboxgl.LngLat(120.5960, 16.4023)) {
@@ -383,23 +397,23 @@ export class CoHomePage {
 
 		loading.present(loading);
 
-			let locationsObs = Observable.create(observable => {
-				this.geolocation.getCurrentPosition(options)
-					.then(resp => {
-						let lat = resp.coords.latitude;
-						let lng = resp.coords.longitude;
+		let locationsObs = Observable.create(observable => {
+			this.geolocation.getCurrentPosition(options)
+				.then(resp => {
+					let lat = resp.coords.latitude;
+					let lng = resp.coords.longitude;
 
-						let location = new mapboxgl.LngLat(lng, lat);
+					let location = new mapboxgl.LngLat(lng, lat);
 
-						observable.next(location);
-						loading.dismiss();
+					observable.next(location);
+					loading.dismiss();
 
-					}).catch(error => {
-						alert('Error getting location, please try again');
-						loading.dismiss();
-					});
-			});
-			return locationsObs;
+				}).catch(error => {
+					alert('Error getting location, please try again');
+					loading.dismiss();
+				});
+		});
+		return locationsObs;
 	}
 
 	centerLocation(location) {

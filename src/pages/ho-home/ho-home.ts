@@ -61,8 +61,8 @@ export class HoHomePage {
 
     this.afAuth.auth.onAuthStateChanged(user => {
       if (user) {
-        this.authProvider.updateStatus('online');
-        this.authProvider.updateOnDisconnect();
+        this.authProvider.updateHOStatus('online');
+        this.authProvider.updateHOOnDisconnect();
       }
     });
 
@@ -369,7 +369,7 @@ async acceptRequest(carowner,id){
 
   doConfirm() {
     if (this.toggleValue) {
-          this.authProvider.updateStatus('online');
+      this.authProvider.updateHOStatus('online');
     }else{
       let alert = this.alertCtrl.create({
         title: 'Are you sure?',
@@ -385,7 +385,7 @@ async acceptRequest(carowner,id){
           {
             text: 'Agree',
             handler: () => {
-              this.authProvider.updateStatus('offline');
+              this.authProvider.updateHOStatus('offline');
             }
           }
         ],

@@ -45,6 +45,9 @@
           <span>{{profileData?.mobile}}</span>
         </ion-item>
       </ion-list>
+          <button ion-button block color="secondary" [disabled]="!reqButton" (click)="sendRequest(profileData?.token)">
+            Request
+          </button>
     </div>
 
     <ng-template #establishment>
@@ -83,8 +86,5 @@
     </ng-template>
 
     
-    <button ion-button block color="secondary" [disabled]="!reqButton" (click)="sendRequest(profileData?.token)">
-      Request
-    </button>
   </div>
 </ion-content>
