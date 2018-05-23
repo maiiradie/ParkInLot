@@ -68,7 +68,7 @@ export class CoHomePage {
 						alert('Your request has been accepted.');
 						this.navCtrl.pop()
 							.then(() => {
-								this.setDest(data.lang, data.latt);
+								this.setDestination(data.lang, data.latt);
 							});
 					} else {
 						alert('Something went wrong with the request.')
@@ -82,7 +82,7 @@ export class CoHomePage {
 						alert('Your request has been accepted.');
 						this.navCtrl.pop()
 							.then(() => {
-								this.setDest(data.lang, data.latt);
+								this.setDestination(data.lang, data.latt);
 							});
 					} else {
 						alert('Something went wrong with the request.')
@@ -101,15 +101,7 @@ export class CoHomePage {
 
 	ionViewDidLoad() {
 		this.testing = this.navParams.get('key');
-		if (this.testing) {
-			this.requestNodeListener();
-			//add code here to start a listener on request node(database)
-			console.log(this.testing);
-			this.afdb.object<any>('location/' + this.testing).valueChanges().take(1)
-			.subscribe( data => {
-				this.setDestination(data.lng,data.lat);					
-			});
-		}
+
 		this.map = this.initMap();
 		this.setMarkers();
 		this.setDirections();
@@ -119,7 +111,14 @@ export class CoHomePage {
 			this.location = this.getCurrentLocation()
 			.subscribe(location => {
 				this.centerLocation(location);
-				this.setOrigin(location);
+					if (this.testing) {
+						this.requestNodeListener();
+						this.afdb.object<any>('location/' + this.testing).valueChanges().take(1)
+						.subscribe( data => {
+								this.setOrigin(location);
+								this.setDestination(data.lng,data.lat);					
+						});
+					}				
 				});			
 			});
 	}
@@ -149,7 +148,7 @@ export class CoHomePage {
 						  text: 'Finish',
 						  handler: () => {
 							this.testing = undefined;	
-							this.setDestination(null,null);
+							this.directions.removeRoutes();
 							this.setMarkers();
 						  }
 						},]
@@ -168,10 +167,8 @@ export class CoHomePage {
 	}
 
 	ngOnDestroy() {
-
 		this.location.unsubscribe();
 		this.hoMarkers.unsubscribe();
-		this.setDestination(null, null);
 	}
 
 	openMenu(evt) {
@@ -196,13 +193,9 @@ export class CoHomePage {
 	setHoMarkers = [];
 
 	setMarkers() {
-		console.log('set markers run!');
 		var arr = [];
-		var map = this.map;
 		var markers = [];
 
-
-		// var map = this.map;
 		if (this.testing) {
 			//remove markers
 			for (var i = 0; i < this.setHoMarkers.length - 1; i++) {
@@ -221,59 +214,27 @@ export class CoHomePage {
 		}else {
 		this.hoMarkers = this.afdb.list('location').snapshotChanges().subscribe(data => {
 
-			for (var a = 0; a < data.length; a++) {
-				console.log(data[a].payload.val().status);
-				if (data[a].payload.val().status == "offline") {
-					
-					if (this.currentMarkers[data[a].key] != undefined) {
-						this.currentMarkers[data[a].key].remove();
-						
-						console.log('current marker: ' + data[a].key);
-					}
-					
-				} else if (data[a].payload.val().status == "online") {
-
-					console.log("detah:" + data[a].key);
-					arr.push(data[a]);
-
-					console.log('arr: ' + arr);
-
-				} else if (data[a].payload.val().status == undefined) {
-
-					// alert('Loginin mo muna yung HO!!! :) ')
-
-				} else {
-
-					alert('Something went wrong in retrieving the markers');
-				}
+			for (var a = 0; a < data.length-1; a++) {
+				arr.push(data[a]);
 			}
 
-	
-			for (var i = 0; i < arr.length; i++) {
-				console.log('nagrun for loop');
-				console.log(arr[i].payload.val().address);
-
+			for (var i = 0; i < arr.length-1; i++) {
 
 				var el = document.createElement('div');
 				el.id = arr[i].key;
-				el.className = "mapmarker";
-				// el.innerHTML = "Marker";
-				el.id = data[i].key;
+
 				if (arr[i].payload.val().establishment) {
 					el.className = "estabMarker";
 				}else{
 					el.className = "mapmarker";
 				}
 				
-
 				var coords = new mapboxgl.LngLat(arr[i].payload.val().lng, arr[i].payload.val().lat);
 
-				// this.currentMarkers[arr[i].key] = new mapboxgl.Marker(el, { offset: [-25, -25] })
 				this.setHoMarkers[i] = new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)
 					.addTo(this.map);
 
-					console.log('arr key: '+arr[i].key);
 				el.addEventListener('click', (e) => {
 					var tmp = e.srcElement.id;
 					let actionSheet = this.actionSheetCtrl.create({
@@ -311,7 +272,6 @@ export class CoHomePage {
 			}
 		});
 		this.map.addControl(this.directions, 'top-left');
-		
 	}
 
 	setOrigin(location){
