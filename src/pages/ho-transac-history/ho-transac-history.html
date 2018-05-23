@@ -16,30 +16,14 @@
 </ion-header>
 
   <ion-content padding>
-  
+    <ion-content padding>
       <ion-list>
-      <div *ngIf="transactions?.length > 0; else noTransactions">
-        
         <ion-item *ngFor="let item of transactions">
-          <div *ngIf="item.status == 'ongoing'; else declined ">
-              <h6>{{item?.fullName}}</h6>
-              <p>startTime: {{item?.ste}}</p>
-              <p>endTime: {{item?.ete}}</p>
-              <p> Amount: {{item?.payment}}php</p>
+          <div>
+            <h6>{{item?.carowner.name}}</h6>
+            <p> Amount: {{item?.payment}}php</p>
           </div>
-
-          <ng-template #declined>
-            <h6>{{item?.fullName}}</h6>
-            <p>Status:declined</p>
-          </ng-template>
-        </ion-item>
-        </div>
-
-        <ng-template #noTransactions>
-          <hr>
-          <h5>No transactions to show</h5>
-        </ng-template>
-
+        </ion-item> 
       </ion-list>
-  
+    </ion-content>
   </ion-content>

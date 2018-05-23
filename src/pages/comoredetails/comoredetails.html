@@ -82,7 +82,8 @@
       </ion-list>
     </ng-template>
 
-    <button ion-button block color="secondary" (click)="sendRequest(profileData?.token)">
+    
+    <button ion-button block color="secondary" [disabled]="!reqButton" (click)="sendRequest(profileData?.token)">
       Request
     </button>
   </div>

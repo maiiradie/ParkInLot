@@ -21,8 +21,11 @@ import { NgModuleLoader } from 'ionic-angular/util/ng-module-loader';
 })
 
 export class CoHomePage {
-	reqListenerSub;
-	testing;
+	_init;
+	_arriving;
+	_initParked;
+	_parked;
+	tempHoID;
 	map;
 	marker;
 	directions;
@@ -51,10 +54,11 @@ export class CoHomePage {
 			}
 		});
 		//this.requestProvider.saveToken();
-		// this.onNotification();
+		//this.onNotification();
 		menuCtrl.enable(true);
 	}
 
+	//push notification
 	async onNotification(){
 		try {
 			await this.platform.ready();
@@ -93,28 +97,20 @@ export class CoHomePage {
 			},(error) => {
 				console.log(error);
 			});
-
 		} catch (e) {
 			console.log(e);
 		}
 	}
 
 	ionViewDidLoad() {
-		this.testing = this.navParams.get('key');
-		if(this.testing){	
-			this.requestNodeListener();
-			//add code here to start a listener on request node(database)
-			console.log(this.testing);
-			this.afdb.object<any>('location/' + this.testing).valueChanges().take(1)
-			.subscribe( data => {
-				this.setDest(data.lng,data.lat);					
-			});
-		}
+		this.checkOnGoingTransaction();
+
+		
+		//initialize map
 		this.map = this.initMap();
 		this.setMarkers();	
 		this.setDirections();
 		this.destination();
-
 		this.map.on('load', () => {
 			this.location = this.getCurrentLocation()
 			.subscribe(location => {
@@ -124,53 +120,137 @@ export class CoHomePage {
 			});
 	}
 
-	requestNodeListener(){
+	hasTransaction(status:String){
+		if(this.tempHoID && status == "arriving"){	
+			this.initListener();
+			//marker setup
+			this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
+			.subscribe( data => {
+				this.setDest(data.lng,data.lat);					
+			});
+		}else if(this.tempHoID && status == "parked"){
+			console.log("executed with parked" + this.tempHoID + " "+ status);
+			this.initParkedListener();	
+		}
+	}
+	async checkOnGoingTransaction(){
+		let query = await this.afdb.list('requests/').snapshotChanges().take(1).subscribe(data=>{			
+		  for(let i = 0; i < data.length; i++){
+			if(data[i].payload.val().arrivingNode){		
+				this.afdb.list<any>('requests/' + data[i].key + '/arrivingNode').snapshotChanges().take(1).subscribe(dataProf=>{
+					if(dataProf[0].payload.val().carowner.coID == this.userId){
+						this.tempHoID = data[i].key
+						console.log("arriving");
+						this.hasTransaction("arriving");
+					}
+				});		
+			}else if(data[i].payload.val().parkedNode){				
+				this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf=>{
+					if(dataProf[0].payload.val().carowner.coID == this.userId){
+						this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf=>{
+							if(dataProf[0].payload.val().carowner.coID == this.userId){
+								console.log("parked");
+								this.tempHoID = data[i].key
+								this.hasTransaction("parked");
+							}
+						});	
+					}
+				});
+			}
+				
+		  }
+		});
+	  }
+
+	initListener(){
+		var key;
 		var start;
 		var end;
-		this.reqListenerSub= this.afdb.object<any>('requests/' + this.testing).valueChanges().take(4).subscribe(data=>{	
-			if(data.motionStatus){
-				console.log(data.motionStatus);
-				if(data.motionStatus == "arriving"){					
-					this.navAddress = "Please navigate";
-				}else if (data.motionStatus == "parked"){
-					this.navAddress = "You have arrived";
-				}				
-			}if (data.endTime){
-				let secTemp = this.afdb.object<any>('requests/' + this.testing).valueChanges().subscribe(data=>{
-					var s = new Date(data.startTime);
-					start = s.toLocaleTimeString();
-					var e = new Date(data.endTime);
-					end = e.toLocaleTimeString();
-					let confirm = this.alertCtrl.create({
-						title: 'Payment',
-						subTitle: 'Start time: ' + start+ '<br>End time: ' + end + '<br>Amount: P' + data.payment,
-						enableBackdropDismiss: false,
-						buttons: [{
-						  text: 'Finish',
-						  handler: () => {
-							this.testing = undefined;	
-							this.setDest(null,null);
-							this.setMarkers();
-						  }
-						},]
-					  });
-					  confirm.present();
-					  console.log("this is unsubscribed");
-					  secTemp.unsubscribe();
-				});				
-			}if (data.startTime){
-				
-				var d = new Date(data.startTime);
-				start = d.toLocaleTimeString();
-				this.navAddress = "Timer started at: " + start;
+		this._init = this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().subscribe(data=>{		
+			for(var i = 0; i < data.length; i++){				
+				if(data[i].payload.val().carowner.coID == this.userId){					
+					key = data[i].key;
+					this.arrivingListener(key);
+					this._init.unsubscribe();
+				  }
 			}
 		});
 	}
 
+	arrivingListener(key){
+		this._arriving= this.afdb.object<any>('requests/' + this.tempHoID + '/arrivingNode/' + key).valueChanges().subscribe(data=>{
+			 if(data.status == "arrived"){
+				 this.navAddress = "You have arrived your destination";
+				 this._arriving.unsubscribe();
+				 this.initParkedListener();          
+			 }else if(data.status == "arriving"){
+				 this.navAddress = "Navigate to destination follow blue lines";
+			 }
+		});
+	}
+
+	initParkedListener(){
+		var key;
+		this._initParked = this.afdb.list<any>('requests/' + this.tempHoID + '/parkedNode').snapshotChanges().subscribe(data=>{
+			for(var i = 0; i < data.length; i++){	
+				if(data[i].payload.val().carowner.coID == this.userId){					
+					key = data[i].key;					
+					this._initParked.unsubscribe();
+					this.parkedListener(key);
+				}
+			}
+		});	
+	}
+
+	parkedListener(key){
+		var start;
+		var end
+		this._parked = this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().subscribe(data=>{
+			if(!data.timeStart && !data.endtime){
+				this.navAddress = "You have arrived your destination";
+			}else if(data.timeStart && !data.endTime){			                
+                var d = new Date(data.timeStart);
+                start = d.toLocaleTimeString();
+                this.navAddress = "Timer started at: " + start;
+
+			}else if(data.endTime){
+				this._parked.unsubscribe();
+				var e = new Date(data.endTime);
+				end = e.toLocaleTimeString();
+				this._parked.unsubscribe();
+				//alert controller
+					let confirm = this.alertCtrl.create({
+							title: 'Payment',
+					        subTitle: 'Start time: ' + start+ '<br>End time: ' + end + '<br>Amount: P' + data.payment,
+					        enableBackdropDismiss: false,
+					        buttons: [{
+					       	 text: 'Finish',
+					         	handler: () => {
+						            this.tempHoID = undefined;  
+						            this.setMarkers();		
+									this.directions.removeRoutes();
+
+									
+					            }
+					        	},]
+					        });
+					       confirm.present();
+				
+			}
+	   });
+	}
+
+
 	ngOnDestroy(){
-		this.location.unsubscribe();
-		this.hoMarkers.unsubscribe();
-		this.setDest(null, null);
+		if(this._init){
+			this._init.unsubscribe();
+		}if(this._arriving){
+			this._arriving.unsubscribe();
+		}if(this._initParked){
+			this._initParked.unsubscribe();
+		}if(this._parked){
+			this._parked.unsubscribe();
+		}
 	}
 
 	openMenu(evt) {
@@ -186,7 +266,7 @@ export class CoHomePage {
 
 	destination(){
 		var geocoder = new MapboxGeocoder({
-    		accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og'
+			accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og',			
 		});
 		document.getElementById('geocoder').appendChild(geocoder.onAdd(this.map));
 	}
@@ -197,13 +277,13 @@ export class CoHomePage {
 		console.log('set markers run!');
 		var arr = [];
 		// var map = this.map;
-		if (this.testing) {
+		if (this.tempHoID) {
 			//remove markers
 			for (var i = 0; i < this.setHoMarkers.length - 1; i++) {
 				this.setHoMarkers[i].remove();
 			}
 
-			this.afdb.object<any>('location/' + this.testing).valueChanges().take(1)
+			this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
 			.subscribe(data => {
 				var el = document.createElement('div');
 				el.className = "mapmarker";
@@ -220,14 +300,12 @@ export class CoHomePage {
 			}
 
 			for (var i = 0; i < arr.length; i++) {
-
 				var el = document.createElement('div');
 				// el.innerHTML = "Marker";
 				el.id = data[i].key;
 				el.className = "mapmarker";
 
 				var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
-
 				this.setHoMarkers[i] = new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)
 					.addTo(this.map);
@@ -271,11 +349,9 @@ export class CoHomePage {
 		this.map.addControl(this.directions, 'top-left');
 		
 	}
-
 	setDestination(location){
 		this.directions.setOrigin(location.lng + ',' + location.lat);
 	}
-
 
 	setDest(lang, latt) {
 		this.directions.setDestination(lang + ',' + latt);

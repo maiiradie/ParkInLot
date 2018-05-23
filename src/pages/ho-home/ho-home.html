@@ -15,58 +15,46 @@
     </ion-item>
 </ion-header>
 
-<ion-content>
-  <div *ngIf="arriving || parked">
-    <div class="co_details">
-      <br>
-      <br>
-      <h3 ion-start>On-going Transaction</h3>
-      <br>
-      <p ion-start>Carowner: {{hoProfile?.fname}} {{hoProfile?.lname}}</p>
+<ion-content> 
+  <div *ngIf="requestingCarOwners.length == 0 && arrivingCarOwners.length == 0 && parkedCarOwners.length == 0">
+    <div class="noParked">
+      
     </div>
   </div>
-<hr>
-    <div *ngIf="!arriving && !parked">
-        <div class="noParked"></div>
-    </div>
+  <ion-list *ngIf="requestingCarOwners.length > 0">
+      <ion-list-header>
+        <br>
+        Requests
+      </ion-list-header>
+      <ion-item *ngFor="let carowner of requestingCarOwners; let i = index">
+          <h2>{{carowner.payload.val().name}}</h2>
+          <h3>{{carowner.payload.val().plateNumber}}</h3>
+          <button ion-button color="danger" item-end (tap)="declineRequest(carowner.key)">Reject</button>
+          <button ion-button  color="secondary" item-end (tap)="acceptRequest(carowner.payload.val(),carowner.key)"> Accept</button>
+        </ion-item>
+    </ion-list>
 
-    <div *ngIf="arriving && !parked ">
-      <button block ion-button  (tap)="toParked()">Arrived</button>
-    </div> 
+    <ion-list *ngIf="arrivingCarOwners.length > 0">
+        <ion-list-header>
+          Arriving
+        </ion-list-header>
+        <ion-item *ngFor="let carowner of arrivingCarOwners; let i = index">
+            <h2>{{carowner.payload.val().carowner.name}}</h2>
+            <h3>{{carowner.payload.val().carowner.plateNumber}}</h3>
+            <button ion-button item-end (tap)="arrived(carowner.payload.val().carowner,carowner.key)">Arrived</button>
+          </ion-item>
+      </ion-list>
 
-    <div *ngIf="!arriving && parked">
-        <div *ngIf="!startTime">
-          <button block ion-button color="secondary"  (tap)="startTimer()"> Start Timer </button>
-        </div>
-        <div *ngIf="startTime">
-            <button block ion-button color="danger"  (tap)="stopTimer()"> Stop Timer </button>
-        </div>
-    </div>
-    <hr>
-    <!-- notes for homeowner -->
-    <div class="notes_container">
-      <div *ngIf="arriving && !parked ">
-          <p ion-start>Click the button once {{hoProfile?.fname}} arrives your place</p>
-      </div> 
+      <ion-list *ngIf="parkedCarOwners.length > 0">
+          <ion-list-header>
+            Parked
+          </ion-list-header>
+          <ion-item *ngFor="let carowner of parkedCarOwners; let i = index">
+              <h2>{{carowner.payload.val().carowner.name}}</h2>
+              <h3>{{carowner.payload.val().carowner.plateNumber}}</h3>
 
-      <div *ngIf="!arriving && parked">
-          <div *ngIf="!startTime">
-              <p ion-start>Click to Start the timer</p>
-          </div>
-          <div *ngIf="startTime">
-              <p ion-start>Timer Started at: {{start}}</p>
-          </div>
-      </div>
-  </div>
-  <!-- Notification button -->
-  <div class="notif">
-      <ion-row>
-        <ion-col>
-          <ion-buttons end>
-            <button ion-button color='light' (tap)='showNotif()' [disabled]="!isEnabled"><ion-icon name="notifications"></ion-icon>
-          </button>
-        </ion-buttons>
-        </ion-col>        
-      </ion-row>
-    </div>
+              <button *ngIf="!carowner.payload.val().timeStart && !carowner.payload.val().endTime" ion-button color="secondary"  item-end (tap)="startTimer(carowner.payload.val().carowner,carowner.key)">Start Time</button>
+              <button *ngIf="carowner.payload.val().timeStart && !carowner.payload.val().endTime"ion-button  color="danger"  item-end (tap)="stopTimer(carowner,carowner.key)"> Stop Time</button>
+            </ion-item>
+        </ion-list>
 </ion-content>
