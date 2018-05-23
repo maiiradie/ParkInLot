@@ -20,6 +20,7 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 })
 
 export class CoHomePage {
+	_markers;
 	_init;
 	_arriving;
 	_initParked;
@@ -106,15 +107,21 @@ export class CoHomePage {
 
 		
 		//initialize map
-		this.map = this.initMap();
-		this.setMarkers();
+		this.map = this.initMap();		
+		this.markerListener();
 		this.setDirections();
 		this.destination();
 		this.map.on('load', () => {
 			this.location = this.getCurrentLocation()
 			.subscribe(location => {
 				this.centerLocation(location);
-			
+				if (this.tempHoID) {
+					this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
+					.subscribe( data => {
+							this.setOrigin(location);
+							this.setDestination(data.lng,data.lat);					
+					});
+				}
 				});			
 			});
 	}
@@ -123,15 +130,8 @@ export class CoHomePage {
 		if(this.tempHoID && status == "arriving"){	
 			this.initListener();
 			//marker setup
-			if (this.tempHoID) {
-				this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
-				.subscribe( data => {
-						this.setOrigin(location);
-						this.setDestination(data.lng,data.lat);					
-				});
-			}	
+	
 		}else if(this.tempHoID && status == "parked"){
-			console.log("executed with parked" + this.tempHoID + " "+ status);
 			this.initParkedListener();	
 		}
 	}
@@ -141,8 +141,8 @@ export class CoHomePage {
 			if(data[i].payload.val().arrivingNode){		
 				this.afdb.list<any>('requests/' + data[i].key + '/arrivingNode').snapshotChanges().take(1).subscribe(dataProf=>{
 					if(dataProf[0].payload.val().carowner.coID == this.userId){
-						this.tempHoID = data[i].key
-						console.log("arriving");
+						this.tempHoID = data[i].key	
+						this._markers.unsubscribe();
 						this.hasTransaction("arriving");
 					}
 				});		
@@ -153,6 +153,7 @@ export class CoHomePage {
 							if(dataProf[0].payload.val().carowner.coID == this.userId){
 								console.log("parked");
 								this.tempHoID = data[i].key
+								this._markers.unsubscribe();
 								this.hasTransaction("parked");
 							}
 						});	
@@ -231,6 +232,7 @@ export class CoHomePage {
 						            this.tempHoID = undefined;  
 						            this.setMarkers();		
 									this.directions.removeRoutes();
+									this.markerListener();
 
 									
 					            }
@@ -281,46 +283,29 @@ export class CoHomePage {
 	currentMarkers = [];
 	setHoMarkers = [];
 
-	setMarkers() {
-		var arr = [];
-		// var map = this.map;
-		var markers = [];
-		if (this.tempHoID) {
-			//remove markers
-			for (var i = 0; i < this.setHoMarkers.length - 1; i++) {
-				this.setHoMarkers[i].remove();
-			}
+	markerListener(){
+		this._markers = this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
+			for (var a = 0; a < data.length; a++) {
+				if(data[a].payload.val().status){
+					console.log(data[a].payload.val().status);
+					if(data[a].payload.val().status == "offline"){
+						console.log("i will remove: " + data[a].key);
+						if(document.getElementById(data[a].key)){
+							this.removeMarker(data[a].key);
+						}
+					}else if(data[a].payload.val().status == "online"){
+						var el = document.createElement('div');
+						el.id = data[a].key;
 
-			this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
-			.subscribe(data => {
-				var el = document.createElement('div');
-				el.className = "mapmarker";
-				new mapboxgl.Marker(el, { offset: [-25, -25] })
-					.setLngLat([data.lng, data.lat])
-					.addTo(this.map);
-			});
-
-		}else {
-		this.hoMarkers = this.afdb.list('location').snapshotChanges().subscribe(data => {
-
-			for (var a = 0; a < data.length-1; a++) {
-				arr.push(data[a]);
-			}
-
-			for (var i = 0; i < arr.length-1; i++) {
-
-				var el = document.createElement('div');
-				el.id = arr[i].key;
-
-				if (arr[i].payload.val().establishment) {
+				if (data[a].payload.val().establishment) {
 					el.className = "estabMarker";
 				}else{
 					el.className = "mapmarker";
 				}
 				
-				var coords = new mapboxgl.LngLat(arr[i].payload.val().lng, arr[i].payload.val().lat);
+				var coords = new mapboxgl.LngLat(data[a].payload.val().lng, data[a].payload.val().lat);
 
-				this.setHoMarkers[i] = new mapboxgl.Marker(el, { offset: [-25, -25] })
+				this.setHoMarkers[a] = new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)
 					.addTo(this.map);
 
@@ -345,8 +330,35 @@ export class CoHomePage {
 					});
 					actionSheet.present();
 				});
+					}
+				}
 			}
+
 		});
+	}
+	removeMarker(elementId){
+		var element = document.getElementById(elementId);
+		element.parentNode.removeChild(element);
+	}
+	setMarkers() {
+		var arr = [];
+		// var map = this.map;
+		var markers = [];
+		if (this.tempHoID) {
+			//remove markers
+			for (var i = 0; i < this.setHoMarkers.length - 1; i++) {
+				this.setHoMarkers[i].remove();
+			}
+
+			this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
+			.subscribe(data => {
+				var el = document.createElement('div');
+				el.className = "mapmarker";
+				new mapboxgl.Marker(el, { offset: [-25, -25] })
+					.setLngLat([data.lng, data.lat])
+					.addTo(this.map);
+			});
+
 		}
 	}
 
