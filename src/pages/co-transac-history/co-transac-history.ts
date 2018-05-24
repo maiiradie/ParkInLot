@@ -43,34 +43,30 @@ export class CoTransacHistoryPage {
     }
   }
 
-  getTransactions() {
-      this.afdb.list('transactions/').valueChanges().take(1).subscribe(data=>{
-        this.transactions = data
-      });
-    // this.transacQuery1 = this.afdb.list('transactions', ref => ref.orderByChild('coID').equalTo(this.id)).valueChanges()
-    //   .subscribe(data => {
+async getTransactions() {
+      // this.afdb.list('transactions/').valueChanges().take(1).subscribe(data=>{
+      //   this.transactions = data
+      // });
+    this.transacQuery1 = await this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
+        console.log(this.id);
+        for(let i = 0; i < data.length; i++){
 
-    //     if (data.length != 0) {  
-    //       var st, et;
+          if(data[i].payload.val().carowner){            
+            if(data[i].payload.val().carowner.coID == this.id){
+               this.afdb.object<any>('profile/' + data[i].payload.val().hoID).valueChanges().take(1).subscribe(prof=>{
 
-    //       for (let x = 0; x < data.length; x++) {
-    //         this.transactions.push(data[x]);
-    //         st = new Date(this.transactions[x].startTime);
-    //         et = new Date(this.transactions[x].endTime);
-    //         this.transactions[x].ste = st.toLocaleString();
-    //         this.transactions[x].ete = et.toLocaleString();
-    //       }
-
-    //       this.transactions.reverse();
-
-    //       for (let a = 0; a < this.transactions.length; a++) {
-    //         this.transacQuery2 = this.afdb.object<any>('profile/' + this.transactions[a].coID).valueChanges().subscribe(name => {
-    //           this.transactions[a].fullName = name.fname + ' ' + name.lname;
-    //         });
-    //       }
-    //     }
+                var obj = {
+                  data: data[i].payload.val().hoID,
+                  name: prof.fname,
+                  payment:data[i].payload.val().payment
+                }
+                this.transactions.push(obj);
+              });
+            }
+          }  
+        }
         
-    //   });
+      });
   }
 
 }

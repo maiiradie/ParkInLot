@@ -25,19 +25,25 @@
       <ion-list no-lines text-wrap>
         <ion-item>
           <ion-icon name="pin" color="secondary" item-start></ion-icon>
-          <p>Capacity</p>
-          <!-- <p *ngIf="profileData?.address == null">Address</p> -->
-          <span>{{userData?.address}}</span>
-          <!-- <span *ngIf="profileData?.address ==null">{{profileData?.capacity}}</span> -->
+          <p>Addrss</p>
+          <span>{{profileData?.address}}</span>
         </ion-item>
 
         <ion-item>
           <ion-icon name="paper" color="secondary" item-start></ion-icon>
-          <p>Details</p>
+          <p>Capacity</p>
           <p *ngIf="profileData?.details == null">Address</p>
-          <span>{{profileData?.details}}</span>
+          <span>{{profileData?.capacity}}</span>
           <span *ngIf="profileData?.details ==null">{{userData?.address}}</span>
         </ion-item>
+
+        <ion-item>
+            <ion-icon name="paper" color="secondary" item-start></ion-icon>
+            <p>Details</p>
+            <p *ngIf="profileData?.details == null">Address</p>
+            <span>{{profileData?.details}}</span>
+            <span *ngIf="profileData?.details ==null">{{userData?.address}}</span>
+          </ion-item>
 
         <ion-item>
           <ion-icon name="call" color="secondary" item-start></ion-icon>

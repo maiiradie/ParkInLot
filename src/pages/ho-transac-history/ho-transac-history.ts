@@ -40,9 +40,16 @@ export class HoTransacHistoryPage {
     this.getTransactions();
   }
 
-  getTransactions() {
-    this.afdb.list('transactions/').valueChanges().take(1).subscribe(data=>{
-      this.transactions = data
-    });
-  }
+  async getTransactions() {
+    this.transacQuery1 = await this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
+      for(let i = 0; i < data.length; i++){
+        
+        if(data[i].payload.val().carowner){            
+          if(data[i].payload.val().hoID == this.userId){
+            this.transactions.push(data[i].payload.val());
+        }  
+      }
+    }
+  });
+}
 }

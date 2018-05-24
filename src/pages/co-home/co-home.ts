@@ -20,6 +20,7 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 })
 
 export class CoHomePage {
+	_watchTrans
 	_markers;
 	_init;
 	_arriving;
@@ -112,14 +113,25 @@ export class CoHomePage {
 		this.setDirections();
 		this.destination();
 		this.map.on('load', () => {
-			this.location = this.getCurrentLocation()
-			.subscribe(location => {
+			this.location = this.getCurrentLocation().subscribe(location => {
 				this.centerLocation(location);
 				if (this.tempHoID) {
+					this.removeCarMarker();
 					this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
-					.subscribe( data => {
-							this.setOrigin(location);
-							this.setDestination(data.lng,data.lat);					
+					.subscribe( data => {							
+						this._watchTrans = this.geolocation.watchPosition();
+						var temp = data
+						this._watchTrans.subscribe((data) => {
+							let LngLat = {
+								lng: data.coords.longitude,
+								lat: data.coords.latitude
+							}							
+							this.setDestination(temp.lng,temp.lat);				
+							this.setOrigin(LngLat);	
+						});
+						
+
+
 					});
 				}
 				});			
@@ -228,6 +240,7 @@ export class CoHomePage {
 					        buttons: [{
 					       	 text: 'Finish',
 					         	handler: () => {
+									//navigator.geolocation.clearWatch(this._watchTrans);
 						            this.tempHoID = undefined;  
 						            this.setMarkers();		
 									this.directions.removeRoutes();
@@ -366,9 +379,14 @@ export class CoHomePage {
 			controls: {
 				inputs: false,
 				profileSwitcher: false,
-				instructions: false
+				instructions: false,
+			},
+			geocoder: {
+				flyTo: false
 			}
+
 		});
+
 		this.map.addControl(this.directions, 'top-left');
 	}
 
@@ -387,7 +405,7 @@ export class CoHomePage {
 			container: 'map',
 			style: 'mapbox://styles/mapbox/streets-v10',
 			center: location,
-			zoom: 14,
+			zoom: 14,			
 			attributionControl: false,
 		});
 		
@@ -417,6 +435,17 @@ export class CoHomePage {
 					observable.next(location);
 					loading.dismiss();
 
+					let watch = this.geolocation.watchPosition();
+					watch.subscribe((data) => {
+						let LngLat = {
+							lng: data.coords.longitude,
+							lat: data.coords.latitude
+						}
+						this.removeCarMarker();
+						this.addCarMarker(LngLat);
+						
+					});
+
 				}).catch(error => {
 					alert('Error getting location, please try again');
 					loading.dismiss();
@@ -437,13 +466,29 @@ export class CoHomePage {
 			});
 		}
 	}
-
-	addMarker(location) {
+	removeCarMarker(){
+		this.marker.remove();
+	}
+	addCarMarker(location){
+		console.log("con");
 		var el = document.createElement('div');
 		el.className = "carmarker";
 
 		this.marker = new mapboxgl.Marker(el)
 			.setLngLat(location)
+			.remove()
 			.addTo(this.map);
 	}
+	addMarker(location) {
+
+		var el = document.createElement('div');
+
+		el.className = "carmarker";
+
+		this.marker = new mapboxgl.Marker(el)
+			.setLngLat(location)
+			.addTo(this.map);
+
+	}
+
 }

@@ -27,7 +27,7 @@ export class ComoredetailsPage {
   hown: boolean = true;
   cancel
   myTimeout;
-  returnStatus;
+  _returnStatus;
 
   
   private key = "key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM";
@@ -52,7 +52,11 @@ export class ComoredetailsPage {
   ionViewDidEnter(){
     this.retrieveImg();
   }
-  ionViewDidLeave(){
+  ionViewDidLeave(){ 
+    if(this._returnStatus){
+      this._returnStatus.unsubscribe();
+    }
+
   }
   getMyData(){
     this.afdb.object('profile/'+ this.authProvider.userId).valueChanges().take(1).subscribe( data => {
@@ -141,18 +145,18 @@ export class ComoredetailsPage {
       await firebase.storage().ref().child("images/" + this.hoID + "/" + this.profileData.garagePic).getDownloadURL().then(d=>{
         this.imgName = d;
       }).catch((error)=>{
-        alert(JSON.stringify(error));
+        // alert(JSON.stringify(error));
+        this.imgName = null;
       });  
   }
   //function listener for accept decline 
   statusListener(){
-    this.returnStatus = this.afdb.list("requests/" + this.hoID + '/requestNode').snapshotChanges().take(2).subscribe(data=>{
+    this._returnStatus = this.afdb.list("requests/" + this.hoID + '/requestNode').snapshotChanges().take(2).subscribe(data=>{
       for(var i = 0; i < data.length; i++){
 
         if(data[i].payload.val().coID == this.requestProvider.userId){
-
           if(data[i].payload.val().status == "declined"){
-            this.returnStatus.unsubscribe();            
+            this._returnStatus.unsubscribe();            
             clearTimeout(this.myTimeout);
             if(this.actrlFlag){
               this.cancel.dismiss();
@@ -181,11 +185,11 @@ export class ComoredetailsPage {
             temp.unsubscribe();
             tempCap ++;        
             this.afdb.object('requests/' + this.hoID ).update({
-              available: tempCap
+              available: tempCap  
               }); 
             });
           }else if(data[i].payload.val().status == "accepted"){
-            this.returnStatus.unsubscribe();            
+            this._returnStatus.unsubscribe();            
             clearTimeout(this.myTimeout);
             if(this.actrlFlag){
               this.cancel.dismiss();
@@ -253,7 +257,7 @@ export class ComoredetailsPage {
               }); 
             });
 
-            this.returnStatus.unsubscribe();
+            this._returnStatus.unsubscribe();
             if(this.actrlFlag){
               this.actrlFlag = false;
             }       
@@ -272,7 +276,7 @@ export class ComoredetailsPage {
      var tempCap;
     this.myTimeout = setTimeout(()=>{ 
           
-      this.returnStatus.unsubscribe();
+      this._returnStatus.unsubscribe();
       this.reqButton = true;
       if(this.actrlFlag){
         this.cancel.dismiss();
@@ -313,7 +317,7 @@ export class ComoredetailsPage {
         this.timeoutFlag = true;
       }
       
-      this.returnStatus.unsubscribe();
+      this._returnStatus.unsubscribe();
      }, 50000);  
   }
 }
