@@ -30,10 +30,23 @@ export class AuthProvider {
       .onDisconnect()
       .update({ status: 'offline' });
   }
+  
+  updateHOOnDisconnect() {
+    firebase.database().ref().child('location/' + this.userId)
+      .onDisconnect()
+      .update({ status: 'offline' });
+  }
 
   updateStatus(status) {
     return this.afdb.object('profile/' + this.userId)
       .update({ 
+        status: status
+      });
+  }
+
+  updateHOStatus(status) {
+    return this.afdb.object('location/' + this.userId)
+      .update({
         status: status
       });
   }

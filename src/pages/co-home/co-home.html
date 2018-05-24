@@ -13,8 +13,10 @@
 </ion-header>
 
 <ion-content>
+<div class="geocoder" id="geocoder"></div>
 <div id="map" class="map">
 </div>
+
 
   <div class="bottom">
     <ion-row>
@@ -25,6 +27,16 @@
       </ion-buttons>
       </ion-col>        
     </ion-row>
+  </div>`
+
+  <div *ngIf="tempHoID">
+      <div class="status_container">
+        <div class="status_text">
+            <div *ngIf="navAddress">
+              {{navAddress}}
+            </div>
+        </div>
+      </div>
   </div>
 
 </ion-content>
