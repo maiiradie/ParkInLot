@@ -44,14 +44,30 @@ export class MyApp {
     platform.ready().then(() => {
       statusBar.styleDefault();
       splashScreen.hide();
-
       this.menuCtrl.swipeEnable(false);
       this.retrieveUser();
     });
+    //enter code here
+    this.afs.auth.onAuthStateChanged(user => {
+      if (user) {
+        this.authProvider.myId(user.uid);
+        console.log(user.uid);
+      }else{
+        this.rootPage = "LoginPage";
+      }
+    });
+    
+
   }
   
   openPage(page: string){
-    this.nav.setRoot(page);
+    if(page == 'CoHomePage') {
+      console.log(page);
+      this.nav.popToRoot();
+    } else {
+      console.log(page);
+      this.nav.push(page);
+    }
   }
 
   isActive(page: string){
@@ -61,16 +77,16 @@ export class MyApp {
   }
 
   retrieveUser() {
-    if (this.authProvider.userId){
-          var userId = this.authProvider.setID();
-          this.afdb.object(`/profile/` + userId).valueChanges().take(1).subscribe( data => {
-            this.profileData = data;
-            this.retrieveImg();
-          });
-        } else {
-          this.profileData = null;
-          this.imgName = "./assets/imgs/avatar.jpg";
-        }
+    if (this.authProvider.userId) {
+      this.userId = this.authProvider.setID();
+      this.afdb.object(`/profile/` + this.userId).valueChanges().take(1).subscribe(data => {
+        this.profileData = data;
+        this.retrieveImg();
+      });
+    } else {
+      this.profileData = null;
+      this.imgName = "./assets/imgs/avatar.jpg";
+    }
   }
 
 
@@ -86,7 +102,6 @@ export class MyApp {
   }
 
   retrieveImg() {
-    this.userId = this.authProvider.setID();
     firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d => {
       this.imgName = d;
     }).catch((error) => {
@@ -104,5 +119,16 @@ export class MyApp {
        });
     });
   }
-  
+
+  logoutHo(){
+    this.authProvider.logoutUser()
+    .then(() => {
+      this.authProvider.updateHOStatus('offline');
+       this.menuCtrl.close()
+       .then( () => {
+          this.nav.setRoot('LoginPage');
+       });
+    });
+  }
+
 }

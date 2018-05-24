@@ -9,14 +9,16 @@ import * as firebase from 'firebase/app';
 
 @Injectable()
 export class AuthProvider {
-
+  
   //Logged in user ID
   userId: any;
 
   constructor(private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
   }
 
-  //run onlogin
+  myId(id){
+    this.userId = id;
+  }
   setID() {
     return this.userId = this.afs.auth.currentUser.uid;
   }
@@ -30,10 +32,23 @@ export class AuthProvider {
       .onDisconnect()
       .update({ status: 'offline' });
   }
+  
+  updateHOOnDisconnect() {
+    firebase.database().ref().child('location/' + this.userId)
+      .onDisconnect()
+      .update({ status: 'offline' });
+  }
 
   updateStatus(status) {
     return this.afdb.object('profile/' + this.userId)
       .update({ 
+        status: status
+      });
+  }
+
+  updateHOStatus(status) {
+    return this.afdb.object('location/' + this.userId)
+      .update({
         status: status
       });
   }

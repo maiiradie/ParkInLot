@@ -51,6 +51,9 @@
           <ion-label stacked>Email</ion-label>
           <ion-input type="email" formControlName = 'email' value="{{profileData?.email}}"></ion-input>
         </ion-item> 
+        <p class="invalidMsg" *ngIf="!userForm.controls.email.valid  && (userForm.controls.email.touched || submitAttempt)">
+					Please enter a valid email.
+				</p>
   
         <ion-item>
           <ion-label stacked>New Password</ion-label>
