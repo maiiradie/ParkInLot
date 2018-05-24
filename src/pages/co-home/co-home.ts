@@ -20,7 +20,9 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 })
 
 export class CoHomePage {
-	_watchTrans
+	LngLat;
+	_watch;
+	_watchTrans;
 	_markers;
 	_init;
 	_arriving;
@@ -118,20 +120,9 @@ export class CoHomePage {
 				if (this.tempHoID) {
 					this.removeCarMarker();
 					this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
-					.subscribe( data => {							
-						this._watchTrans = this.geolocation.watchPosition();
-						var temp = data
-						this._watchTrans.subscribe((data) => {
-							let LngLat = {
-								lng: data.coords.longitude,
-								lat: data.coords.latitude
-							}							
-							this.setDestination(temp.lng,temp.lat);				
-							this.setOrigin(LngLat);	
-						});
-						
-
-
+					.subscribe( data => {
+						let temp = data
+						this.setDestination(temp.lng,temp.lat);				
 					});
 				}
 				});			
@@ -240,7 +231,6 @@ export class CoHomePage {
 					        buttons: [{
 					       	 text: 'Finish',
 					         	handler: () => {
-									//navigator.geolocation.clearWatch(this._watchTrans);
 						            this.tempHoID = undefined;  
 						            this.setMarkers();		
 									this.directions.removeRoutes();
@@ -435,14 +425,20 @@ export class CoHomePage {
 					observable.next(location);
 					loading.dismiss();
 
-					let watch = this.geolocation.watchPosition();
-					watch.subscribe((data) => {
-						let LngLat = {
+					this._watch = this.geolocation.watchPosition();
+					this._watch.subscribe((data) => {
+						this.LngLat = {
 							lng: data.coords.longitude,
 							lat: data.coords.latitude
 						}
 						this.removeCarMarker();
-						this.addCarMarker(LngLat);
+						if(this.tempHoID){
+							this.setOrigin(this.LngLat);
+						}else{
+							this.directions.removeRoutes();
+							this.addCarMarker(this.LngLat);
+						}
+
 						
 					});
 
