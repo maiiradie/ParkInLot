@@ -21,7 +21,8 @@ export class RequestProvider {
               private fcm: FCM, 
               public http: HttpClient, 
               private afdb: AngularFireDatabase) {
-    this.setID();
+              //this.setID();
+              
   }
 
   setID() {

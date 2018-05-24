@@ -151,7 +151,6 @@ export class CoHomePage {
 					if(dataProf[0].payload.val().carowner.coID == this.userId){
 						this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf=>{
 							if(dataProf[0].payload.val().carowner.coID == this.userId){
-								console.log("parked");
 								this.tempHoID = data[i].key
 								this._markers.unsubscribe();
 								this.hasTransaction("parked");
@@ -287,9 +286,7 @@ export class CoHomePage {
 		this._markers = this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
 			for (var a = 0; a < data.length; a++) {
 				if(data[a].payload.val().status){
-					console.log(data[a].payload.val().status);
 					if(data[a].payload.val().status == "offline"){
-						console.log("i will remove: " + data[a].key);
 						if(document.getElementById(data[a].key)){
 							this.removeMarker(data[a].key);
 						}

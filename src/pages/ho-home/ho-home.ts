@@ -30,7 +30,7 @@ export class HoHomePage {
   parked: boolean = false;
   unfiltered;
   filtered;
-  myId = this.authProvider.setID();
+  myId = this.authProvider.userId;
   items: Array<any> = [];
   itemRef: firebase.database.Reference = firebase.database().ref('/transac');
   flagAlrtCtrl:boolean = false;

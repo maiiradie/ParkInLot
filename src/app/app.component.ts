@@ -44,10 +44,20 @@ export class MyApp {
     platform.ready().then(() => {
       statusBar.styleDefault();
       splashScreen.hide();
-
       this.menuCtrl.swipeEnable(false);
       this.retrieveUser();
     });
+    //enter code here
+    this.afs.auth.onAuthStateChanged(user => {
+      if (user) {
+        this.authProvider.myId(user.uid);
+        console.log(user.uid);
+      }else{
+        this.rootPage = "LoginPage";
+      }
+    });
+    
+
   }
   
   openPage(page: string){
@@ -109,5 +119,16 @@ export class MyApp {
        });
     });
   }
-  
+
+  logoutHo(){
+    this.authProvider.logoutUser()
+    .then(() => {
+      this.authProvider.updateHOStatus('offline');
+       this.menuCtrl.close()
+       .then( () => {
+          this.nav.setRoot('LoginPage');
+       });
+    });
+  }
+
 }
