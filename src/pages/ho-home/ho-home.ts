@@ -20,6 +20,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   templateUrl: 'ho-home.html',
 })
 export class HoHomePage {
+  role = "";
   parkedCarOwners = [];
   requestingCarOwners = [];
   arrivingCarOwners = [];
@@ -86,6 +87,11 @@ export class HoHomePage {
         this.hoProfile = profileData;
     });
   }
+
+   ionViewWillEnter() {
+    this.getRole();
+  }
+
   getTransactions(){
     this.afdb.list('requests/' + this.userId + '/requestNode').snapshotChanges().subscribe(data=>{  
       this.requestingCarOwners = data;
@@ -237,12 +243,14 @@ async acceptRequest(carowner,id){
   }
 
   openMenu(evt) {
-    if (evt === "Ho-Menu") {
+    if (evt === "coho-Menu") {
+      this.menuCtrl.enable(true, 'coho-Menu');
+      this.menuCtrl.enable(false, 'Co-Menu');
+      this.menuCtrl.enable(false, 'Ho-Menu');
+    } else if (evt === "Ho-Menu") {
       this.menuCtrl.enable(true, 'Ho-Menu');
       this.menuCtrl.enable(false, 'Co-Menu');
-    } else if (evt === "Co-Menu") {
-      this.menuCtrl.enable(false, 'Ho-Menu');
-      this.menuCtrl.enable(true, 'Co-Menu');
+      this.menuCtrl.enable(false, 'coho-Menu');
     }
     this.menuCtrl.toggle();
   }
@@ -367,6 +375,23 @@ async acceptRequest(carowner,id){
   }
 
 
+  getRole() {
+    this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
+      var x = data.payload.val().role;
+      console.log(x);
+      if (x === 1) {
+        this.role = "carowner";
+      } else if (x === 2) {
+        this.role = "homeowner";
+      } else if (x === 3) {
+        this.role = "both";
+      } else {
+        alert('Something went wrong.');
+        this.role = undefined;
+      }
+      console.log('ho eto yung role: ' + this.role);
+    });
+  }
 
   doConfirm() {
     if (this.toggleValue) {

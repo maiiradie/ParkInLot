@@ -53,10 +53,15 @@ export class LoginPage {
 
             this.x = this.authProvider.getUser().subscribe((data) => {
               if (data.reg_status === "approved") {
-                if (data.carowner) {
+                if(data.role == 3) {
+                  console.log('role: ' + data.role);
                   this.navCtrl.setRoot("CoHomePage");
                   this.x.unsubscribe();
-                } else if (data.homeowner) {
+                } else if (data.carowner && (data.role == 1 || data.role == undefined)) {
+                   console.log('nakapasok !!!');
+                  this.navCtrl.setRoot("CoHomePage");
+                  this.x.unsubscribe();
+                } else if (data.homeowner && (data.role == 2 || data.role == undefined)) {
                   this.navCtrl.setRoot("HoHomePage");
                   this.x.unsubscribe();
                 } 

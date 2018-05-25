@@ -52,11 +52,19 @@ openEstbProfile(){
   this.navCtrl.push('EstProfilePage');
 }
 
-logout(){
-//clear any cached data
-  this.authProvider.logoutUser().then( () => {
+// logout(){
+// //clear any cached data
+//   this.authProvider.logoutUser().then( () => {
+//     this.navCtrl.setRoot('LoginPage');
+//   });
+// }
+
+  logout() {
+    //clear any cached data
+    this.authProvider.logoutUser()
+    // .then( () => {
     this.navCtrl.setRoot('LoginPage');
-  });
-}
+    // });
+  }
 
 }

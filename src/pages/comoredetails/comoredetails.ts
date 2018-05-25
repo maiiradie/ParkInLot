@@ -80,7 +80,8 @@ export class ComoredetailsPage {
 
   sendRequest(HoToken){
     this.reqButton = false;
-    let coID = this.requestProvider.setID();   
+    let coID = this.authProvider.setID();
+    console.log('ito na pota: ' +coID);   
     let temp = this.afdb.object<any>('requests/' + this.hoID ).valueChanges().subscribe(data => {
       if (data.available == 0) {
         this.reqButton = true;
