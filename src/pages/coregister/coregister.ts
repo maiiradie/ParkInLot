@@ -48,7 +48,7 @@ export class CoregisterPage {
         'fname':[null,Validators.compose([Validators.required, Validators.pattern('[^0-9]*')])],
         'lname':[null,Validators.compose([Validators.required, Validators.pattern('[^0-9]*')])],
         'email':[null,Validators.compose([Validators.required, Validators.email])],
-        'password':[null,Validators.compose([Validators.minLength(6)])],
+        'password':[null,Validators.compose([Validators.required, Validators.minLength(6)])],
         'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11), Validators.pattern('^09[0-9]*')])]
       });
 

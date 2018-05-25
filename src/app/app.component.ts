@@ -144,7 +144,11 @@ export class MyApp {
        });
     });
   }
+<<<<<<< HEAD
 
+=======
+  
+>>>>>>> f2b98416516d16b385fcd1a4867cef251b7b3e85
   logoutHoCo(){
     this.authProvider.logoutUser();
     this.menuCtrl.close();

@@ -1,0 +1,42 @@
+<ion-content padding class="transparent-header">
+    <ion-header>
+      <ion-navbar>
+      </ion-navbar>
+    </ion-header>
+  
+    <div padding>
+      <ion-row>
+        <ion-col>
+          <img class="logo" src="./assets/imgs/logo.png"/>
+        </ion-col>
+      </ion-row>
+  
+      <p>Please enter your new password before proceeding.</p>
+      <form [formGroup]="passForm" (submit)='onSubmit()'>
+        <ion-row>
+          <ion-col>
+            <ion-list inset class="no-border">
+              <ion-item>
+                <ion-input type="password" name="password"  placeholder="Password" formControlName="password"></ion-input>
+              </ion-item>
+              <p class="invalidMsg" *ngIf="!passForm.controls.password.valid  && (passForm.controls.password.touched || submitAttempt)">
+							  Please enter a valid password. Password must contain at least 6 characters.
+						  </p>
+              <ion-item>
+                <ion-input type="password" name='repassword' placeholder="Confirm Password" formControlName="rePassword"></ion-input>
+              </ion-item>
+              <p class="invalidMsg" *ngIf="!passForm.controls.rePassword.valid  && (passForm.controls.rePassword.touched || submitAttempt)">
+							  Passwords do not match.
+						  </p>
+            </ion-list>
+          </ion-col>
+        </ion-row>
+  
+        <ion-row>
+          <ion-col> 
+            <button ion-button class="login-button" type="submit" [disabled]="!passForm.valid">Reset Password</button>
+          </ion-col>
+        </ion-row>
+      </form>
+    </div>
+  </ion-content>

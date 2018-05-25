@@ -40,8 +40,6 @@ export class AuthProvider {
   }
 
  updateStatus(status) {
-
-
     var x; 
     this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
       x = data.payload.val().role;
@@ -94,6 +92,17 @@ export class AuthProvider {
     return this.updateStatus('offline').then( () => {
         this.afs.auth.signOut();
     });
+  }
+
+  updateIsNew() {
+    return this.afdb.object('profile/' + this.userId)
+      .update({
+        isNew: false
+      });
+  }
+
+  updatePassword(pass) {
+    return this.afs.auth.currentUser.updatePassword(pass);
   }
 
   // logoutUser() {
