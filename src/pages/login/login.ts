@@ -104,7 +104,6 @@ export class LoginPage {
             this.x = this.authProvider.getUser().subscribe((data) => {
               if (data.isNew) {
                 console.log("new user");
-                this.authProvider.updateIsNew();
                 this.navCtrl.setRoot("ResetPassPage");
                 loading.dismiss();
               } else {

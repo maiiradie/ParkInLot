@@ -48,6 +48,7 @@ export class ResetPassPage {
 
   onSubmit() {
     this.authProvider.updatePassword(this.passForm.value['password']);
+    this.authProvider.updateIsNew();
 
     var x = this.authProvider.getUser().subscribe( data => {
       if(data.role == 3) {
