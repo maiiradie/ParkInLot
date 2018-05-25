@@ -48,6 +48,7 @@ export class MyApp {
       this.retrieveUser();
     });
     //enter code here
+
     this.afs.auth.onAuthStateChanged(user => {
       if (user) {
         this.authProvider.myId(user.uid);

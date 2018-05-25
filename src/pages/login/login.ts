@@ -28,7 +28,59 @@ export class LoginPage {
   }
 
   ionViewDidLoad() {
+   this.getTransaction();
   }
+  profile = []
+  transactions = []
+  async getTransaction(){ 
+    let transac =  this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
+      for(let i = 0; i < data.length; i++){
+        if(data[i].payload.val().status == "pending"){
+          let hoID = data[i].payload.val().hoID;
+          this.profile.push(hoID);
+        }
+      }
+      this.profile = this.removeDuplicates(this.profile);
+      //call a funcition here that will
+      this.getTotalAmount(this.profile)
+    });
+  }
+  async getTotalAmount(profArr){
+    let transac =  this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
+      for(let i = 0; i < profArr.length; i++){
+        let amount = 0
+        for(let x = 0; x < data.length; x++){
+          if(profArr[i] == data[x].payload.val().hoID){
+            amount += data[x].payload.val().payment;
+          }
+          
+        }
+        //add another function here passing these arguements and and the same time querying the profile of the homeowner
+        console.log(profArr[i] + " " + amount);
+        this.getProfile(profArr[i],amount);
+      }
+    });
+  }
+  async getProfile(profile,amount){
+    let temp = await this.afdb.object<any>('profile/' + profile).snapshotChanges().take(1).subscribe(data=>{
+      var temp = {
+        name: data.payload.val().email,
+        amount,
+      }
+      this.transactions.push(temp);
+
+    });
+  }
+
+  removeDuplicates(arr){
+    let unique_array = []
+    for(let i = 0;i < arr.length; i++){
+        if(unique_array.indexOf(arr[i]) == -1){
+            unique_array.push(arr[i])
+        }
+    }
+    return unique_array
+}
   
   showToast(message) {
     let toast = this.toastCtrl.create({
