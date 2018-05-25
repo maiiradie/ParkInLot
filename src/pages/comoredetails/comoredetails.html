@@ -25,15 +25,15 @@
       <ion-list no-lines text-wrap>
         <ion-item>
           <ion-icon name="pin" color="secondary" item-start></ion-icon>
-          <p>Addrss</p>
-          <span>{{profileData?.address}}</span>
+          <p>Address</p>
+          <span>{{garrageDet?.address}}</span>
         </ion-item>
 
         <ion-item>
           <ion-icon name="paper" color="secondary" item-start></ion-icon>
           <p>Capacity</p>
           <p *ngIf="profileData?.details == null">Address</p>
-          <span>{{profileData?.capacity}}</span>
+          <span>{{garrageDet?.capacity}}</span>
           <span *ngIf="profileData?.details ==null">{{userData?.address}}</span>
         </ion-item>
 

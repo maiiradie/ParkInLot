@@ -120,6 +120,7 @@ export class CoHomePage {
 			this.location = this.getCurrentLocation().subscribe(location => {
 				this.centerLocation(location);
 				if (this.tempHoID) {
+					this.removeAllMarker();
 					this.removeCarMarker();
 					this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
 					.subscribe( data => {
@@ -365,6 +366,16 @@ export class CoHomePage {
 				}
 			}
 
+		});
+	}
+	removeAllMarker(){
+		let temp = this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
+			for(let i = 0; i < data.length; i++){
+				if(document.getElementById(data[i].key)){
+					this.removeMarker(data[i].key);
+				}
+				temp.unsubscribe();
+			}
 		});
 	}
 	removeMarker(elementId){

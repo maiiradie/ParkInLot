@@ -28,6 +28,7 @@ export class ComoredetailsPage {
   hown: boolean = true;
   cancel
   myTimeout;
+  garrageDet;
   _returnStatus;
 
   
@@ -45,8 +46,10 @@ export class ComoredetailsPage {
   }
   
   ionViewDidLoad() { 
-    this.getMyData();
     this.hoID = this.navParams.get('key');
+    this.getGarrageData();
+    this.getMyData();
+    
     this.displayInfo();
     
   }
@@ -62,6 +65,12 @@ export class ComoredetailsPage {
   getMyData(){
     this.afdb.object('profile/'+ this.authProvider.userId).valueChanges().take(1).subscribe( data => {
       this.myData = data;
+    });
+  }
+  getGarrageData(){    
+    this.afdb.object('requests/'+ this.hoID).valueChanges().take(1).subscribe( data => {
+      this.garrageDet = data
+      console.log(data);
     });
   }
 
@@ -81,12 +90,7 @@ export class ComoredetailsPage {
 
   sendRequest(HoToken){
     this.reqButton = false;
-<<<<<<< HEAD
     let coID = this.authProvider.userId;   
-=======
-    let coID = this.authProvider.setID();
-    console.log('ito na pota: ' +coID);   
->>>>>>> 174da5e59af9c4803350c0d3b879a65382e6f090
     let temp = this.afdb.object<any>('requests/' + this.hoID ).valueChanges().subscribe(data => {
       if (data.available == 0) {
         this.reqButton = true;
