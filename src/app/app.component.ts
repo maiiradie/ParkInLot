@@ -142,7 +142,8 @@ export class MyApp {
           this.nav.setRoot('LoginPage');
        });
     });
-
+  }
+  
   logoutHoCo(){
     this.authProvider.logoutUser();
     this.menuCtrl.close();

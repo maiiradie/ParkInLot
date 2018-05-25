@@ -46,34 +46,39 @@ export class LoginPage {
     loading.present(loading).then( () => {
       if ((this.login.email != null) || (this.login.password != null)) {
         this.authProvider.loginUser(this.login).then(() => {
-
           this.authProvider.setID();
 
           if (this.authProvider.setID().length != 0) {
-
             this.x = this.authProvider.getUser().subscribe((data) => {
-              if (data.reg_status === "approved") {
-                if(data.role == 3) {
-                  console.log('role: ' + data.role);
-                  this.navCtrl.setRoot("CoHomePage");
-                  this.x.unsubscribe();
-                } else if (data.carowner && (data.role == 1 || data.role == undefined)) {
-                   console.log('nakapasok !!!');
-                  this.navCtrl.setRoot("CoHomePage");
-                  this.x.unsubscribe();
-                } else if (data.homeowner && (data.role == 2 || data.role == undefined)) {
-                  this.navCtrl.setRoot("HoHomePage");
-                  this.x.unsubscribe();
-                } 
-              } else if (data.reg_status === "rejected") {
-                this.showToast('Cannot login to application. Account request has been rejected by admin.');
-              } else if (data.establishment) {
-                this.navCtrl.setRoot("EstHomePage");
-                this.x.unsubscribe();
+              if (data.isNew) {
+                console.log("new user");
+                this.authProvider.updateIsNew();
+                this.navCtrl.setRoot("ResetPassPage");
+                loading.dismiss();
               } else {
-                this.showToast('Cannot login to application. Account request has not yet been approved by admin.');
+                if (data.reg_status === "approved") {
+                  if(data.role == 3) {
+                    console.log('role: ' + data.role);
+                    this.navCtrl.setRoot("CoHomePage");
+                    this.x.unsubscribe();
+                  } else if (data.carowner && (data.role == 1 || data.role == undefined)) {
+                     console.log('nakapasok !!!');
+                    this.navCtrl.setRoot("CoHomePage");
+                    this.x.unsubscribe();
+                  } else if (data.homeowner && (data.role == 2 || data.role == undefined)) {
+                    this.navCtrl.setRoot("HoHomePage");
+                    this.x.unsubscribe();
+                  } 
+                } else if (data.reg_status === "rejected") {
+                  this.showToast('Cannot login to application. Account request has been rejected by admin.');
+                } else if (data.establishment) {
+                  this.navCtrl.setRoot("EstHomePage");
+                  this.x.unsubscribe();
+                } else {
+                  this.showToast('Cannot login to application. Account request has not yet been approved by admin.');
+                }
+                loading.dismiss();
               }
-              loading.dismiss();
             });
           }
 
