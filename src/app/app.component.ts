@@ -61,7 +61,7 @@ export class MyApp {
   }
   
   openPage(page: string){
-    if(page == 'CoHomePage') {
+    if(page == 'CoHomePage' || page == 'HoHomePage') {
       console.log(page);
       this.nav.popToRoot();
     } else {

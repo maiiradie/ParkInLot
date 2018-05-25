@@ -332,7 +332,8 @@ async acceptRequest(carowner,id){
   async updateRequests(key,endDate,payment,carowner){
     var push;
     let temp = await this.afdb.list('requests/' + this.userId + '/parkedNode').update(key,
-      {
+      { 
+        status: "pending",
         endTime: endDate, 
         payment:  payment,
         hoID: this.userId

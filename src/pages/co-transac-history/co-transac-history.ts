@@ -54,11 +54,19 @@ async getTransactions() {
           if(data[i].payload.val().carowner){            
             if(data[i].payload.val().carowner.coID == this.id){
                this.afdb.object<any>('profile/' + data[i].payload.val().hoID).valueChanges().take(1).subscribe(prof=>{
-
+                var dateStart = new Date(data[i].payload.val().timeStart);
+                var date = dateStart.toLocaleDateString();
+                var start = dateStart.toLocaleTimeString();
+                var dateEnd = new Date(data[i].payload.val().endTime);
+                var end = dateEnd.toLocaleTimeString();
+                var timeStart = dateStart.toLocaleTimeString();                
                 var obj = {
                   data: data[i].payload.val().hoID,
                   name: prof.fname,
-                  payment:data[i].payload.val().payment
+                  payment:data[i].payload.val().payment,
+                  date,
+                  start,
+                  end
                 }
                 this.transactions.push(obj);
               });

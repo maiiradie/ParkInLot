@@ -17,7 +17,7 @@ export class HoTransacHistoryPage {
   profData: Array<any> = [];
   transactions = [];
   profileName = [];
-  
+  month = ["January","February","March","April","May","June","July","August","September","October","November,","December"];
   transacQuery1;
   transacQuery2;
 
@@ -38,15 +38,67 @@ export class HoTransacHistoryPage {
 
   ionViewDidLoad() {
     this.getTransactions();
+    this.getDueMonth()
+    this.getDueAmount();
+  }
+  amount = 0;
+  amounts = 0;
+  amountss = 0 ;
+  monthNum;
+  dateMonth:String;
+  async getDueMonth(){
+    let temp = await this.afdb.list<any>('transactions/',ref =>ref.orderByChild('timeStart')).snapshotChanges().take(1).subscribe(data=>{
+      for(var i = 0; i < data.length; i++){
+        if(data[i].payload.val().hoID == this.userId && data[i].payload.val().status == "pending"){          
+          let tempDate = new Date(data[i].payload.val().timeStart)
+          this.monthNum = tempDate.getMonth();
+          this.dateMonth = this.month[this.monthNum]; 
+          break
+        }
+      }
+    });
+  }
+  async getDueAmount(){
+    let temp = await this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
+      for(let i = 0; i < data.length; i++){  
+        if(data[i].payload.val().carowner){            
+          if(data[i].payload.val().hoID == this.userId && data[i].payload.val().status == "pending"){
+            var tempDate = new Date(data[i].payload.val().timeStart);
+            var tempMonth = tempDate.getMonth()
+            if(tempMonth == this.monthNum){
+              this.amounts += data[i].payload.val().payment;
+              this.amountss = this.amounts;
+              this.amount = this.amountss * .20;
+            }
+
+          }
+        }
+      }
+    });
   }
 
   async getTransactions() {
     this.transacQuery1 = await this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
-      for(let i = 0; i < data.length; i++){
-        
+      for(let i = data.length - 1; i > -1; i--){        
         if(data[i].payload.val().carowner){            
           if(data[i].payload.val().hoID == this.userId){
-            this.transactions.push(data[i].payload.val());
+            var dateStart = new Date(data[i].payload.val().timeStart);
+            var date = dateStart.toLocaleDateString();
+            var start = dateStart.toLocaleTimeString();
+            var dateEnd = new Date(data[i].payload.val().endTime);
+            var endTime = dateEnd.toLocaleTimeString();
+            var timeStart = dateStart.toLocaleTimeString();
+            var timeEnd; 
+            var temp = {
+              name: data[i].payload.val().carowner.name,
+              date: date,
+              start: start,
+              end: endTime,
+              payment: data[i].payload.val().payment,
+              
+
+            }
+            this.transactions.push(temp);
         }  
       }
     }
