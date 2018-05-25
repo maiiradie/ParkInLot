@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FCM } from '@ionic-native/fcm';
 import { RequestProvider } from '../../providers/request/request';
 import { AuthProvider } from '../../providers/auth/auth';
+import { query } from '@angular/core/src/animation/dsl';
 import * as firebase from 'firebase/app';
 
 @IonicPage()
@@ -80,7 +81,7 @@ export class ComoredetailsPage {
 
   sendRequest(HoToken){
     this.reqButton = false;
-    let coID = this.requestProvider.setID();   
+    let coID = this.authProvider.userId;   
     let temp = this.afdb.object<any>('requests/' + this.hoID ).valueChanges().subscribe(data => {
       if (data.available == 0) {
         this.reqButton = true;
@@ -150,11 +151,11 @@ export class ComoredetailsPage {
       });  
   }
   //function listener for accept decline 
-  statusListener(){
-    this._returnStatus = this.afdb.list("requests/" + this.hoID + '/requestNode').snapshotChanges().take(2).subscribe(data=>{
-      for(var i = 0; i < data.length; i++){
-
-        if(data[i].payload.val().coID == this.requestProvider.userId){
+  async statusListener(){
+      this._returnStatus = await this.afdb.list<any>('requests/' + this.hoID + '/requestNode',ref => ref.orderByChild('coID').equalTo(this.authProvider.userId)).snapshotChanges().take(2).subscribe(data=>{
+        
+        for(var i = 0; i < data.length; i++){    
+                
           if(data[i].payload.val().status == "declined"){
             this._returnStatus.unsubscribe();            
             clearTimeout(this.myTimeout);
@@ -217,9 +218,8 @@ export class ComoredetailsPage {
             alert.present();
 
           }
-        }
-      }
-    });
+        }     
+      }); 
   } 
 //actioncontroller
   showConfirm(i) {
@@ -238,7 +238,7 @@ export class ComoredetailsPage {
             let tempo = this.afdb.list('requests/' + this.hoID + '/requestNode/').snapshotChanges().subscribe(data=>{
               tempo.unsubscribe();
               for(var i = 0; i < data.length;i ++){
-                if(data[i].payload.val().coID == this.requestProvider.userId){
+                if(data[i].payload.val().coID == this.authProvider.userId){
                   this.afdb.list('requests/' + this.hoID + '/requestNode/').remove(data[i].key);
                 }
               }
@@ -285,7 +285,7 @@ export class ComoredetailsPage {
       let tempo = this.afdb.list('requests/' + this.hoID + '/requestNode/').snapshotChanges().subscribe(data=>{
         tempo.unsubscribe();
         for(var i = 0; i < data.length;i ++){
-          if(data[i].payload.val().coID == this.requestProvider.userId){
+          if(data[i].payload.val().coID == this.authProvider.userId){
             this.afdb.list('requests/' + this.hoID + '/requestNode/').remove(data[i].key);
           }
         }

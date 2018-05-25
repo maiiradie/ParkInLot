@@ -20,9 +20,9 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 })
 
 export class CoHomePage {
+	stop: boolean = true;
 	LngLat;
-	_watch;
-	_watchTrans;
+	_watch = this.geolocation.watchPosition();;
 	_markers;
 	_init;
 	_arriving;
@@ -50,12 +50,13 @@ export class CoHomePage {
 		public loadingCtrl: LoadingController,
 		private menuCtrl: MenuController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
-		this.afAuth.auth.onAuthStateChanged(user => {
-			if (user) {
-				this.authProvider.updateStatus('online');
-				this.authProvider.updateOnDisconnect();
-			}
-		});
+		
+		// this.afAuth.auth.onAuthStateChanged(user => {
+		// 	if (user) {
+		// 		this.authProvider.updateStatus('online');
+		// 		this.authProvider.updateOnDisconnect();
+		// 	}
+		// });
 		//this.requestProvider.saveToken();
 		//this.onNotification();
 		menuCtrl.enable(true);
@@ -248,6 +249,9 @@ export class CoHomePage {
 
 
 	ngOnDestroy(){
+		if(this._watch){
+			this._watch.subscribe().unsubscribe();
+		}
 		if(this._init){
 			this._init.unsubscribe();
 		}if(this._arriving){
@@ -257,7 +261,7 @@ export class CoHomePage {
 		}if(this._parked){
 			this._parked.unsubscribe();
 		}if(this.location){
-			this.location.unsubscribe
+			this.location.unsubscribe();
 		}if(this.hoMarkers){
 			this.hoMarkers.unsubscribe();
 		}
@@ -425,7 +429,8 @@ export class CoHomePage {
 					observable.next(location);
 					loading.dismiss();
 
-					this._watch = this.geolocation.watchPosition();
+					
+					
 					this._watch.subscribe((data) => {
 						this.LngLat = {
 							lng: data.coords.longitude,
@@ -433,13 +438,12 @@ export class CoHomePage {
 						}
 						this.removeCarMarker();
 						if(this.tempHoID){
+							console.log(this.tempHoID);
 							this.setOrigin(this.LngLat);
 						}else{
 							this.directions.removeRoutes();
 							this.addCarMarker(this.LngLat);
-						}
-
-						
+						}									
 					});
 
 				}).catch(error => {
@@ -466,7 +470,6 @@ export class CoHomePage {
 		this.marker.remove();
 	}
 	addCarMarker(location){
-		console.log("con");
 		var el = document.createElement('div');
 		el.className = "carmarker";
 
