@@ -1,9 +1,14 @@
 <ion-header>
   <ion-navbar>
       <ion-buttons start left>
-          <button ion-button icon-only (click)="openMenu('Co-Menu')">
-            <ion-icon name='menu'></ion-icon>
-          </button>
+          <button *ngIf="role == 'carowner' || role == undefined; else x" ion-button icon-only (click)="openMenu('Co-Menu')">
+        <ion-icon name="menu"></ion-icon>
+      </button>
+      <ng-template #x>
+        <button ion-button icon-only (click)="openMenu('coho-Menu')">
+          <ion-icon name="menu"></ion-icon>
+        </button>
+      </ng-template>
         </ion-buttons>
 
     <ion-title>
@@ -22,7 +27,8 @@
     <ion-row>
       <ion-col>
         <ion-buttons end>
-          <button ion-button color='light' (click)='centerLocation()'><ion-icon name="locate"></ion-icon>
+       <button ion-button color='light' (click)='centerLocation()'>
+            <ion-icon name="locate"></ion-icon>
         </button>
       </ion-buttons>
       </ion-col>        

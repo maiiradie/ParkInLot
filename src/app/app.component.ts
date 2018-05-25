@@ -61,12 +61,15 @@ export class MyApp {
 
   }
   
-  openPage(page: string){
-    if(page == 'CoHomePage' || page == 'HoHomePage') {
-      console.log(page);
+  openPage(page: string, role){
+    if ((page == 'CoHomePage' && role == 'carowner') || (page == 'HoHomePage' && role == 'homeowner'))  {
       this.nav.popToRoot();
-    } else {
-      console.log(page);
+    } else if(page == 'HoHomePage' && role == 'both') {
+      this.nav.push(page);
+    } else if(page == 'CoHomePage' && role == 'both') {
+      this.nav.popToRoot();
+    } 
+    else {
       this.nav.push(page);
     }
   }
@@ -92,13 +95,14 @@ export class MyApp {
 
 
   openMenu(evt) {
-    if(evt === "Ho-Menu"){
-       this.menuCtrl.enable(true, 'Ho-Menu');
-       this.menuCtrl.enable(false, 'Co-Menu');
+    if (evt === "coho-Menu"){
+      // this.menuCtrl.enable(true, 'coho-Menu');
+      //  this.menuCtrl.enable(false, 'Co-Menu');
     }else if(evt === "Co-Menu"){
-       this.menuCtrl.enable(false, 'Ho-Menu');
-       this.menuCtrl.enable(true, 'Co-Menu');
-    }
+      //  this.menuCtrl.enable(false, 'Ho-Menu');
+      //  this.menuCtrl.enable(true, 'Co-Menu');
+    } 
+
     this.menuCtrl.toggle();
   }
 
@@ -113,13 +117,22 @@ export class MyApp {
 
   logout(){
     this.authProvider.logoutUser()
-    .then(() => {
-       this.menuCtrl.close()
-       .then( () => {
+      //  .then( () => {
+         this.menuCtrl.close()
           this.nav.setRoot('LoginPage');
-       });
-    });
+      //  });
   }
+
+  // logoutHo(){
+  //   this.authProvider.logoutUser()
+  //   // .then(() => {
+  //     this.authProvider.updateHOStatus('offline')
+  //      .then( () => {
+  //        this.menuCtrl.close();
+  //         this.nav.setRoot('LoginPage');
+  //      });
+  //   // });
+  // }
 
   logoutHo(){
     this.authProvider.logoutUser()
@@ -130,6 +143,11 @@ export class MyApp {
           this.nav.setRoot('LoginPage');
        });
     });
+
+  logoutHoCo(){
+    this.authProvider.logoutUser();
+    this.menuCtrl.close();
+    this.nav.setRoot('LoginPage');
   }
 
 }

@@ -34,6 +34,7 @@ export class CoHomePage {
 	directions;
 	hoMarkers;
 	location;
+	role  = "";
 	userId = this.authProvider.userId;
 	navAddress;
 	constructor(private afAuth: AngularFireAuth,
@@ -128,6 +129,10 @@ export class CoHomePage {
 				}
 				});			
 			});
+	}
+
+	ionViewWillEnter() {
+		this.getRole();
 	}
 
 	hasTransaction(status:String){
@@ -269,14 +274,36 @@ export class CoHomePage {
 	}
 
 	openMenu(evt) {
-		if (evt === "Ho-Menu") {
-			this.menuCtrl.enable(true, 'Ho-Menu');
+		if (evt === "coho-Menu") {
+			this.menuCtrl.enable(true, 'coho-Menu');
 			this.menuCtrl.enable(false, 'Co-Menu');
-		} else if (evt === "Co-Menu") {
 			this.menuCtrl.enable(false, 'Ho-Menu');
+		} else if (evt === "Co-Menu") {
 			this.menuCtrl.enable(true, 'Co-Menu');
+			this.menuCtrl.enable(false, 'Ho-Menu');
+			this.menuCtrl.enable(false, 'coho-Menu');
 		}
 		this.menuCtrl.toggle();
+	}
+
+		getRole() {
+		this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
+			var x = data.payload.val().role;
+			console.log(x);
+			if (x === 1) {
+				this.role = "carowner";
+			} else if (x === 2) {
+				this.role = "homeowner";
+			} else if (x  === 3) {
+				this.role = "both";
+			} else {
+				alert('Something went wrong.');
+				this.role = undefined;
+			}
+			console.log('co eto yung role: ' + this.role);
+			
+		});
+		return this.role;
 	}
 
 	destination() {

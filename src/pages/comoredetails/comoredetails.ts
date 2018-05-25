@@ -81,7 +81,12 @@ export class ComoredetailsPage {
 
   sendRequest(HoToken){
     this.reqButton = false;
+<<<<<<< HEAD
     let coID = this.authProvider.userId;   
+=======
+    let coID = this.authProvider.setID();
+    console.log('ito na pota: ' +coID);   
+>>>>>>> 174da5e59af9c4803350c0d3b879a65382e6f090
     let temp = this.afdb.object<any>('requests/' + this.hoID ).valueChanges().subscribe(data => {
       if (data.available == 0) {
         this.reqButton = true;
