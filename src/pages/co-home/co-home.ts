@@ -298,7 +298,6 @@ export class CoHomePage {
 			} else if (x  === 3) {
 				this.role = "both";
 			} else {
-				alert('Something went wrong.');
 				this.role = undefined;
 			}
 			console.log('co eto yung role: ' + this.role);

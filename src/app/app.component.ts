@@ -116,7 +116,7 @@ export class MyApp {
  }
 
   logout(){
-    this.authProvider.logoutUser()
+      this.afs.auth.signOut();
       //  .then( () => {
          this.menuCtrl.close()
           this.nav.setRoot('LoginPage');

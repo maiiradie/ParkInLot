@@ -30,6 +30,7 @@ export class ComoredetailsPage {
   myTimeout;
   garrageDet;
   _returnStatus;
+  garrageDetTwo;
 
   
   private key = "key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM";
@@ -71,6 +72,9 @@ export class ComoredetailsPage {
     this.afdb.object('requests/'+ this.hoID).valueChanges().take(1).subscribe( data => {
       this.garrageDet = data
       console.log(data);
+    });
+    this.afdb.object('location/'+ this.hoID).valueChanges().take(1).subscribe( data => {
+      this.garrageDetTwo = data
     });
   }
 
