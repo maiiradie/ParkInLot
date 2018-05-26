@@ -74,7 +74,7 @@
         <ion-item>
           <ion-icon name="car" color="secondary" item-start></ion-icon>
           <p>Rate</p>
-          <span>₱{{profileData?.rate}}</span>
+          <span>₱{{profileData?.regularPrice}}</span>
         </ion-item>
 
         <ion-item>
@@ -85,8 +85,8 @@
 
         <ion-item>
           <ion-icon name="call" color="secondary" item-start></ion-icon>
-          <p>Overnight Price</p>
-          <span>₱{{profileData?.overnightPrice}}</span>
+          <p>Capacity</p>
+          <span>{{profileData?.capacity}}</span>
         </ion-item>
       </ion-list>
     </ng-template>
