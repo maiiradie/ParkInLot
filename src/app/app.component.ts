@@ -52,7 +52,6 @@ export class MyApp {
     this.afs.auth.onAuthStateChanged(user => {
       if (user) {
         this.authProvider.myId(user.uid);
-        console.log(user.uid);
       }else{
         this.rootPage = "LoginPage";
       }
@@ -110,7 +109,6 @@ export class MyApp {
     firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d => {
       this.imgName = d;
     }).catch((error) => {
-      console.log("error in retrieving image: " + JSON.stringify(error));
       this.imgName = "./assets/imgs/avatar.jpg";
     });
  }

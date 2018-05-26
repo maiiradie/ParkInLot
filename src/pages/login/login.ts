@@ -89,6 +89,9 @@ export class LoginPage {
                   } else if (data.homeowner && (data.role == 2 || data.role == undefined)) {
                     this.navCtrl.setRoot("HoHomePage");
                     this.x.unsubscribe();
+                  }else if(data.establishment && (data.role == 4 || data.role == undefined)){
+                    this.navCtrl.setRoot("EstHomePage");
+                    this.x.unsubscribe();
                   } 
                 } else if (data.reg_status === "rejected") {
                   this.showToast('Cannot login to application. Account request has been rejected by admin.');

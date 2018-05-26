@@ -12,7 +12,7 @@ import { AuthProvider } from '../../providers/auth/auth';
   templateUrl: 'est-home.html',
 })
 export class EstHomePage {
-
+  status
   profileData:any;
   myStatus: boolean;
   toggleValue:boolean;
@@ -29,22 +29,29 @@ export class EstHomePage {
   }
 
   ionViewDidLoad() {
-  
-      this.afdb.object<any>('profile/'+ this.userId ).snapshotChanges().subscribe( data => {
+    
+      this.afdb.object<any>('location/'+ this.userId ).snapshotChanges().subscribe( data => {
         this.profileData = data;
-        this.myStatus = data.payload.val().availability;
+        this.myStatus = data.payload.val().status;
         
         if(this.myStatus == true){
-          this.OnOff = 'Available'
+          this.OnOff = 'Available';
         }else{
           this.OnOff = 'Full'
+          
         }
       });
 
 }
 
 updateStat(){
-    this.afdb.object('profile/' + this.userId).update({availability: this.toggleValue})
+  if(this.toggleValue){
+    this.afdb.object('location/' + this.userId).update({status: "online"});
+  }else{
+    this.afdb.object('location/' + this.userId).update({status: "offline"});
+  }
+    
+
     
 }
 

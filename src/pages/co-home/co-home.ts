@@ -52,15 +52,6 @@ export class CoHomePage {
 		public loadingCtrl: LoadingController,
 		private menuCtrl: MenuController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
-		
-		// this.afAuth.auth.onAuthStateChanged(user => {
-		// 	if (user) {
-		// 		this.authProvider.updateStatus('online');
-		// 		this.authProvider.updateOnDisconnect();
-		// 	}
-		// });
-		//this.requestProvider.saveToken();
-		//this.onNotification();
 		menuCtrl.enable(true);
 	}
 
@@ -100,10 +91,8 @@ export class CoHomePage {
 
 				};
 			}, (error) => {
-				console.log(error);
 			});
 		} catch (e) {
-			console.log(e);
 		}
 	}
 
@@ -132,7 +121,6 @@ export class CoHomePage {
 						this.addTempHo(temp);
 
 						this.tempLocation = temp;
-						console.log(this.tempLocation.lng,this.tempLocation.lat);
 					});
 				}
 				});			
@@ -244,7 +232,6 @@ export class CoHomePage {
 				var e = new Date(data.endTime);
 				end = e.toLocaleTimeString();
 				this._parked.unsubscribe();
-				//alert controller
 					let confirm = this.alertCtrl.create({
 							title: 'Payment',
 					        subTitle: 'Start time: ' + start+ '<br>End time: ' + end + '<br>Amount: P' + data.payment,
@@ -304,7 +291,6 @@ export class CoHomePage {
 		getRole() {
 		this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
 			var x = data.payload.val().role;
-			//console.log(x);
 			if (x === 1) {
 				this.role = "carowner";
 			} else if (x === 2) {
@@ -314,7 +300,6 @@ export class CoHomePage {
 			} else {
 				this.role = undefined;
 			}
-			//console.log('co eto yung role: ' + this.role);
 			
 		});
 		return this.role;
@@ -333,16 +318,16 @@ export class CoHomePage {
 	markerListener(){
 		this._markers = this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
 			for (var a = 0; a < data.length; a++) {
-				if(data[a].payload.val().status){
-					if(data[a].payload.val().status == "offline"){
+				if(data[a].payload.val().status && !data[a].payload.val().establishment){
+					if(data[a].payload.val().status == "offline"){						
 						if(document.getElementById(data[a].key)){
-							this.removeMarker(data[a].key);
-						}
+							this.removeMarker(data[a].key);				
+						}	
 					}else if(data[a].payload.val().status == "online"){
-						var el = document.createElement('div');
-						el.id = data[a].key;
+							var el = document.createElement('div');
+							el.id = data[a].key;						
 
-				if (data[a].payload.val().establishment) {
+				if (data[a].payload.val().establishment) {				
 					el.className = "estabMarker";
 				}else{
 					el.className = "mapmarker";
@@ -375,10 +360,81 @@ export class CoHomePage {
 					});
 					actionSheet.present();
 				});
+				
 					}
+				}else{
+					if(data[a].payload.val().status == "offline"){
+						console.log('establishment is offline' )						
+						if(document.getElementById(data[a].key)){							
+							this.removeMarker(data[a].key);
+							var el = document.createElement('div');
+							el.id = data[a].key;	
+							el.className = "closed";	
+							
+							var coords = new mapboxgl.LngLat(data[a].payload.val().lng, data[a].payload.val().lat);
+
+							this.setHoMarkers[a] = new mapboxgl.Marker(el, { offset: [-25, -25] })
+								.setLngLat(coords)
+								.addTo(this.map);
+								el.addEventListener('click', (e) => {
+									var tmp = e.srcElement.id;
+									let actionSheet = this.actionSheetCtrl.create({
+										title: '',
+										buttons: [
+											{
+												text: 'More Details',
+												handler: () => {
+													this.navCtrl.push("ComoredetailsPage", { key: tmp });
+												}
+											},
+											{
+												text: 'Cancel',
+												role: 'cancel',
+												handler: () => {
+												}
+											}
+										]
+									});
+									actionSheet.present();
+								});
+							}
+								
+						}else if(data[a].payload.val().status == "online"){
+								//this.removeMarker(data[a].key);
+								var el = document.createElement('div');
+								el.id = data[a].key;	
+								el.className = "estabMarker";	
+								
+								var coords = new mapboxgl.LngLat(data[a].payload.val().lng, data[a].payload.val().lat);
+	
+								this.setHoMarkers[a] = new mapboxgl.Marker(el, { offset: [-25, -25] })
+									.setLngLat(coords)
+									.addTo(this.map);
+									el.addEventListener('click', (e) => {
+										var tmp = e.srcElement.id;
+										let actionSheet = this.actionSheetCtrl.create({
+											title: '',
+											buttons: [
+												{
+													text: 'More Details',
+													handler: () => {
+														this.navCtrl.push("ComoredetailsPage", { key: tmp });
+													}
+												},
+												{
+													text: 'Cancel',
+													role: 'cancel',
+													handler: () => {
+													}
+												}
+											]
+										});
+										actionSheet.present();
+									});
+					}
+
 				}
 			}
-
 		});
 	}
 	removeAllMarker(){
