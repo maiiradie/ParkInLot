@@ -32,6 +32,7 @@ export class CoHomePage {
 	map;
 	marker;
 	directions;
+	tempLocation;
 	hoMarkers;
 	location;
 	role  = "";
@@ -124,8 +125,14 @@ export class CoHomePage {
 					this.removeCarMarker();
 					this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
 					.subscribe( data => {
-						let temp = data
-						this.setDestination(temp.lng,temp.lat);				
+						let temp = {
+							lng: data.lng,
+							lat: data.lat
+						}
+						this.addTempHo(temp);
+
+						this.tempLocation = temp;
+						console.log(this.tempLocation.lng,this.tempLocation.lat);
 					});
 				}
 				});			
@@ -150,20 +157,27 @@ export class CoHomePage {
 		  for(let i = 0; i < data.length; i++){
 			if(data[i].payload.val().arrivingNode){		
 				this.afdb.list<any>('requests/' + data[i].key + '/arrivingNode').snapshotChanges().take(1).subscribe(dataProf=>{
-					if(dataProf[0].payload.val().carowner.coID == this.userId){
-						this.tempHoID = data[i].key	
-						this._markers.unsubscribe();
-						this.hasTransaction("arriving");
+					for(let a = 0; a < dataProf.length; a++){
+						if(dataProf[a].payload.val().carowner.coID == this.userId){
+							this.tempHoID = data[i].key	
+							this._markers.unsubscribe();
+							this.hasTransaction("arriving");
+							break;
+						}
 					}
+
 				});		
 			}else if(data[i].payload.val().parkedNode){				
 				this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf=>{
 					if(dataProf[0].payload.val().carowner.coID == this.userId){
 						this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf=>{
-							if(dataProf[0].payload.val().carowner.coID == this.userId){
-								this.tempHoID = data[i].key
-								this._markers.unsubscribe();
-								this.hasTransaction("parked");
+							for(let a = 0; a < dataProf.length; a++){
+								if(dataProf[0].payload.val().carowner.coID == this.userId){
+									this.tempHoID = data[i].key
+									this._markers.unsubscribe();
+									this.hasTransaction("parked");
+									break;
+								}
 							}
 						});	
 					}
@@ -290,7 +304,7 @@ export class CoHomePage {
 		getRole() {
 		this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
 			var x = data.payload.val().role;
-			console.log(x);
+			//console.log(x);
 			if (x === 1) {
 				this.role = "carowner";
 			} else if (x === 2) {
@@ -300,7 +314,7 @@ export class CoHomePage {
 			} else {
 				this.role = undefined;
 			}
-			console.log('co eto yung role: ' + this.role);
+			//console.log('co eto yung role: ' + this.role);
 			
 		});
 		return this.role;
@@ -380,6 +394,13 @@ export class CoHomePage {
 	removeMarker(elementId){
 		var element = document.getElementById(elementId);
 		element.parentNode.removeChild(element);
+	}
+	addTempHo(data){
+		var el = document.createElement('div');
+		el.className = "mapmarker";
+		new mapboxgl.Marker(el, { offset: [-25, -25] })
+			.setLngLat([data.lng, data.lat])
+			.addTo(this.map);
 	}
 	setMarkers() {
 		var arr = [];
@@ -474,8 +495,9 @@ export class CoHomePage {
 							lat: data.coords.latitude
 						}
 						this.removeCarMarker();
-						if(this.tempHoID){
-							console.log(this.tempHoID);
+						if(this.tempHoID && this.tempLocation){
+							
+							this.setDestination(this.tempLocation.lng,this.tempLocation.lat);
 							this.setOrigin(this.LngLat);
 						}else{
 							this.directions.removeRoutes();
