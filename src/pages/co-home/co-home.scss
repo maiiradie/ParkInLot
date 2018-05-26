@@ -23,17 +23,24 @@ page-co-home {
 	.estabMarker{
 		background-image: url('../assets/imgs/est_open.png');
 
-		background-size: 35px 48px;
-		width: 35px;
-		height: 48px; 
+		background-size: 100%;
+		width: 70px;
+		height: 70px; 
+		cursor: pointer;
+	}
+	.closed{
+		background-image: url('../assets/imgs/est_closed.png');
+		background-size: 100%;
+		width: 70px;
+		height: 70px; 
 		cursor: pointer;
 	}
 
 	.carmarker{
 		background-image: url('../assets/imgs/car.png');
 
-		background-size: 60px 30px;
-		width: 60px;
+		background-size: 100%;
+		width: 30px;
 		height: 30px; 
 		cursor: pointer;
 	}

@@ -168,13 +168,13 @@ export class CoEditProfilePage {
             this.afdb.object(`/profile/` + this.userId).update({profPic: this.imgName}).then(() => {  
               loading.dismiss();
               this.showToast('Profile updated successfully.');
-              this.navCtrl.setRoot('CoprofilePage');    
+              this.navCtrl.setRoot('CoHomePage');    
             });
           });    
         } else {
           loading.dismiss();
           this.showToast('Profile updated successfully.');
-          this.navCtrl.setRoot('CoprofilePage');
+          this.navCtrl.setRoot('CoHomePage');    
         }       
       })
     }

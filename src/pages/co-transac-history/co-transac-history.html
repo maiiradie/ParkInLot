@@ -18,10 +18,11 @@
 <ion-content padding>
   <ion-list>
     <ion-item *ngFor="let item of transactions">
-      <div>
-        <h6>{{item?.carowner.name}}</h6>
+        <h6>{{item?.name}}</h6>
+        <p>Date: {{item?.date}}</p>
+        <p>Start Time: {{item?.start}}</p>
+        <p>End Time:  {{item?.end}}</p>
         <p> Amount: {{item?.payment}}php</p>
-      </div>
     </ion-item> 
   </ion-list>
 </ion-content>

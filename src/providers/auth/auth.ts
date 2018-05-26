@@ -39,10 +39,41 @@ export class AuthProvider {
       .update({ status: 'offline' });
   }
 
-  updateStatus(status) {
+ updateStatus(status) {
+    var x; 
+    this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
+      x = data.payload.val().role;
+      
+      if(x == 1) {
+        // return this.afdb.object('profile/' + this.userId)
+        // .update({ 
+        //   status: status
+        // }).then( () => {
+        //   this.afs.auth.signOut();
+        // });
+      } else if(x == 3) {
+        // this.afdb.object('profile/' + this.userId)
+        // .update({
+        //   status: status
+        // }).then( () => {
+          
+          
+          this.afdb.object('location/' + this.userId)
+            .update({
+              status: status
+            }).then(() => {
+              this.afs.auth.signOut();
+            }); 
+        // });
+
+      }
+    });
+
     return this.afdb.object('profile/' + this.userId)
-      .update({ 
+      .update({
         status: status
+      }).then(() => {
+        this.afs.auth.signOut();
       });
   }
 
@@ -63,6 +94,23 @@ export class AuthProvider {
     });
   }
 
+  updateIsNew() {
+    return this.afdb.object('profile/' + this.userId)
+      .update({
+        isNew: false
+      });
+  }
+
+  updatePassword(pass) {
+    return this.afs.auth.currentUser.updatePassword(pass);
+  }
+
+  // logoutUser() {
+  //    this.updateStatus('offline')
+  //   .then( () => {
+  //       this.afs.auth.signOut();
+  //   });
+  // }
   registerCarOwner(uForm, cForm, img){
     return this.afs.auth.createUserWithEmailAndPassword(uForm.email,uForm.password)
      .then((user) => {

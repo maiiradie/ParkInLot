@@ -155,13 +155,13 @@ export class HoEditProfilePage {
             this.afdb.object(`/profile/` + this.userId).update({profPic: this.imgName}).then(() => {  
               loading.dismiss();
               this.showToast('Profile updated successfully.');
-              this.navCtrl.setRoot('HoprofilePage');    
+              this.navCtrl.setRoot('HoHomePage');    
             });
           });    
         } else {
           loading.dismiss();
           this.showToast('Profile updated successfully.');
-          this.navCtrl.setRoot('HoprofilePage');
+          this.navCtrl.setRoot('HoHomePage');    
         }       
       })
     }

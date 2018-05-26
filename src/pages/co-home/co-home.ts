@@ -20,6 +20,9 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 })
 
 export class CoHomePage {
+	stop: boolean = true;
+	LngLat;
+	_watch = this.geolocation.watchPosition();;
 	_markers;
 	_init;
 	_arriving;
@@ -29,8 +32,10 @@ export class CoHomePage {
 	map;
 	marker;
 	directions;
+	tempLocation;
 	hoMarkers;
 	location;
+	role  = "";
 	userId = this.authProvider.userId;
 	navAddress;
 	constructor(private afAuth: AngularFireAuth,
@@ -47,14 +52,6 @@ export class CoHomePage {
 		public loadingCtrl: LoadingController,
 		private menuCtrl: MenuController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
-		this.afAuth.auth.onAuthStateChanged(user => {
-			if (user) {
-				this.authProvider.updateStatus('online');
-				this.authProvider.updateOnDisconnect();
-			}
-		});
-		//this.requestProvider.saveToken();
-		//this.onNotification();
 		menuCtrl.enable(true);
 	}
 
@@ -94,10 +91,8 @@ export class CoHomePage {
 
 				};
 			}, (error) => {
-				console.log(error);
 			});
 		} catch (e) {
-			console.log(e);
 		}
 	}
 
@@ -112,18 +107,28 @@ export class CoHomePage {
 		this.setDirections();
 		this.destination();
 		this.map.on('load', () => {
-			this.location = this.getCurrentLocation()
-			.subscribe(location => {
+			this.location = this.getCurrentLocation().subscribe(location => {
 				this.centerLocation(location);
 				if (this.tempHoID) {
+					this.removeAllMarker();
+					this.removeCarMarker();
 					this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
 					.subscribe( data => {
-							this.setOrigin(location);
-							this.setDestination(data.lng,data.lat);					
+						let temp = {
+							lng: data.lng,
+							lat: data.lat
+						}
+						this.addTempHo(temp);
+
+						this.tempLocation = temp;
 					});
 				}
 				});			
 			});
+	}
+
+	ionViewWillEnter() {
+		this.getRole();
 	}
 
 	hasTransaction(status:String){
@@ -140,20 +145,27 @@ export class CoHomePage {
 		  for(let i = 0; i < data.length; i++){
 			if(data[i].payload.val().arrivingNode){		
 				this.afdb.list<any>('requests/' + data[i].key + '/arrivingNode').snapshotChanges().take(1).subscribe(dataProf=>{
-					if(dataProf[0].payload.val().carowner.coID == this.userId){
-						this.tempHoID = data[i].key	
-						this._markers.unsubscribe();
-						this.hasTransaction("arriving");
+					for(let a = 0; a < dataProf.length; a++){
+						if(dataProf[a].payload.val().carowner.coID == this.userId){
+							this.tempHoID = data[i].key	
+							this._markers.unsubscribe();
+							this.hasTransaction("arriving");
+							break;
+						}
 					}
+
 				});		
 			}else if(data[i].payload.val().parkedNode){				
 				this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf=>{
 					if(dataProf[0].payload.val().carowner.coID == this.userId){
 						this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf=>{
-							if(dataProf[0].payload.val().carowner.coID == this.userId){
-								this.tempHoID = data[i].key
-								this._markers.unsubscribe();
-								this.hasTransaction("parked");
+							for(let a = 0; a < dataProf.length; a++){
+								if(dataProf[0].payload.val().carowner.coID == this.userId){
+									this.tempHoID = data[i].key
+									this._markers.unsubscribe();
+									this.hasTransaction("parked");
+									break;
+								}
 							}
 						});	
 					}
@@ -220,7 +232,6 @@ export class CoHomePage {
 				var e = new Date(data.endTime);
 				end = e.toLocaleTimeString();
 				this._parked.unsubscribe();
-				//alert controller
 					let confirm = this.alertCtrl.create({
 							title: 'Payment',
 					        subTitle: 'Start time: ' + start+ '<br>End time: ' + end + '<br>Amount: P' + data.payment,
@@ -245,6 +256,9 @@ export class CoHomePage {
 
 
 	ngOnDestroy(){
+		if(this._watch){
+			this._watch.subscribe().unsubscribe();
+		}
 		if(this._init){
 			this._init.unsubscribe();
 		}if(this._arriving){
@@ -254,7 +268,7 @@ export class CoHomePage {
 		}if(this._parked){
 			this._parked.unsubscribe();
 		}if(this.location){
-			this.location.unsubscribe
+			this.location.unsubscribe();
 		}if(this.hoMarkers){
 			this.hoMarkers.unsubscribe();
 		}
@@ -262,14 +276,33 @@ export class CoHomePage {
 	}
 
 	openMenu(evt) {
-		if (evt === "Ho-Menu") {
-			this.menuCtrl.enable(true, 'Ho-Menu');
+		if (evt === "coho-Menu") {
+			this.menuCtrl.enable(true, 'coho-Menu');
 			this.menuCtrl.enable(false, 'Co-Menu');
-		} else if (evt === "Co-Menu") {
 			this.menuCtrl.enable(false, 'Ho-Menu');
+		} else if (evt === "Co-Menu") {
 			this.menuCtrl.enable(true, 'Co-Menu');
+			this.menuCtrl.enable(false, 'Ho-Menu');
+			this.menuCtrl.enable(false, 'coho-Menu');
 		}
 		this.menuCtrl.toggle();
+	}
+
+		getRole() {
+		this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
+			var x = data.payload.val().role;
+			if (x === 1) {
+				this.role = "carowner";
+			} else if (x === 2) {
+				this.role = "homeowner";
+			} else if (x  === 3) {
+				this.role = "both";
+			} else {
+				this.role = undefined;
+			}
+			
+		});
+		return this.role;
 	}
 
 	destination() {
@@ -285,16 +318,16 @@ export class CoHomePage {
 	markerListener(){
 		this._markers = this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
 			for (var a = 0; a < data.length; a++) {
-				if(data[a].payload.val().status){
-					if(data[a].payload.val().status == "offline"){
+				if(data[a].payload.val().status && !data[a].payload.val().establishment){
+					if(data[a].payload.val().status == "offline"){						
 						if(document.getElementById(data[a].key)){
-							this.removeMarker(data[a].key);
-						}
+							this.removeMarker(data[a].key);				
+						}	
 					}else if(data[a].payload.val().status == "online"){
-						var el = document.createElement('div');
-						el.id = data[a].key;
+							var el = document.createElement('div');
+							el.id = data[a].key;						
 
-				if (data[a].payload.val().establishment) {
+				if (data[a].payload.val().establishment) {				
 					el.className = "estabMarker";
 				}else{
 					el.className = "mapmarker";
@@ -327,15 +360,103 @@ export class CoHomePage {
 					});
 					actionSheet.present();
 				});
+				
 					}
+				}else{
+					if(data[a].payload.val().status == "offline"){
+						console.log('establishment is offline' )						
+						if(document.getElementById(data[a].key)){							
+							this.removeMarker(data[a].key);
+							var el = document.createElement('div');
+							el.id = data[a].key;	
+							el.className = "closed";	
+							
+							var coords = new mapboxgl.LngLat(data[a].payload.val().lng, data[a].payload.val().lat);
+
+							this.setHoMarkers[a] = new mapboxgl.Marker(el, { offset: [-25, -25] })
+								.setLngLat(coords)
+								.addTo(this.map);
+								el.addEventListener('click', (e) => {
+									var tmp = e.srcElement.id;
+									let actionSheet = this.actionSheetCtrl.create({
+										title: '',
+										buttons: [
+											{
+												text: 'More Details',
+												handler: () => {
+													this.navCtrl.push("ComoredetailsPage", { key: tmp });
+												}
+											},
+											{
+												text: 'Cancel',
+												role: 'cancel',
+												handler: () => {
+												}
+											}
+										]
+									});
+									actionSheet.present();
+								});
+							}
+								
+						}else if(data[a].payload.val().status == "online"){
+								//this.removeMarker(data[a].key);
+								var el = document.createElement('div');
+								el.id = data[a].key;	
+								el.className = "estabMarker";	
+								
+								var coords = new mapboxgl.LngLat(data[a].payload.val().lng, data[a].payload.val().lat);
+	
+								this.setHoMarkers[a] = new mapboxgl.Marker(el, { offset: [-25, -25] })
+									.setLngLat(coords)
+									.addTo(this.map);
+									el.addEventListener('click', (e) => {
+										var tmp = e.srcElement.id;
+										let actionSheet = this.actionSheetCtrl.create({
+											title: '',
+											buttons: [
+												{
+													text: 'More Details',
+													handler: () => {
+														this.navCtrl.push("ComoredetailsPage", { key: tmp });
+													}
+												},
+												{
+													text: 'Cancel',
+													role: 'cancel',
+													handler: () => {
+													}
+												}
+											]
+										});
+										actionSheet.present();
+									});
+					}
+
 				}
 			}
-
+		});
+	}
+	removeAllMarker(){
+		let temp = this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
+			for(let i = 0; i < data.length; i++){
+				if(document.getElementById(data[i].key)){
+					this.removeMarker(data[i].key);
+				}
+				temp.unsubscribe();
+			}
 		});
 	}
 	removeMarker(elementId){
 		var element = document.getElementById(elementId);
 		element.parentNode.removeChild(element);
+	}
+	addTempHo(data){
+		var el = document.createElement('div');
+		el.className = "mapmarker";
+		new mapboxgl.Marker(el, { offset: [-25, -25] })
+			.setLngLat([data.lng, data.lat])
+			.addTo(this.map);
 	}
 	setMarkers() {
 		var arr = [];
@@ -366,9 +487,14 @@ export class CoHomePage {
 			controls: {
 				inputs: false,
 				profileSwitcher: false,
-				instructions: false
+				instructions: false,
+			},
+			geocoder: {
+				flyTo: false
 			}
+
 		});
+
 		this.map.addControl(this.directions, 'top-left');
 	}
 
@@ -387,7 +513,7 @@ export class CoHomePage {
 			container: 'map',
 			style: 'mapbox://styles/mapbox/streets-v10',
 			center: location,
-			zoom: 14,
+			zoom: 14,			
 			attributionControl: false,
 		});
 		
@@ -417,6 +543,24 @@ export class CoHomePage {
 					observable.next(location);
 					loading.dismiss();
 
+					
+					
+					this._watch.subscribe((data) => {
+						this.LngLat = {
+							lng: data.coords.longitude,
+							lat: data.coords.latitude
+						}
+						this.removeCarMarker();
+						if(this.tempHoID && this.tempLocation){
+							
+							this.setDestination(this.tempLocation.lng,this.tempLocation.lat);
+							this.setOrigin(this.LngLat);
+						}else{
+							this.directions.removeRoutes();
+							this.addCarMarker(this.LngLat);
+						}									
+					});
+
 				}).catch(error => {
 					alert('Error getting location, please try again');
 					loading.dismiss();
@@ -437,13 +581,28 @@ export class CoHomePage {
 			});
 		}
 	}
-
-	addMarker(location) {
+	removeCarMarker(){
+		this.marker.remove();
+	}
+	addCarMarker(location){
 		var el = document.createElement('div');
 		el.className = "carmarker";
 
 		this.marker = new mapboxgl.Marker(el)
 			.setLngLat(location)
+			.remove()
 			.addTo(this.map);
 	}
+	addMarker(location) {
+
+		var el = document.createElement('div');
+
+		el.className = "carmarker";
+
+		this.marker = new mapboxgl.Marker(el)
+			.setLngLat(location)
+			.addTo(this.map);
+
+	}
+
 }

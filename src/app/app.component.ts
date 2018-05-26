@@ -48,10 +48,10 @@ export class MyApp {
       this.retrieveUser();
     });
     //enter code here
+
     this.afs.auth.onAuthStateChanged(user => {
       if (user) {
         this.authProvider.myId(user.uid);
-        console.log(user.uid);
       }else{
         this.rootPage = "LoginPage";
       }
@@ -60,12 +60,15 @@ export class MyApp {
 
   }
   
-  openPage(page: string){
-    if(page == 'CoHomePage') {
-      console.log(page);
+  openPage(page: string, role){
+    if ((page == 'CoHomePage' && role == 'carowner') || (page == 'HoHomePage' && role == 'homeowner'))  {
       this.nav.popToRoot();
-    } else {
-      console.log(page);
+    } else if(page == 'HoHomePage' && role == 'both') {
+      this.nav.push(page);
+    } else if(page == 'CoHomePage' && role == 'both') {
+      this.nav.popToRoot();
+    } 
+    else {
       this.nav.push(page);
     }
   }
@@ -91,13 +94,14 @@ export class MyApp {
 
 
   openMenu(evt) {
-    if(evt === "Ho-Menu"){
-       this.menuCtrl.enable(true, 'Ho-Menu');
-       this.menuCtrl.enable(false, 'Co-Menu');
+    if (evt === "coho-Menu"){
+      // this.menuCtrl.enable(true, 'coho-Menu');
+      //  this.menuCtrl.enable(false, 'Co-Menu');
     }else if(evt === "Co-Menu"){
-       this.menuCtrl.enable(false, 'Ho-Menu');
-       this.menuCtrl.enable(true, 'Co-Menu');
-    }
+      //  this.menuCtrl.enable(false, 'Ho-Menu');
+      //  this.menuCtrl.enable(true, 'Co-Menu');
+    } 
+
     this.menuCtrl.toggle();
   }
 
@@ -105,20 +109,28 @@ export class MyApp {
     firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d => {
       this.imgName = d;
     }).catch((error) => {
-      console.log("error in retrieving image: " + JSON.stringify(error));
       this.imgName = "./assets/imgs/avatar.jpg";
     });
  }
 
   logout(){
-    this.authProvider.logoutUser()
-    .then(() => {
-       this.menuCtrl.close()
-       .then( () => {
+      this.afs.auth.signOut();
+      //  .then( () => {
+         this.menuCtrl.close()
           this.nav.setRoot('LoginPage');
-       });
-    });
+      //  });
   }
+
+  // logoutHo(){
+  //   this.authProvider.logoutUser()
+  //   // .then(() => {
+  //     this.authProvider.updateHOStatus('offline')
+  //      .then( () => {
+  //        this.menuCtrl.close();
+  //         this.nav.setRoot('LoginPage');
+  //      });
+  //   // });
+  // }
 
   logoutHo(){
     this.authProvider.logoutUser()
@@ -129,6 +141,11 @@ export class MyApp {
           this.nav.setRoot('LoginPage');
        });
     });
+  }
+  logoutHoCo(){
+    this.authProvider.logoutUser();
+    this.menuCtrl.close();
+    this.nav.setRoot('LoginPage');
   }
 
 }

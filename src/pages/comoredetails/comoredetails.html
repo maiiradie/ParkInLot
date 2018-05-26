@@ -25,19 +25,25 @@
       <ion-list no-lines text-wrap>
         <ion-item>
           <ion-icon name="pin" color="secondary" item-start></ion-icon>
-          <p>Capacity</p>
-          <!-- <p *ngIf="profileData?.address == null">Address</p> -->
-          <span>{{userData?.address}}</span>
-          <!-- <span *ngIf="profileData?.address ==null">{{profileData?.capacity}}</span> -->
+          <p>Address</p>
+          <span>{{garrageDetTwo?.address}}</span>
         </ion-item>
 
         <ion-item>
           <ion-icon name="paper" color="secondary" item-start></ion-icon>
-          <p>Details</p>
+          <p>Capacity</p>
           <p *ngIf="profileData?.details == null">Address</p>
-          <span>{{profileData?.details}}</span>
+          <span>{{garrageDet?.capacity}}</span>
           <span *ngIf="profileData?.details ==null">{{userData?.address}}</span>
         </ion-item>
+
+        <ion-item>
+            <ion-icon name="paper" color="secondary" item-start></ion-icon>
+            <p>Details</p>
+            <p *ngIf="profileData?.details == null">Address</p>
+            <span>{{profileData?.details}}</span>
+            <span *ngIf="profileData?.details ==null">{{userData?.address}}</span>
+          </ion-item>
 
         <ion-item>
           <ion-icon name="call" color="secondary" item-start></ion-icon>
@@ -68,7 +74,7 @@
         <ion-item>
           <ion-icon name="car" color="secondary" item-start></ion-icon>
           <p>Rate</p>
-          <span>₱{{profileData?.rate}}</span>
+          <span>₱{{profileData?.regularPrice}}</span>
         </ion-item>
 
         <ion-item>
@@ -79,8 +85,8 @@
 
         <ion-item>
           <ion-icon name="call" color="secondary" item-start></ion-icon>
-          <p>Overnight Price</p>
-          <span>₱{{profileData?.overnightPrice}}</span>
+          <p>Capacity</p>
+          <span>{{profileData?.capacity}}</span>
         </ion-item>
       </ion-list>
     </ng-template>

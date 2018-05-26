@@ -2,9 +2,14 @@
 
   <ion-navbar>
     <ion-buttons start left>
-      <button ion-button icon-only (click)="openMenu('Ho-Menu')">
-        <ion-icon name="menu"></ion-icon>
-      </button>
+           <button *ngIf="role == 'homeowner' || role == undefined; else both" ion-button icon-only (click)="openMenu('Ho-Menu')">
+                <ion-icon name="menu"></ion-icon>
+            </button>
+          <ng-template #both>
+            <!-- <button ion-button icon-only (click)="openMenu('coho-Menu')">
+              <ion-icon name="menu"></ion-icon>
+            </button> -->
+          </ng-template>
     </ion-buttons>
     <ion-title>Home Owner</ion-title>
   </ion-navbar>

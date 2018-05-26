@@ -8,19 +8,19 @@
         </div>   
 
         <ion-list no-lines>
-            <button ion-item menuClose (click)="openPage('HoHomePage')">
+             <button ion-item menuClose (click)="openPage('HoHomePage', 'homeowner')">
                 <ion-icon item-start name="home" [color]="isActive('HoHomePage')"></ion-icon>
                 Home
             </button>
-            <button ion-item menuClose (click)="openPage('HoprofilePage')">
+            <button ion-item menuClose (click)="openPage('HoprofilePage', 'homeowner')">
                 <ion-icon item-start name="contact" [color]="isActive('HoProfilePage')"></ion-icon>
                 Profile
             </button>
-            <button ion-item menuClose (click)="openPage('HoGaragePage')">
+            <button ion-item menuClose (click)="openPage('HoGaragePage', 'homeowner')">
                 <ion-icon item-start name="cash" [color]="isActive('HoGaragePage')"></ion-icon>
                 Garage
             </button>
-            <button ion-item menuClose (click)="openPage('HoTransacHistoryPage')">
+            <button ion-item menuClose (click)="openPage('HoTransacHistoryPage', 'homeowner')">
                 <ion-icon item-start name="bookmarks" [color]="isActive('HoTransacHistoryPage')"></ion-icon>
                 Transaction
             </button>
@@ -34,37 +34,82 @@
 
 
 
-<ion-menu [content]="content"  id="Co-Menu" class="menu-material" [swipeEnabled]="false">
+<ion-menu [content]="content" id="Co-Menu" class="menu-material" [swipeEnabled]="false">
     <ion-content>
         <div class="menu-header">
             <!-- <img src="./assets/imgs/avatar.jpg" class="user-avatar round" *ngIf="!imgName"> -->
-            <img class="user-avatar round" [src]="imgName" *ngIf="imgName"/>
+            <img class="user-avatar round" [src]="imgName" *ngIf="imgName" />
             <p class="name">{{profileData?.fname}} {{profileData?.lname}}</p>
-            <p class="e-mail">{{profileData?.email}}</p> 
-        </div>     
-                    <ion-list no-lines>
-                        <button ion-item menuClose (click)="openPage('CoHomePage')">
-                            <ion-icon item-start name="home" [color]="isActive('CoHomePage')"></ion-icon>
-                            Home
-                        </button>
-                        <button ion-item menuClose (click)="openPage('CoprofilePage')">
-                            <ion-icon item-start name="contact" [color]="isActive('CoprofilePage')"></ion-icon>
-                            Profile
-                        </button>
-                        <button ion-item menuClose (click)="openPage('CoCarPage')">
-                            <ion-icon item-start name="car" [color]="isActive('CoCarPage')"></ion-icon>
-                            Car
-                        </button>
-                        <button ion-item menuClose (click)="openPage('CoTransacHistoryPage')">
-                            <ion-icon item-start name="bookmarks" [color]="isActive('CoTransacHistoryPage')"></ion-icon>
-                            Transaction
-                        </button>
-                        <button ion-item menuClose (click)="logout()">
-                            <ion-icon item-start name="power"></ion-icon>
-                            Logout
-                        </button>
-                    </ion-list>           
-               
+            <p class="e-mail">{{profileData?.email}}</p>
+        </div>
+        <ion-list no-lines>
+            <button ion-item menuClose (click)="openPage('CoHomePage', 'carowner')">
+                <ion-icon item-start name="home" [color]="isActive('CoHomePage')"></ion-icon>
+                Home
+            </button>
+            <button ion-item menuClose (click)="openPage('CoprofilePage', 'carowner')">
+                <ion-icon item-start name="contact" [color]="isActive('CoprofilePage')"></ion-icon>
+                Profile
+            </button>
+            <button ion-item menuClose (click)="openPage('CoCarPage', 'carowner')">
+                <ion-icon item-start name="car" [color]="isActive('CoCarPage')"></ion-icon>
+                Car
+            </button>
+            <button ion-item menuClose (click)="openPage('CoTransacHistoryPage', 'carowner')">
+                <ion-icon item-start name="bookmarks" [color]="isActive('CoTransacHistoryPage')"></ion-icon>
+                Transaction
+            </button>
+            <button ion-item menuClose (click)="logout()">
+                <ion-icon item-start name="power"></ion-icon>
+                Logout
+            </button>
+        </ion-list>
+
+    </ion-content>
+</ion-menu>
+
+
+<ion-menu [content]="content" id="coho-Menu" class="menu-material" [swipeEnabled]="false">
+    <ion-content>
+        <div class="menu-header">
+            <img src="./assets/imgs/avatar.jpg" class="user-avatar round" *ngIf="!imgName">
+            <img class="user-avatar round" [src]="imgName" *ngIf="imgName" />
+            <p class="name">{{profileData?.fname}} {{profileData?.lname}}</p>
+            <p class="e-mail">{{profileData?.email}}</p>
+        </div>
+
+        <ion-list no-lines>
+
+            <button ion-item menuClose (click)="openPage('CoHomePage', 'both')">
+                <ion-icon item-start name="home" [color]="isActive('CoHomePage')"></ion-icon>
+                Home
+            </button>
+            <button ion-item menuClose (click)="openPage('HoHomePage', 'both')">
+                <ion-icon item-start name="home" [color]="isActive('HoHomePage')"></ion-icon>
+                Homeowner 
+            </button>
+            <button ion-item menuClose (click)="openPage('HoprofilePage', 'both')">
+                <ion-icon item-start name="contact" [color]="isActive('HoProfilePage')"></ion-icon>
+                Profile
+            </button>
+            <button ion-item menuClose (click)="openPage('CoCarPage', 'both')">
+                <ion-icon item-start name="car" [color]="isActive('CoCarPage')"></ion-icon>
+                Car
+            </button>
+            <button ion-item menuClose (click)="openPage('HoGaragePage', 'both')">
+                <ion-icon item-start name="cash" [color]="isActive('HoGaragePage')"></ion-icon>
+                Garage
+            </button>
+            <button ion-item menuClose (click)="openPage('HoTransacHistoryPage', 'both')">
+                <ion-icon item-start name="bookmarks" [color]="isActive('HoTransacHistoryPage')"></ion-icon>
+                Transaction
+            </button>
+            <button ion-item menuClose (click)="logoutHoCo()">
+                <ion-icon item-start name="power"></ion-icon>
+                Logout
+            </button>
+
+        </ion-list>
     </ion-content>
 </ion-menu>
 

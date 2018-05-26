@@ -5,6 +5,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { FCM } from '@ionic-native/fcm';
 import { RequestProvider } from '../../providers/request/request';
 import { AuthProvider } from '../../providers/auth/auth';
+import { query } from '@angular/core/src/animation/dsl';
 import * as firebase from 'firebase/app';
 
 @IonicPage()
@@ -27,7 +28,9 @@ export class ComoredetailsPage {
   hown: boolean = true;
   cancel
   myTimeout;
-  returnStatus;
+  garrageDet;
+  _returnStatus;
+  garrageDetTwo;
 
   
   private key = "key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM";
@@ -44,19 +47,34 @@ export class ComoredetailsPage {
   }
   
   ionViewDidLoad() { 
-    this.getMyData();
     this.hoID = this.navParams.get('key');
+    this.getGarrageData();
+    this.getMyData();
+    
     this.displayInfo();
     
   }
   ionViewDidEnter(){
     this.retrieveImg();
   }
-  ionViewDidLeave(){
+  ionViewDidLeave(){ 
+    if(this._returnStatus){
+      this._returnStatus.unsubscribe();
+    }
+
   }
   getMyData(){
     this.afdb.object('profile/'+ this.authProvider.userId).valueChanges().take(1).subscribe( data => {
       this.myData = data;
+    });
+  }
+  getGarrageData(){    
+    this.afdb.object('requests/'+ this.hoID).valueChanges().take(1).subscribe( data => {
+      this.garrageDet = data
+      console.log(data);
+    });
+    this.afdb.object('location/'+ this.hoID).valueChanges().take(1).subscribe( data => {
+      this.garrageDetTwo = data
     });
   }
 
@@ -76,7 +94,7 @@ export class ComoredetailsPage {
 
   sendRequest(HoToken){
     this.reqButton = false;
-    let coID = this.requestProvider.setID();   
+    let coID = this.authProvider.userId;   
     let temp = this.afdb.object<any>('requests/' + this.hoID ).valueChanges().subscribe(data => {
       if (data.available == 0) {
         this.reqButton = true;
@@ -141,18 +159,18 @@ export class ComoredetailsPage {
       await firebase.storage().ref().child("images/" + this.hoID + "/" + this.profileData.garagePic).getDownloadURL().then(d=>{
         this.imgName = d;
       }).catch((error)=>{
-        alert(JSON.stringify(error));
+        // alert(JSON.stringify(error));
+        this.imgName = null;
       });  
   }
   //function listener for accept decline 
-  statusListener(){
-    this.returnStatus = this.afdb.list("requests/" + this.hoID + '/requestNode').snapshotChanges().take(2).subscribe(data=>{
-      for(var i = 0; i < data.length; i++){
-
-        if(data[i].payload.val().coID == this.requestProvider.userId){
-
+  async statusListener(){
+      this._returnStatus = await this.afdb.list<any>('requests/' + this.hoID + '/requestNode',ref => ref.orderByChild('coID').equalTo(this.authProvider.userId)).snapshotChanges().take(2).subscribe(data=>{
+        
+        for(var i = 0; i < data.length; i++){    
+                
           if(data[i].payload.val().status == "declined"){
-            this.returnStatus.unsubscribe();            
+            this._returnStatus.unsubscribe();            
             clearTimeout(this.myTimeout);
             if(this.actrlFlag){
               this.cancel.dismiss();
@@ -181,11 +199,11 @@ export class ComoredetailsPage {
             temp.unsubscribe();
             tempCap ++;        
             this.afdb.object('requests/' + this.hoID ).update({
-              available: tempCap
+              available: tempCap  
               }); 
             });
           }else if(data[i].payload.val().status == "accepted"){
-            this.returnStatus.unsubscribe();            
+            this._returnStatus.unsubscribe();            
             clearTimeout(this.myTimeout);
             if(this.actrlFlag){
               this.cancel.dismiss();
@@ -213,9 +231,8 @@ export class ComoredetailsPage {
             alert.present();
 
           }
-        }
-      }
-    });
+        }     
+      }); 
   } 
 //actioncontroller
   showConfirm(i) {
@@ -234,7 +251,7 @@ export class ComoredetailsPage {
             let tempo = this.afdb.list('requests/' + this.hoID + '/requestNode/').snapshotChanges().subscribe(data=>{
               tempo.unsubscribe();
               for(var i = 0; i < data.length;i ++){
-                if(data[i].payload.val().coID == this.requestProvider.userId){
+                if(data[i].payload.val().coID == this.authProvider.userId){
                   this.afdb.list('requests/' + this.hoID + '/requestNode/').remove(data[i].key);
                 }
               }
@@ -253,7 +270,7 @@ export class ComoredetailsPage {
               }); 
             });
 
-            this.returnStatus.unsubscribe();
+            this._returnStatus.unsubscribe();
             if(this.actrlFlag){
               this.actrlFlag = false;
             }       
@@ -272,7 +289,7 @@ export class ComoredetailsPage {
      var tempCap;
     this.myTimeout = setTimeout(()=>{ 
           
-      this.returnStatus.unsubscribe();
+      this._returnStatus.unsubscribe();
       this.reqButton = true;
       if(this.actrlFlag){
         this.cancel.dismiss();
@@ -281,7 +298,7 @@ export class ComoredetailsPage {
       let tempo = this.afdb.list('requests/' + this.hoID + '/requestNode/').snapshotChanges().subscribe(data=>{
         tempo.unsubscribe();
         for(var i = 0; i < data.length;i ++){
-          if(data[i].payload.val().coID == this.requestProvider.userId){
+          if(data[i].payload.val().coID == this.authProvider.userId){
             this.afdb.list('requests/' + this.hoID + '/requestNode/').remove(data[i].key);
           }
         }
@@ -313,7 +330,7 @@ export class ComoredetailsPage {
         this.timeoutFlag = true;
       }
       
-      this.returnStatus.unsubscribe();
+      this._returnStatus.unsubscribe();
      }, 50000);  
   }
 }
