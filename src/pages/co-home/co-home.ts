@@ -98,7 +98,7 @@ export class CoHomePage {
 
 
 	ionViewDidLoad() {
-		this.checkOnGoingTransaction();
+		
 
 		
 		//initialize map
@@ -109,21 +109,7 @@ export class CoHomePage {
 		this.map.on('load', () => {
 			this.location = this.getCurrentLocation().subscribe(location => {
 				this.centerLocation(location);
-				if (this.tempHoID) {
-					this.removeAllMarker();
-					this.removeCarMarker();
-					this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
-					.subscribe( data => {
-						let temp = {
-							lng: data.lng,
-							lat: data.lat
-						}
-						this.addTempHo(temp);	
-						console.log("i executed");
-
-						this.tempLocation = temp;
-					});
-				}
+				this.checkOnGoingTransaction();
 				});			
 			});
 	}
@@ -135,7 +121,6 @@ export class CoHomePage {
 	hasTransaction(status:String){
 		if(this.tempHoID && status == "arriving"){	
 			this.initListener();
-			//marker setup
 	
 		}else if(this.tempHoID && status == "parked"){
 			this.initParkedListener();	
@@ -148,10 +133,13 @@ export class CoHomePage {
 				this.afdb.list<any>('requests/' + data[i].key + '/arrivingNode').snapshotChanges().take(1).subscribe(dataProf=>{
 					for(let a = 0; a < dataProf.length; a++){
 						if(dataProf[a].payload.val().status != "cancelled"){
-							if(dataProf[a].payload.val().carowner.coID == this.userId){
-								this.tempHoID = data[i].key	
+							if(dataProf[a].payload.val().carowner.coID == this.userId){	
+								console.log("arriving")							
+								this.tempHoID = data[i].key		
+						
 								this._markers.unsubscribe();
 								this.hasTransaction("arriving");
+								this.getTempLocation(this.tempHoID);
 								break;
 							}
 						}
@@ -164,9 +152,10 @@ export class CoHomePage {
 						this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf=>{
 							for(let a = 0; a < dataProf.length; a++){
 								if(dataProf[0].payload.val().carowner.coID == this.userId){
-									this.tempHoID = data[i].key
+									this.tempHoID = data[i].key									
 									this._markers.unsubscribe();
 									this.hasTransaction("parked");
+									this.getTempLocation(this.tempHoID);
 									break;
 								}
 							}
@@ -177,6 +166,18 @@ export class CoHomePage {
 				
 		  }
 		});
+	  }
+	  async getTempLocation(homeowner){		  		
+		  console.log("getTempLocation");
+				 	let subs = await this.afdb.object<any>('location/' + homeowner).valueChanges().take(1).subscribe(data => {
+						let temp = {
+							lng: data.lng,
+							lat: data.lat
+						}
+						console.log(data.lng + " " + data.lat);
+						this.addTempHo(temp);	
+						this.tempLocation = temp;
+					 });
 	  }
 
 	initListener(){
@@ -195,16 +196,82 @@ export class CoHomePage {
 	}
 
 	arrivingListener(key){
+		
 		this._arriving= this.afdb.object<any>('requests/' + this.tempHoID + '/arrivingNode/' + key).valueChanges().subscribe(data=>{
-			 if(data.status == "arrived"){
-				 this.navAddress = "You have arrived your destination";
-				 this._arriving.unsubscribe();
-				 this.initParkedListener();          
-			 }else if(data.status == "arriving"){
+			  if(data.status == "arriving"){
 				 this.navAddress = "Navigate to destination follow blue lines";
+			 }else if (data.status == "hoCancelled"){
+				 this.navAddress = "Transaction was cancelled";				 
 			 }
 		});
 	}
+	async clearTransac(){
+		
+		let temp1 = await this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().take(1).subscribe(data=>{
+			for(let i = 0 ; i < data.length; i++){
+				if(data[i].payload.val().carowner.coID == this.userId){
+					this._arriving.unsubscribe();
+					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);					
+					this.returnCap();
+					  if(this._arriving){
+						this._arriving.unsubscribe();
+					}  
+				}
+			}
+		});	
+
+		let temp2 = await this.afdb.list<any>('requests/' + this.tempHoID + '/parkedNode').snapshotChanges().take(1).subscribe(data=>{
+			for(let i = 0 ; i < data.length; i++){
+				if(data[i].payload.val().carowner.coID == this.userId){
+					this.afdb.list('requests/' + this.tempHoID + '/parkedNode').remove(data[i].key);					
+					this.returnCap();
+					  if(this._arriving){
+						this._arriving.unsubscribe();
+						}	  
+				}
+			}
+		});
+	}
+	async returnCap(){
+		var tempCap;
+		let temp =  await this.afdb.object<any>('requests/' + this.tempHoID ).valueChanges().subscribe(data=>{        
+			tempCap = data.available
+			temp.unsubscribe();
+			tempCap ++;        
+			this.afdb.object('requests/' + this.tempHoID ).update({
+			  available: tempCap
+			}); 
+
+			this.tempHoID = undefined;
+			this.removeAllMarker();					  
+			this.setMarkers();		
+			this.directions.removeRoutes();
+			this.markerListener();			
+			this.setMarkers();
+		  });
+	}
+
+	initCancelWholeTransac(){
+		let alert = this.alertCtrl.create({
+			title: 'Cancel Transaction',
+			subTitle: 'Do you want to cancel the transaction?',
+			buttons: [
+			  {
+				text: 'No',
+				role: 'no',
+				handler: () => {
+				}
+			  },
+			  {
+				text: 'Yes',
+				handler: () => {
+				  this.cancelWholeTransac();
+				}
+			  }
+			]
+		  });
+		  alert.present();
+	}		
 	cancelWholeTransac(){
 		let query = this.afdb.list<any>('requests/' + this.tempHoID +'/arrivingNode', ref=> ref.orderByChild("carowner")).snapshotChanges().take(1).subscribe(data=>{
 			for(let i = 0; i < data.length; i++){
@@ -223,15 +290,22 @@ export class CoHomePage {
 				}
 			}
 		});
-
-	}		
+	}
 	arrivedTransac(){
 		let query = this.afdb.list<any>('requests/' + this.tempHoID +'/arrivingNode', ref=> ref.orderByChild("carowner")).snapshotChanges().take(1).subscribe(data=>{
 			for(let i = 0; i < data.length; i++){
 				if(data[i].payload.val().carowner.coID == this.userId){
-					this.afdb.list<any>('requests/' + this.tempHoID +'/arrivingNode').update(data[i].key,{
-						status: "arrived"
-					});
+					this.initParkedListener();   
+					this._arriving.unsubscribe();       
+					
+					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);
+					this.afdb.list('requests/' + this.tempHoID + '/parkedNode').push({
+						carowner:data[i].payload.val().carowner,
+						timeStart: "",
+						endTime: "",
+						payment: ""
+					  });
+					  this.navAddress = "You have arrived your destination";				 
 				}
 			}
 		});
@@ -253,10 +327,15 @@ export class CoHomePage {
 	parkedListener(key){
 		var start;
 		var end
+		console.log("parked listener is runing");
 		this._parked = this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().subscribe(data=>{
-			if(!data.timeStart && !data.endtime){
-				this.navAddress = "You have arrived your destination";
-			}else if(data.timeStart && !data.endTime){			                
+			if(this._arriving){
+				this._arriving.unsubscribe();
+			}			
+			if(!data.timeStart && !data.endtime && !data.status){
+				this.navAddress = "Wait to start Timer";
+			}else if(data.timeStart && !data.endTime){	
+						                
                 var d = new Date(data.timeStart);
                 start = d.toLocaleTimeString();
                 this.navAddress = "Timer started at: " + start;
@@ -284,6 +363,11 @@ export class CoHomePage {
 					        });
 					       confirm.present();
 				
+			}if(data.status){
+				if(data.status == "cancelled"){
+					this.navAddress ="Transaction was cancelled"
+					this._parked.unsubscribe();
+				}
 			}
 	   });
 	}
@@ -349,8 +433,8 @@ export class CoHomePage {
 	currentMarkers = [];
 	setHoMarkers = [];
 
-	markerListener(){
-		this._markers = this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
+	async markerListener(){
+		this._markers = await this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
 			for (var a = 0; a < data.length; a++) {
 				if(data[a].payload.val().status && !data[a].payload.val().establishment){
 					if(data[a].payload.val().status == "offline"){						
@@ -577,15 +661,19 @@ export class CoHomePage {
 					observable.next(location);
 					loading.dismiss();
 
-					
-					
+
+					this.removeAllMarker();
+					this.removeCarMarker();	
+
 					this._watch.subscribe((data) => {
 						this.LngLat = {
 							lng: data.coords.longitude,
 							lat: data.coords.latitude
 						}
 						this.removeCarMarker();
-						if(this.tempHoID && this.tempLocation){							
+						if(this.tempHoID && this.tempLocation){	
+							this.removeAllMarker();
+							this.removeCarMarker();				
 							this.setDestination(this.tempLocation.lng,this.tempLocation.lat);
 							this.setOrigin(this.LngLat);
 						}else{

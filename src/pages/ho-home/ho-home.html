@@ -58,32 +58,45 @@
               <ion-item >
                   <h2>{{carowner.payload.val().carowner.name}}</h2>
                   <p>{{carowner.payload.val().carowner.plateNumber}}</p>
-                  <p *ngIf="carowner.payload.val().status == 'cancelled'" item-end>Cancelled <ion-icon name="alert"></ion-icon></p>
+                  <p *ngIf="carowner.payload.val().status == 'cancelled'" item-end>Cancelled  <ion-icon name="alert" color="danger"></ion-icon></p>
+                  <p *ngIf="carowner.payload.val().status == 'arrived'" item-end>Arrived  <ion-icon name="checkmark-circle" color="secondary"></ion-icon></p>
               </ion-item>
               <ion-item-options>            
                 <button *ngIf="carowner.payload.val().status == 'cancelled'" ion-button color="light" icon-start (tap)="clearArriving(carowner.key)">
                   <ion-icon name="close-circle"></ion-icon>
                   Clear
                 </button>
-                <button *ngIf="carowner.payload.val().status != 'cancelled'" ion-button color="secondary" icon-start (tap)="arrived(carowner.payload.val().carowner,carowner.key)">
-                    <ion-icon name="checkmark-circle"></ion-icon>
-                    Arrived
-                  </button>
+                <button *ngIf="carowner.payload.val().status != 'cancelled'" ion-button color="danger" icon-start (tap)="initCancelArriving(carowner.payload.val().carowner,carowner.key)">
+                  <ion-icon name="checkmark-circle"></ion-icon>
+                  Cancel
+              </button>
+
               </ion-item-options>
             </ion-item-sliding>
           </ion-list>
   
-        <ion-list *ngIf="parkedCarOwners.length > 0">
+          <ion-list *ngIf="parkedCarOwners.length > 0">
             <ion-list-header>
-              Parked
-            </ion-list-header>
-            <ion-item *ngFor="let carowner of parkedCarOwners; let i = index">
-                <h2>{{carowner.payload.val().carowner.name}}</h2>
-                <h3>{{carowner.payload.val().carowner.plateNumber}}</h3>
-                <p *ngIf="carowner.payload.val().timeStart && !carowner.payload.val().endTime">Time Start: {{carowner.payload.val().timeStartFormat }}</p>
-                <button *ngIf="!carowner.payload.val().timeStart && !carowner.payload.val().endTime" ion-button color="secondary"  item-end (tap)="startTimer(carowner.payload.val().carowner,carowner.key)">Start Time</button>
-                <button *ngIf="carowner.payload.val().timeStart && !carowner.payload.val().endTime"ion-button  color="danger"  item-end (tap)="stopTimer(carowner,carowner.key)"> Stop Time</button>
+                Parked
+              </ion-list-header>
+            <ion-item-sliding *ngFor="let carowner of parkedCarOwners; let i = index">
+              <ion-item >
+                  <h2>{{carowner.payload.val().carowner.name}}</h2>
+                <h3>{{carowner.payload.val().carowner.plateNumber}}</h3>              
+                  <p *ngIf="carowner.payload.val().timeStart && !carowner.payload.val().endTime">Time Start: {{carowner.payload.val().timeStartFormat }}</p>
               </ion-item>
+              <ion-item-options>  
+                <button *ngIf="!carowner.payload.val().timeStart && !carowner.payload.val().endTime" ion-button color="danger"  item-end (tap)="initCancelParked(carowner.payload.val().carowner,carowner.key)">
+                  Cancel</button>          
+                <button *ngIf="!carowner.payload.val().timeStart && !carowner.payload.val().endTime" ion-button color="secondary"  item-end (tap)="startTimer(carowner.payload.val().carowner,carowner.key)">
+                  Start Time</button>
+                  
+                <button *ngIf="carowner.payload.val().timeStart && !carowner.payload.val().endTime"ion-button  color="danger"  item-end (tap)="stopTimer(carowner,carowner.key)"> 
+                  Stop Time</button>
+
+              </ion-item-options>
+            </ion-item-sliding>
           </ion-list>
+
   </ion-content>
   

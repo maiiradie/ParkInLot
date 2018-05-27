@@ -107,6 +107,9 @@ export class HoHomePage {
   }
 
   arrived(carowner,key){
+    this.afdb.list('requests/' + this.userId + '/arrivingNode').update(key,{
+      status: "transferred"
+    });
     this.afdb.list('requests/' + this.userId + '/arrivingNode').remove(key);
     this.afdb.list('requests/' + this.userId + '/parkedNode').push({
       carowner:carowner,
@@ -116,6 +119,54 @@ export class HoHomePage {
     });
 
   }
+  initCancelParked(carowner,key){
+    let alert = this.alertCtrl.create({
+      title: 'Cancel Transaction',
+      subTitle: 'Do you want to cancel the transaction?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'no',
+          handler: () => {
+            //console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Yes',
+          handler: () => {
+            this.afdb.list<any>('requests/' + this.userId + '/parkedNode').update(key,{
+              status: 'cancelled'
+            });
+          }
+        }
+      ]
+    });
+    alert.present();
+}
+  initCancelArriving(carowner,key){
+    let alert = this.alertCtrl.create({
+      title: 'Cancel Transaction',
+      subTitle: 'Do you want to cancel the transaction?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'no',
+          handler: () => {
+            //console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Yes',
+          handler: () => {
+            this.afdb.list<any>('requests/' + this.userId + '/arrivingNode').update(key,{
+              status: 'hoCancelled'
+            });
+          }
+        }
+      ]
+    });
+    alert.present();
+}
 
   clearArriving(key){
     var tempCap;
@@ -412,7 +463,7 @@ async acceptRequest(carowner,id){
     }else{
       let alert = this.alertCtrl.create({
         title: 'Are you sure?',
-        message: 'Turning Off you availability will make you not appear in the map and you will not receive any requeasts.',
+        message: 'Turning off your availability will make you not appear in the map and you will not receive any requests.',
         buttons: [
           {
             text: 'Cancel',

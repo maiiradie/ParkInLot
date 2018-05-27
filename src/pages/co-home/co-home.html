@@ -41,8 +41,9 @@
             <div *ngIf="navAddress">
               {{navAddress}}
             </div>
-            <button *ngIf="navAddress == 'Navigate to destination follow blue lines'" ion-button  color="danger" (tap)="cancelWholeTransac()">Cancel</button>
+            <button *ngIf="navAddress == 'Navigate to destination follow blue lines'" ion-button  color="danger" (tap)="initCancelWholeTransac()">Cancel</button>
             <button *ngIf="navAddress == 'Navigate to destination follow blue lines'" ion-button  color="secondary" (tap)="arrivedTransac()">Arrived</button>
+            <button *ngIf="navAddress == 'Transaction was cancelled'" ion-button  (tap)="clearTransac()">Continue</button>
         </div>
       </div>
   </div>

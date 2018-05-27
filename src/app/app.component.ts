@@ -51,6 +51,7 @@ export class MyApp {
 
     this.afs.auth.onAuthStateChanged(user => {
       if (user) {
+        console.log(user.uid);
         this.authProvider.myId(user.uid);
       }else{
         this.rootPage = "LoginPage";
