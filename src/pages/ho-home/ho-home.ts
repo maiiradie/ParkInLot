@@ -107,7 +107,6 @@ export class HoHomePage {
   }
 
   arrived(carowner,key){
-    this.afdb.list('requests/' + this.userId + '/arrivingNode').update(key,{status: "arrived"});
     this.afdb.list('requests/' + this.userId + '/arrivingNode').remove(key);
     this.afdb.list('requests/' + this.userId + '/parkedNode').push({
       carowner:carowner,
@@ -118,6 +117,19 @@ export class HoHomePage {
 
   }
 
+  clearArriving(key){
+    var tempCap;
+    this.afdb.list('requests/' + this.userId + '/arrivingNode').remove(key);
+          // tempCap  
+      let temp = this.afdb.object<any>('requests/' + this.userId ).valueChanges().subscribe(data=>{        
+        tempCap = data.available
+        temp.unsubscribe();
+        tempCap ++;        
+        this.afdb.object('requests/' + this.userId ).update({
+          available: tempCap
+        }); 
+      });
+  }
   ngOnDestroy() {
     //this.request.unsubscribe();
   }
@@ -279,9 +291,11 @@ async acceptRequest(carowner,id){
     var startTemp = Date.now();
     var tempD = new Date(startTemp);
     this.start = tempD.toLocaleTimeString();
-    this.afdb.list('requests/' + this.myId + '/parkedNode').update(key,{timeStart: startTemp});
+    this.afdb.list('requests/' + this.myId + '/parkedNode').update(key,{
+      timeStart: startTemp,
+      timeStartFormat: this.start
+    });
   }
-
   stopTimer(carowner,key) {
     var tempCap;
     this.startTime

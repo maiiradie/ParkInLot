@@ -118,7 +118,8 @@ export class CoHomePage {
 							lng: data.lng,
 							lat: data.lat
 						}
-						this.addTempHo(temp);
+						this.addTempHo(temp);	
+						console.log("i executed");
 
 						this.tempLocation = temp;
 					});
@@ -146,11 +147,13 @@ export class CoHomePage {
 			if(data[i].payload.val().arrivingNode){		
 				this.afdb.list<any>('requests/' + data[i].key + '/arrivingNode').snapshotChanges().take(1).subscribe(dataProf=>{
 					for(let a = 0; a < dataProf.length; a++){
-						if(dataProf[a].payload.val().carowner.coID == this.userId){
-							this.tempHoID = data[i].key	
-							this._markers.unsubscribe();
-							this.hasTransaction("arriving");
-							break;
+						if(dataProf[a].payload.val().status != "cancelled"){
+							if(dataProf[a].payload.val().carowner.coID == this.userId){
+								this.tempHoID = data[i].key	
+								this._markers.unsubscribe();
+								this.hasTransaction("arriving");
+								break;
+							}
 						}
 					}
 
@@ -200,6 +203,37 @@ export class CoHomePage {
 			 }else if(data.status == "arriving"){
 				 this.navAddress = "Navigate to destination follow blue lines";
 			 }
+		});
+	}
+	cancelWholeTransac(){
+		let query = this.afdb.list<any>('requests/' + this.tempHoID +'/arrivingNode', ref=> ref.orderByChild("carowner")).snapshotChanges().take(1).subscribe(data=>{
+			for(let i = 0; i < data.length; i++){
+				if(data[i].payload.val().carowner.coID == this.userId){
+					this.afdb.list<any>('requests/' + this.tempHoID +'/arrivingNode').update(data[i].key,{
+						status: "cancelled"
+					});
+					if(this._arriving){
+						this._arriving.unsubscribe();
+					}					
+					this.tempHoID = undefined;
+					this.removeAllMarker();
+					this.setMarkers();		
+					this.directions.removeRoutes();
+					this.markerListener();
+				}
+			}
+		});
+
+	}		
+	arrivedTransac(){
+		let query = this.afdb.list<any>('requests/' + this.tempHoID +'/arrivingNode', ref=> ref.orderByChild("carowner")).snapshotChanges().take(1).subscribe(data=>{
+			for(let i = 0; i < data.length; i++){
+				if(data[i].payload.val().carowner.coID == this.userId){
+					this.afdb.list<any>('requests/' + this.tempHoID +'/arrivingNode').update(data[i].key,{
+						status: "arrived"
+					});
+				}
+			}
 		});
 	}
 
@@ -551,8 +585,7 @@ export class CoHomePage {
 							lat: data.coords.latitude
 						}
 						this.removeCarMarker();
-						if(this.tempHoID && this.tempLocation){
-							
+						if(this.tempHoID && this.tempLocation){							
 							this.setDestination(this.tempLocation.lng,this.tempLocation.lat);
 							this.setOrigin(this.LngLat);
 						}else{
