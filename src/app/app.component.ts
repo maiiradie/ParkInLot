@@ -45,15 +45,22 @@ export class MyApp {
       statusBar.styleDefault();
       splashScreen.hide();
       this.menuCtrl.swipeEnable(false);
-      this.retrieveUser();
     });
     //enter code here
 
     this.afs.auth.onAuthStateChanged(user => {
+      alert('auth change run app');
       if (user) {
-        console.log(user.uid);
-        this.authProvider.myId(user.uid);
+      this.authProvider.myId(user.uid);
+
+      this.afdb.object(`profile/` + user.uid).valueChanges().take(1).subscribe(data => {
+        this.profileData = data;
+        this.retrieveImg(user.uid);
+      });
+       
       }else{
+        this.profileData = null;
+        this.imgName = "./assets/imgs/avatar.jpg";
         this.rootPage = "LoginPage";
       }
     });
@@ -79,21 +86,7 @@ export class MyApp {
       return 'primary';
     }
   }
-
-  retrieveUser() {
-    if (this.authProvider.userId) {
-      this.userId = this.authProvider.setID();
-      this.afdb.object(`/profile/` + this.userId).valueChanges().take(1).subscribe(data => {
-        this.profileData = data;
-        this.retrieveImg();
-      });
-    } else {
-      this.profileData = null;
-      this.imgName = "./assets/imgs/avatar.jpg";
-    }
-  }
-
-
+  
   openMenu(evt) {
     if (evt === "coho-Menu"){
       // this.menuCtrl.enable(true, 'coho-Menu');
@@ -106,8 +99,8 @@ export class MyApp {
     this.menuCtrl.toggle();
   }
 
-  retrieveImg() {
-    firebase.storage().ref().child("images/" + this.userId + "/" + this.profileData.profPic).getDownloadURL().then(d => {
+  retrieveImg(id) {
+    firebase.storage().ref().child("images/" + id + "/" + this.profileData.profPic).getDownloadURL().then(d => {
       this.imgName = d;
     }).catch((error) => {
       this.imgName = "./assets/imgs/avatar.jpg";

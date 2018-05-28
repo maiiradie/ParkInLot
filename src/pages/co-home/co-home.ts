@@ -98,10 +98,6 @@ export class CoHomePage {
 
 
 	ionViewDidLoad() {
-		
-
-		
-		//initialize map
 		this.map = this.initMap();		
 		this.markerListener();
 		this.setDirections();
@@ -111,7 +107,7 @@ export class CoHomePage {
 				this.centerLocation(location);
 				this.checkOnGoingTransaction();
 				});			
-			});
+		});
 	}
 
 	ionViewWillEnter() {
