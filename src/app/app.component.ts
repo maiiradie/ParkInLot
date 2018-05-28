@@ -45,17 +45,24 @@ export class MyApp {
       statusBar.styleDefault();
       splashScreen.hide();
       this.menuCtrl.swipeEnable(false);
-    });
-    //enter code here
+    });    
 
     this.afs.auth.onAuthStateChanged(user => {
-      alert('auth change run app');
-      if (user) {
-      this.authProvider.myId(user.uid);
+      if (user) {          
+      this.afdb.object<any>(`profile/` + user.uid).valueChanges().take(1).subscribe(data => {
+        this.profileData = data;        
+        this.retrieveImg(user.uid);        
+        if(data.homeowner){          
+          this.authProvider.updateLocationLog(user.uid,'online');
+          this.authProvider.updateHOOnDisconnect(user.uid);  
 
-      this.afdb.object(`profile/` + user.uid).valueChanges().take(1).subscribe(data => {
-        this.profileData = data;
-        this.retrieveImg(user.uid);
+          this.authProvider.updateOnDisconnect(user.uid);
+          this.authProvider.updateLogStatus(user.uid,'online');
+          
+        }else if(data.carowner){
+          this.authProvider.updateLogStatus(user.uid,'online');
+          this.authProvider.updateOnDisconnect(user.uid);
+        }
       });
        
       }else{
@@ -108,11 +115,15 @@ export class MyApp {
  }
 
   logout(){
-      this.afs.auth.signOut();
-      //  .then( () => {
-         this.menuCtrl.close()
+      this.authProvider.logoutUser()
+      .then(()=>{
+        this.authProvider.updateLogStatus(this.userId,"offline");
+        this.menuCtrl.close()
+        .then(()=>{
           this.nav.setRoot('LoginPage');
-      //  });
+        })
+
+      })
   }
 
   // logoutHo(){

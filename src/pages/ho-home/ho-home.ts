@@ -59,14 +59,6 @@ export class HoHomePage {
     private authProvider: AuthProvider,
     private alertCtrl: AlertController,
     private menuCtrl: MenuController) {
-
-    this.afAuth.auth.onAuthStateChanged(user => {
-      if (user) {
-        this.authProvider.updateHOStatus('online');
-        this.authProvider.updateHOOnDisconnect();
-      }
-    });
-
     //this.requestProvider.saveToken();
    // this.onNotification();
     menuCtrl.enable(true);

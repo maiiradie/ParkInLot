@@ -25,6 +25,10 @@ export class LoginPage {
     private afs:AngularFireAuth,
     private toastCtrl:ToastController,
     private loadingCtrl:LoadingController) {
+
+      if(this.authProvider.setID){
+        console.log('there id exists');
+      }
   }
 
   ionViewDidLoad() {
