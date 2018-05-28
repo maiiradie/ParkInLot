@@ -31,7 +31,7 @@ export class HoHomePage {
   parked: boolean = false;
   unfiltered;
   filtered;
-  myId = this.authProvider.userId;
+
   items: Array<any> = [];
   itemRef: firebase.database.Reference = firebase.database().ref('/transac');
   flagAlrtCtrl:boolean = false;
@@ -329,7 +329,7 @@ async acceptRequest(carowner,id){
 
 
   toParked() {
-    this.afdb.object('requests/' + this.myId).update({
+    this.afdb.object('requests/' + this.userId).update({
       motionStatus: "parked"
     });
     this.arriving = false;
@@ -342,7 +342,7 @@ async acceptRequest(carowner,id){
     var startTemp = Date.now();
     var tempD = new Date(startTemp);
     this.start = tempD.toLocaleTimeString();
-    this.afdb.list('requests/' + this.myId + '/parkedNode').update(key,{
+    this.afdb.list('requests/' + this.userId + '/parkedNode').update(key,{
       timeStart: startTemp,
       timeStartFormat: this.start
     });
@@ -358,7 +358,7 @@ async acceptRequest(carowner,id){
     var computedHours;
     var payment;
     //query to database
-    this.afdb.list('requests/' + this.myId + '/parkedNode').snapshotChanges().take(1).subscribe(data=>{
+    this.afdb.list('requests/' + this.userId + '/parkedNode').snapshotChanges().take(1).subscribe(data=>{
       
       for(var i = 0; i < data.length; i++){			
 				if(data[i].payload.val().carowner.coID == carowner.payload.val().carowner.coID){	
@@ -411,7 +411,7 @@ async acceptRequest(carowner,id){
         payment:  payment,
         hoID: this.userId
       });     
-      let tempPush = await this.afdb.list('requests/' + this.myId + '/parkedNode').snapshotChanges().subscribe(data=>{
+      let tempPush = await this.afdb.list('requests/' + this.userId + '/parkedNode').snapshotChanges().subscribe(data=>{
         tempPush.unsubscribe();
         for(var i = 0; i < data.length; i++){			
           if(data[i].payload.val().carowner.coID == carowner){    

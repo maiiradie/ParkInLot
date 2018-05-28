@@ -22,10 +22,10 @@ import 'rxjs/add/operator/take';
 export class CoCarPage {
   userData;
   imgName;
-  userId;
+  userId = this.authProvider.userId;
 
   constructor(private afdb:AngularFireDatabase, private afs:AngularFireAuth, private authProvider:AuthProvider, public navCtrl: NavController, public navParams: NavParams) {
-    this.userId = this.authProvider.setID();
+
   }
 
   ionViewDidLoad() {

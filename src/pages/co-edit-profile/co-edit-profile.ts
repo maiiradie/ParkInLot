@@ -33,7 +33,7 @@ export class CoEditProfilePage {
   imgUrl;
   user;
   private imgPath;
-  private userId;
+  private userId = this.authProvider.userId;
   private imgType;
   profile$: AngularFireObject<any>;
 
@@ -57,7 +57,7 @@ export class CoEditProfilePage {
         'password':[null,Validators.compose([Validators.minLength(6)])],
         'mobile':[null,Validators.compose([Validators.required, Validators.minLength(11), Validators.maxLength(11), Validators.pattern('^09[0-9]*')])]
       });
-    this.userId = this.authProvider.userId;
+    
   }
 
   ionViewDidLoad() {

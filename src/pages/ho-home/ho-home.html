@@ -84,6 +84,7 @@
                   <h2>{{carowner.payload.val().carowner.name}}</h2>
                 <h3>{{carowner.payload.val().carowner.plateNumber}}</h3>              
                   <p *ngIf="carowner.payload.val().timeStart && !carowner.payload.val().endTime">Time Start: {{carowner.payload.val().timeStartFormat }}</p>
+                  <p *ngIf="carowner.payload.val().status == 'arrived'" item-end>Arrived  <ion-icon name="checkmark-circle" color="secondary"></ion-icon></p>
               </ion-item>
               <ion-item-options>  
                 <button *ngIf="!carowner.payload.val().timeStart && !carowner.payload.val().endTime" ion-button color="danger"  item-end (tap)="initCancelParked(carowner.payload.val().carowner,carowner.key)">
