@@ -19,7 +19,7 @@
     <ion-content padding>
       <ion-list>
           <ion-list-header>
-             Due Amount For {{dateMonth}}: {{amount}}Php
+             Due Amount For {{dateMonth}}: Php{{amount}}
             </ion-list-header>
         <ion-item *ngFor="let item of transactions">
           <div>
@@ -27,7 +27,7 @@
             <p>Date: {{item?.date}}</p>
             <p>Start Time: {{item?.start}}</p>
             <p>End Time:  {{item?.end}}</p>
-            <p> Amount: {{item?.payment}}php</p>
+            <p> Amount: Php{{item?.payment}}</p>
           </div>
         </ion-item> 
       </ion-list>

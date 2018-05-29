@@ -59,8 +59,21 @@ export class HoHomePage {
     private authProvider: AuthProvider,
     private alertCtrl: AlertController,
     private menuCtrl: MenuController) {
-    //this.requestProvider.saveToken();
-   // this.onNotification();
+
+
+    let temp = this.afdb.object<any>('profile/' + this.userId).valueChanges().subscribe(data=>{
+      if(data.reg_status != "approved" && this.parkedCarOwners.length == 0  && this.requestingCarOwners.length == 0 && this.arrivingCarOwners.length == 0){
+        temp.unsubscribe();
+        this.authProvider.logoutUser()
+        .then(() => {
+          this.authProvider.updateHOStatus('offline');
+           this.menuCtrl.close()
+           .then( () => {
+              this.navCtrl.setRoot('LoginPage');
+           });
+        });
+      }
+    });
     menuCtrl.enable(true);
   }
   myVar = 'pic_angular.jpg'
@@ -435,7 +448,7 @@ async acceptRequest(carowner,id){
   getRole() {
     this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
       var x = data.payload.val().role;
-      console.log(x);
+      //console.log(x);
       if (x === 1) {
         this.role = "carowner";
       } else if (x === 2) {
