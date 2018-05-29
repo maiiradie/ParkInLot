@@ -673,6 +673,7 @@ export class CoHomePage {
 							this.setDestination(this.tempLocation.lng,this.tempLocation.lat);
 							this.setOrigin(this.LngLat);
 						}else{
+							this.markerListener();
 							this.directions.removeRoutes();
 							this.addCarMarker(this.LngLat);
 						}									
