@@ -13,6 +13,7 @@ import { FCM } from '@ionic-native/fcm';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { CoTransacHistoryPage } from '../co-transac-history/co-transac-history';
 
 @IonicPage()
 @Component({
@@ -42,8 +43,7 @@ export class HoHomePage {
   request;
 
   //for toggle of availability
-  toggleValue = true;
-
+  toggleValue;
   //button toggle for notification
   isEnabled:boolean = false;
   requestAlrtCtrl;
@@ -97,6 +97,7 @@ export class HoHomePage {
       .subscribe(profileData => {
         this.hoProfile = profileData;
     });
+    this.getToggleValue();
   }
 
    ionViewWillEnter() {
@@ -496,5 +497,22 @@ async acceptRequest(carowner,id){
       alert.present();
     }
 
+  }
+
+  getToggleValue() {
+    
+    this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
+      if( data.payload.val().role == 3) {        
+        this.afdb.object('location/' + this.userId).snapshotChanges().take(1).subscribe(data => {
+          if (data.payload.val().status == 'online') {
+            this.toggleValue = true;
+          }else{
+            this.toggleValue = false;
+          }
+        });
+      } else {
+        this.toggleValue = true;
+      }
+    });
   }
 }

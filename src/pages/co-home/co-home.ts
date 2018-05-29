@@ -67,10 +67,6 @@ export class CoHomePage {
 						alert('Your request has been declined.');
 					} else if (data.status == 'accepted') {
 						alert('Your request has been accepted.');
-						this.navCtrl.pop()
-							.then(() => {
-								this.setDestination(data.lang, data.latt);
-							});
 					} else {
 						alert('Something went wrong with the request.')
 					}
@@ -81,10 +77,6 @@ export class CoHomePage {
 						alert('Your request has been declined.');
 					} else if (data.status == 'accepted') {
 						alert('Your request has been accepted.');
-						this.navCtrl.pop()
-							.then(() => {
-								this.setDestination(data.lang, data.latt);
-							});
 					} else {
 						alert('Something went wrong with the request.')
 					}
@@ -122,6 +114,7 @@ export class CoHomePage {
 			this.initParkedListener();	
 		}
 	}
+
 	async checkOnGoingTransaction(){
 		let query = await this.afdb.list('requests/').snapshotChanges().take(1).subscribe(data=>{			
 		  for(let i = 0; i < data.length; i++){
@@ -132,7 +125,6 @@ export class CoHomePage {
 							if(dataProf[a].payload.val().carowner.coID == this.userId){	
 								console.log("arriving")							
 								this.tempHoID = data[i].key		
-						
 								this._markers.unsubscribe();
 								this.hasTransaction("arriving");
 								this.getTempLocation(this.tempHoID);
@@ -159,21 +151,19 @@ export class CoHomePage {
 					}
 				});
 			}
-				
 		  }
 		});
 	  }
 	  async getTempLocation(homeowner){		  		
-		  console.log("getTempLocation");
-				 	let subs = await this.afdb.object<any>('location/' + homeowner).valueChanges().take(1).subscribe(data => {
-						let temp = {
-							lng: data.lng,
-							lat: data.lat
-						}
-						console.log(data.lng + " " + data.lat);
-						this.addTempHo(temp);	
-						this.tempLocation = temp;
-					 });
+		let subs = await this.afdb.object<any>('location/' + homeowner).valueChanges().take(1).subscribe(data => {
+			let temp = {
+				lng: data.lng,
+				lat: data.lat
+			};
+
+			this.addTempHo(temp);	
+			this.tempLocation = temp;
+		});
 	  }
 
 	initListener(){
@@ -192,7 +182,6 @@ export class CoHomePage {
 	}
 
 	arrivingListener(key){
-		
 		this._arriving= this.afdb.object<any>('requests/' + this.tempHoID + '/arrivingNode/' + key).valueChanges().subscribe(data=>{
 			  if(data.status == "arriving"){
 				 this.navAddress = "Navigate to destination follow blue lines";
@@ -201,8 +190,8 @@ export class CoHomePage {
 			 }
 		});
 	}
-	async clearTransac(){
-		
+
+	async clearTransac(){	
 		let temp1 = await this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().take(1).subscribe(data=>{
 			for(let i = 0 ; i < data.length; i++){
 				if(data[i].payload.val().carowner.coID == this.userId){
@@ -228,6 +217,7 @@ export class CoHomePage {
 			}
 		});
 	}
+	
 	async returnCap(){
 		var tempCap;
 		let temp =  await this.afdb.object<any>('requests/' + this.tempHoID ).valueChanges().subscribe(data=>{        
@@ -402,7 +392,7 @@ export class CoHomePage {
 		this.menuCtrl.toggle();
 	}
 
-		getRole() {
+	getRole() {
 		this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
 			var x = data.payload.val().role;
 			if (x === 1) {
@@ -433,7 +423,7 @@ export class CoHomePage {
 		this._markers = await this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
 			for (var a = 0; a < data.length; a++) {
 				if(data[a].payload.val().status && !data[a].payload.val().establishment){
-					if(data[a].payload.val().status == "offline"){						
+					if(data[a].payload.val().status == "offline" || data[a].key == this.userId){						
 						if(document.getElementById(data[a].key)){
 							this.removeMarker(data[a].key);				
 						}	

@@ -9,17 +9,8 @@ import { FilePath } from '@ionic-native/file-path';
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
-
 import firebase from 'firebase';
-
 import 'rxjs/add/operator/take';
-
-/**
- * Generated class for the CoEditProfilePage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
 
 @IonicPage()
 @Component({
@@ -92,7 +83,6 @@ export class CoEditProfilePage {
     alert.present();
   }
 
-  // Open File Chooser and select image
   changeImg() {
     this.fileChooser.open().then((url)=>{
       this.filePath.resolveNativePath(url).then((path)=>{
@@ -124,7 +114,6 @@ export class CoEditProfilePage {
     });
   }
 
-  // Upload image to Firebase Storage
   async upload(buffer, name, type) {
     let blob = new Blob([buffer], { type: type });
 
