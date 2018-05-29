@@ -11,10 +11,10 @@ import 'rxjs/add/operator/take';
 import { Profile } from '../models/profile';
 import { LoginPage } from '../pages/login/login';
 
-import { HoHomePage }  from '../pages/ho-home/ho-home';
-import { HoprofilePage }  from '../pages/hoprofile/hoprofile';
-import { HoGaragePage }  from '../pages/ho-garage/ho-garage';
-import { HoTransacHistoryPage }  from '../pages/ho-transac-history/ho-transac-history';
+import { HoHomePage } from '../pages/ho-home/ho-home';
+import { HoprofilePage } from '../pages/hoprofile/hoprofile';
+import { HoGaragePage } from '../pages/ho-garage/ho-garage';
+import { HoTransacHistoryPage } from '../pages/ho-transac-history/ho-transac-history';
 
 import { CoHomePage } from '../pages/co-home/co-home';
 import { CoEditProfilePage } from '../pages/co-edit-profile/co-edit-profile';
@@ -36,7 +36,7 @@ export class MyApp {
 
   constructor(private menuCtrl: MenuController,
     private authProvider: AuthProvider,
-    private afdb: AngularFireDatabase, 
+    private afdb: AngularFireDatabase,
     private afs: AngularFireAuth,
     platform: Platform,
     statusBar: StatusBar,
@@ -45,65 +45,61 @@ export class MyApp {
       statusBar.styleDefault();
       splashScreen.hide();
       this.menuCtrl.swipeEnable(false);
-    });    
+    });
 
     this.afs.auth.onAuthStateChanged(user => {
-      if (user) {          
-      this.afdb.object<any>(`profile/` + user.uid).valueChanges().take(1).subscribe(data => {
-        this.profileData = data;        
-        this.retrieveImg(user.uid);        
-        if(data.homeowner){          
-          this.authProvider.updateLocationLog(user.uid,'online');
-          this.authProvider.updateHOOnDisconnect(user.uid);  
+      if (user) {
+        this.afdb.object<any>(`profile/` + user.uid).valueChanges().take(1).subscribe(data => {
+          this.profileData = data;
+          this.retrieveImg(user.uid);
+          if (data.homeowner && !data.carowner) {
+            console.log('one');
+            this.authProvider.updateLocationLog(user.uid, 'online');
+            this.authProvider.updateHOOnDisconnect(user.uid);
 
-          this.authProvider.updateOnDisconnect(user.uid);
-          this.authProvider.updateLogStatus(user.uid,'online');
-          
-        }else if(data.carowner){
-          this.authProvider.updateLogStatus(user.uid,'online');
-          this.authProvider.updateOnDisconnect(user.uid);
-        }
-      });
-       
-      }else{
+            this.authProvider.updateOnDisconnect(user.uid);
+            this.authProvider.updateLogStatus(user.uid, 'online');
+
+          } else if (data.carowner && !data.homeowner) {
+            console.log('two');
+            this.authProvider.updateLogStatus(user.uid, 'online');
+            this.authProvider.updateOnDisconnect(user.uid);
+          } else if (data.carowner && data.homeower) {
+            this.afdb.object<any>(`location/` + user.uid).valueChanges().take(1).subscribe(data => {
+
+              console.log('three');
+              this.authProvider.updateLogStatus(user.uid, data.payload.val().status);
+              this.authProvider.updateHOOnDisconnect(user.uid);
+
+            });
+          }
+        });
+
+      } else {
         this.profileData = null;
         this.imgName = "./assets/imgs/avatar.jpg";
         this.rootPage = "LoginPage";
       }
     });
-    
-
   }
-  
-  openPage(page: string, role){
-    if ((page == 'CoHomePage' && role == 'carowner') || (page == 'HoHomePage' && role == 'homeowner'))  {
+
+  openPage(page: string, role) {
+    if ((page == 'CoHomePage' && role == 'carowner') || (page == 'HoHomePage' && role == 'homeowner')) {
       this.nav.popToRoot();
-    } else if(page == 'HoHomePage' && role == 'both') {
+    } else if (page == 'HoHomePage' && role == 'both') {
       this.nav.push(page);
-    } else if(page == 'CoHomePage' && role == 'both') {
+    } else if (page == 'CoHomePage' && role == 'both') {
       this.nav.popToRoot();
-    } 
+    }
     else {
       this.nav.push(page);
     }
   }
 
-  isActive(page: string){
-    if (this.nav.getActive() && this.nav.getActive().name === page){
+  isActive(page: string) {
+    if (this.nav.getActive() && this.nav.getActive().name === page) {
       return 'primary';
     }
-  }
-  
-  openMenu(evt) {
-    if (evt === "coho-Menu"){
-      // this.menuCtrl.enable(true, 'coho-Menu');
-      //  this.menuCtrl.enable(false, 'Co-Menu');
-    }else if(evt === "Co-Menu"){
-      //  this.menuCtrl.enable(false, 'Ho-Menu');
-      //  this.menuCtrl.enable(true, 'Co-Menu');
-    } 
-
-    this.menuCtrl.toggle();
   }
 
   retrieveImg(id) {
@@ -112,45 +108,34 @@ export class MyApp {
     }).catch((error) => {
       this.imgName = "./assets/imgs/avatar.jpg";
     });
- }
+  }
 
-  logout(){
-    this.authProvider.updateLogStatus(this.afs.auth.currentUser.uid,"offline");
-      this.authProvider.logoutUser()
-      .then(()=>{
+  logout() {
+    this.authProvider.updateLogStatus(this.afs.auth.currentUser.uid, "offline");
+    this.authProvider.logoutUser()
+      .then(() => {
         this.menuCtrl.close()
-        .then(()=>{
-          this.nav.setRoot('LoginPage');
-        })
+          .then(() => {
+            this.nav.setRoot('LoginPage');
+          })
 
       })
   }
 
-  // logoutHo(){
-  //   this.authProvider.logoutUser()
-  //   // .then(() => {
-  //     this.authProvider.updateHOStatus('offline')
-  //      .then( () => {
-  //        this.menuCtrl.close();
-  //         this.nav.setRoot('LoginPage');
-  //      });
-  //   // });
-  // }
-
-  logoutHo(){
+  logoutHo() {
     this.authProvider.logoutUser()
-    .then(() => {
-      this.authProvider.updateHOStatus('offline');
-       this.menuCtrl.close()
-       .then( () => {
-          this.nav.setRoot('LoginPage');
-       });
-    });
+      .then(() => {
+        this.authProvider.updateHOStatus('offline');
+        this.menuCtrl.close()
+          .then(() => {
+            this.nav.setRoot('LoginPage');
+          });
+      });
   }
-  logoutHoCo(){
+
+  logoutHoCo() {
     this.authProvider.logoutUser();
     this.menuCtrl.close();
     this.nav.setRoot('LoginPage');
   }
-
 }
