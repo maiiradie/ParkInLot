@@ -58,7 +58,7 @@
               <ion-item >
                   <h2>{{carowner.payload.val().carowner.name}}</h2>
                   <p>{{carowner.payload.val().carowner.plateNumber}}</p>
-                  <p *ngIf="carowner.payload.val().status == 'cancelled'" item-end>Cancelled  <ion-icon name="alert" color="danger"></ion-icon></p>
+                  <p *ngIf="carowner.payload.val().status == 'cancelled' || carowner.payload.val().status == 'hoCancelled'" item-end>Cancelled  <ion-icon name="alert" color="danger"></ion-icon></p>
                   <p *ngIf="carowner.payload.val().status == 'arrived'" item-end>Arrived  <ion-icon name="checkmark-circle" color="secondary"></ion-icon></p>
               </ion-item>
               <ion-item-options>            
@@ -66,10 +66,10 @@
                   <ion-icon name="close-circle"></ion-icon>
                   Clear
                 </button>
-                <button *ngIf="carowner.payload.val().status != 'cancelled'" ion-button color="danger" icon-start (tap)="initCancelArriving(carowner.payload.val().carowner,carowner.key)">
+                <button *ngIf="carowner.payload.val().status != 'arriving' || carowner.payload.val().status != 'hoCancelled'" ion-button color="danger" icon-start (tap)="initCancelArriving(carowner.payload.val().carowner,carowner.key)">
                   <ion-icon name="checkmark-circle"></ion-icon>
                   Cancel
-              </button>
+                </button>
 
               </ion-item-options>
             </ion-item-sliding>

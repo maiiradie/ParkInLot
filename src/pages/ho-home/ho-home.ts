@@ -64,6 +64,12 @@ export class HoHomePage {
     let temp = this.afdb.object<any>('profile/' + this.userId).valueChanges().subscribe(data=>{
       if(data.reg_status != "approved" && this.parkedCarOwners.length == 0  && this.requestingCarOwners.length == 0 && this.arrivingCarOwners.length == 0){
         temp.unsubscribe();
+        let toast = this.toastCtrl.create({
+          message: 'Account has been disabled',
+          duration: 4000,
+          position: 'top'
+        });
+        toast.present();
         this.authProvider.logoutUser()
         .then(() => {
           this.authProvider.updateHOStatus('offline');

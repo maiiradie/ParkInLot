@@ -115,9 +115,9 @@ export class MyApp {
  }
 
   logout(){
+    this.authProvider.updateLogStatus(this.afs.auth.currentUser.uid,"offline");
       this.authProvider.logoutUser()
       .then(()=>{
-        this.authProvider.updateLogStatus(this.userId,"offline");
         this.menuCtrl.close()
         .then(()=>{
           this.nav.setRoot('LoginPage');
