@@ -13,6 +13,7 @@ import { FCM } from '@ionic-native/fcm';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { CoTransacHistoryPage } from '../co-transac-history/co-transac-history';
 
 @IonicPage()
 @Component({
@@ -31,7 +32,7 @@ export class HoHomePage {
   parked: boolean = false;
   unfiltered;
   filtered;
-  myId = this.authProvider.userId;
+
   items: Array<any> = [];
   itemRef: firebase.database.Reference = firebase.database().ref('/transac');
   flagAlrtCtrl:boolean = false;
@@ -42,8 +43,7 @@ export class HoHomePage {
   request;
 
   //for toggle of availability
-  toggleValue = true;
-
+  toggleValue;
   //button toggle for notification
   isEnabled:boolean = false;
   requestAlrtCtrl;
@@ -60,15 +60,29 @@ export class HoHomePage {
     private alertCtrl: AlertController,
     private menuCtrl: MenuController) {
 
-    this.afAuth.auth.onAuthStateChanged(user => {
-      if (user) {
-        this.authProvider.updateHOStatus('online');
-        this.authProvider.updateHOOnDisconnect();
+
+    let temp = this.afdb.object<any>('profile/' + this.userId).valueChanges().subscribe(data=>{
+      if(data.reg_status != "approved" && this.parkedCarOwners.length == 0  && this.requestingCarOwners.length == 0 && this.arrivingCarOwners.length == 0){
+        temp.unsubscribe();
+        let toast = this.toastCtrl.create({
+          message: 'Account has been disabled',
+          duration: 4000,
+          position: 'top'
+        });
+        toast.present();
+        this.authProvider.logoutUser()
+        .then(() => {
+          this.authProvider.updateHOStatus('offline');
+           this.menuCtrl.close()
+           .then( () => {
+              this.navCtrl.setRoot('LoginPage');
+           });
+        });
       }
     });
-
-    //this.requestProvider.saveToken();
-   // this.onNotification();
+    this.requestProvider.saveToken();
+    this.onNotification();
+    
     menuCtrl.enable(true);
   }
   myVar = 'pic_angular.jpg'
@@ -86,6 +100,7 @@ export class HoHomePage {
       .subscribe(profileData => {
         this.hoProfile = profileData;
     });
+    this.getToggleValue();
   }
 
    ionViewWillEnter() {
@@ -107,7 +122,9 @@ export class HoHomePage {
   }
 
   arrived(carowner,key){
-    this.afdb.list('requests/' + this.userId + '/arrivingNode').update(key,{status: "arrived"});
+    this.afdb.list('requests/' + this.userId + '/arrivingNode').update(key,{
+      status: "transferred"
+    });
     this.afdb.list('requests/' + this.userId + '/arrivingNode').remove(key);
     this.afdb.list('requests/' + this.userId + '/parkedNode').push({
       carowner:carowner,
@@ -117,7 +134,68 @@ export class HoHomePage {
     });
 
   }
+  initCancelParked(carowner,key){
+    let alert = this.alertCtrl.create({
+      title: 'Cancel Transaction',
+      subTitle: 'Do you want to cancel the transaction?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'no',
+          handler: () => {
+            //console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Yes',
+          handler: () => {
+            this.afdb.list<any>('requests/' + this.userId + '/parkedNode').update(key,{
+              status: 'cancelled'
+            });
+          }
+        }
+      ]
+    });
+    alert.present();
+}
+  initCancelArriving(carowner,key){
+    let alert = this.alertCtrl.create({
+      title: 'Cancel Transaction',
+      subTitle: 'Do you want to cancel the transaction?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'no',
+          handler: () => {
+            //console.log('Cancel clicked');
+          }
+        },
+        {
+          text: 'Yes',
+          handler: () => {
+            this.afdb.list<any>('requests/' + this.userId + '/arrivingNode').update(key,{
+              status: 'hoCancelled'
+            });
+          }
+        }
+      ]
+    });
+    alert.present();
+}
 
+  clearArriving(key){
+    var tempCap;
+    this.afdb.list('requests/' + this.userId + '/arrivingNode').remove(key);
+          // tempCap  
+      let temp = this.afdb.object<any>('requests/' + this.userId ).valueChanges().subscribe(data=>{        
+        tempCap = data.available
+        temp.unsubscribe();
+        tempCap ++;        
+        this.afdb.object('requests/' + this.userId ).update({
+          available: tempCap
+        }); 
+      });
+  }
   ngOnDestroy() {
     //this.request.unsubscribe();
   }
@@ -266,7 +344,7 @@ async acceptRequest(carowner,id){
 
 
   toParked() {
-    this.afdb.object('requests/' + this.myId).update({
+    this.afdb.object('requests/' + this.userId).update({
       motionStatus: "parked"
     });
     this.arriving = false;
@@ -279,9 +357,11 @@ async acceptRequest(carowner,id){
     var startTemp = Date.now();
     var tempD = new Date(startTemp);
     this.start = tempD.toLocaleTimeString();
-    this.afdb.list('requests/' + this.myId + '/parkedNode').update(key,{timeStart: startTemp});
+    this.afdb.list('requests/' + this.userId + '/parkedNode').update(key,{
+      timeStart: startTemp,
+      timeStartFormat: this.start
+    });
   }
-
   stopTimer(carowner,key) {
     var tempCap;
     this.startTime
@@ -293,7 +373,7 @@ async acceptRequest(carowner,id){
     var computedHours;
     var payment;
     //query to database
-    this.afdb.list('requests/' + this.myId + '/parkedNode').snapshotChanges().take(1).subscribe(data=>{
+    this.afdb.list('requests/' + this.userId + '/parkedNode').snapshotChanges().take(1).subscribe(data=>{
       
       for(var i = 0; i < data.length; i++){			
 				if(data[i].payload.val().carowner.coID == carowner.payload.val().carowner.coID){	
@@ -346,7 +426,7 @@ async acceptRequest(carowner,id){
         payment:  payment,
         hoID: this.userId
       });     
-      let tempPush = await this.afdb.list('requests/' + this.myId + '/parkedNode').snapshotChanges().subscribe(data=>{
+      let tempPush = await this.afdb.list('requests/' + this.userId + '/parkedNode').snapshotChanges().subscribe(data=>{
         tempPush.unsubscribe();
         for(var i = 0; i < data.length; i++){			
           if(data[i].payload.val().carowner.coID == carowner){    
@@ -378,7 +458,7 @@ async acceptRequest(carowner,id){
   getRole() {
     this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
       var x = data.payload.val().role;
-      console.log(x);
+      //console.log(x);
       if (x === 1) {
         this.role = "carowner";
       } else if (x === 2) {
@@ -398,7 +478,7 @@ async acceptRequest(carowner,id){
     }else{
       let alert = this.alertCtrl.create({
         title: 'Are you sure?',
-        message: 'Turning Off you availability will make you not appear in the map and you will not receive any requeasts.',
+        message: 'Turning off your availability will make you not appear in the map and you will not receive any requests.',
         buttons: [
           {
             text: 'Cancel',
@@ -420,5 +500,22 @@ async acceptRequest(carowner,id){
       alert.present();
     }
 
+  }
+
+  getToggleValue() {
+    
+    this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
+      if( data.payload.val().role == 3) {        
+        this.afdb.object('location/' + this.userId).snapshotChanges().take(1).subscribe(data => {
+          if (data.payload.val().status == 'online') {
+            this.toggleValue = true;
+          }else{
+            this.toggleValue = false;
+          }
+        });
+      } else {
+        this.toggleValue = true;
+      }
+    });
   }
 }

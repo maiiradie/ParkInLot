@@ -25,6 +25,25 @@ export class LoginPage {
     private afs:AngularFireAuth,
     private toastCtrl:ToastController,
     private loadingCtrl:LoadingController) {
+
+      try{
+        if(this.afs.auth.currentUser.uid){
+          this.afdb.object<any>('profile/' + this.afs.auth.currentUser.uid).valueChanges().take(1).subscribe(data=>{
+            if(data.role == 3) {
+              this.navCtrl.setRoot("CoHomePage");
+            } else if (data.carowner && (data.role == 1 || data.role == undefined)) {
+              this.navCtrl.setRoot("CoHomePage");
+            } else if (data.homeowner && (data.role == 2 || data.role == undefined)) {
+              this.navCtrl.setRoot("HoHomePage");
+            }else if(data.establishment && (data.role == 4 || data.role == undefined)){
+              this.navCtrl.setRoot("EstHomePage");
+            } 
+          });
+        }
+      }catch(e){
+        console.log(e);
+      }
+      
   }
 
   ionViewDidLoad() {
@@ -41,16 +60,6 @@ export class LoginPage {
 
     });
   }
-
-  removeDuplicates(arr){
-    let unique_array = []
-    for(let i = 0;i < arr.length; i++){
-        if(unique_array.indexOf(arr[i]) == -1){
-            unique_array.push(arr[i])
-        }
-    }
-    return unique_array
-}
   
   showToast(message) {
     let toast = this.toastCtrl.create({
@@ -79,11 +88,9 @@ export class LoginPage {
               } else {
                 if (data.reg_status === "approved") {
                   if(data.role == 3) {
-                    console.log('role: ' + data.role);
                     this.navCtrl.setRoot("CoHomePage");
                     this.x.unsubscribe();
                   } else if (data.carowner && (data.role == 1 || data.role == undefined)) {
-                     console.log('nakapasok !!!');
                     this.navCtrl.setRoot("CoHomePage");
                     this.x.unsubscribe();
                   } else if (data.homeowner && (data.role == 2 || data.role == undefined)) {

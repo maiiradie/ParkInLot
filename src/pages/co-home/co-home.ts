@@ -52,6 +52,8 @@ export class CoHomePage {
 		public loadingCtrl: LoadingController,
 		private menuCtrl: MenuController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
+		this.requestProvider.saveToken();
+		this.onNotification();
 		menuCtrl.enable(true);
 	}
 
@@ -67,10 +69,6 @@ export class CoHomePage {
 						alert('Your request has been declined.');
 					} else if (data.status == 'accepted') {
 						alert('Your request has been accepted.');
-						this.navCtrl.pop()
-							.then(() => {
-								this.setDestination(data.lang, data.latt);
-							});
 					} else {
 						alert('Something went wrong with the request.')
 					}
@@ -81,10 +79,6 @@ export class CoHomePage {
 						alert('Your request has been declined.');
 					} else if (data.status == 'accepted') {
 						alert('Your request has been accepted.');
-						this.navCtrl.pop()
-							.then(() => {
-								this.setDestination(data.lang, data.latt);
-							});
 					} else {
 						alert('Something went wrong with the request.')
 					}
@@ -98,33 +92,16 @@ export class CoHomePage {
 
 
 	ionViewDidLoad() {
-		this.checkOnGoingTransaction();
-
-		
-		//initialize map
-		this.map = this.initMap();		
-		this.markerListener();
+		this.map = this.initMap();				
 		this.setDirections();
 		this.destination();
 		this.map.on('load', () => {
 			this.location = this.getCurrentLocation().subscribe(location => {
 				this.centerLocation(location);
-				if (this.tempHoID) {
-					this.removeAllMarker();
-					this.removeCarMarker();
-					this.afdb.object<any>('location/' + this.tempHoID).valueChanges().take(1)
-					.subscribe( data => {
-						let temp = {
-							lng: data.lng,
-							lat: data.lat
-						}
-						this.addTempHo(temp);
-
-						this.tempLocation = temp;
-					});
-				}
+				this.checkOnGoingTransaction();
+				
 				});			
-			});
+		});
 	}
 
 	ionViewWillEnter() {
@@ -134,23 +111,27 @@ export class CoHomePage {
 	hasTransaction(status:String){
 		if(this.tempHoID && status == "arriving"){	
 			this.initListener();
-			//marker setup
 	
 		}else if(this.tempHoID && status == "parked"){
 			this.initParkedListener();	
 		}
 	}
+
 	async checkOnGoingTransaction(){
 		let query = await this.afdb.list('requests/').snapshotChanges().take(1).subscribe(data=>{			
 		  for(let i = 0; i < data.length; i++){
 			if(data[i].payload.val().arrivingNode){		
 				this.afdb.list<any>('requests/' + data[i].key + '/arrivingNode').snapshotChanges().take(1).subscribe(dataProf=>{
 					for(let a = 0; a < dataProf.length; a++){
-						if(dataProf[a].payload.val().carowner.coID == this.userId){
-							this.tempHoID = data[i].key	
-							this._markers.unsubscribe();
-							this.hasTransaction("arriving");
-							break;
+						if(dataProf[a].payload.val().status != "cancelled"){
+							if(dataProf[a].payload.val().carowner.coID == this.userId){	
+								console.log("arriving")							
+								this.tempHoID = data[i].key		
+								this._markers.unsubscribe();
+								this.hasTransaction("arriving");
+								this.getTempLocation(this.tempHoID);
+								break;
+							}
 						}
 					}
 
@@ -161,9 +142,10 @@ export class CoHomePage {
 						this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf=>{
 							for(let a = 0; a < dataProf.length; a++){
 								if(dataProf[0].payload.val().carowner.coID == this.userId){
-									this.tempHoID = data[i].key
+									this.tempHoID = data[i].key									
 									this._markers.unsubscribe();
 									this.hasTransaction("parked");
+									this.getTempLocation(this.tempHoID);
 									break;
 								}
 							}
@@ -171,8 +153,18 @@ export class CoHomePage {
 					}
 				});
 			}
-				
 		  }
+		});
+	  }
+	  async getTempLocation(homeowner){		  		
+		let subs = await this.afdb.object<any>('location/' + homeowner).valueChanges().take(1).subscribe(data => {
+			let temp = {
+				lng: data.lng,
+				lat: data.lat
+			};
+
+			this.addTempHo(temp);	
+			this.tempLocation = temp;
 		});
 	  }
 
@@ -193,13 +185,117 @@ export class CoHomePage {
 
 	arrivingListener(key){
 		this._arriving= this.afdb.object<any>('requests/' + this.tempHoID + '/arrivingNode/' + key).valueChanges().subscribe(data=>{
-			 if(data.status == "arrived"){
-				 this.navAddress = "You have arrived your destination";
-				 this._arriving.unsubscribe();
-				 this.initParkedListener();          
-			 }else if(data.status == "arriving"){
+			  if(data.status == "arriving"){
 				 this.navAddress = "Navigate to destination follow blue lines";
+			 }else if (data.status == "hoCancelled"){
+				 this.navAddress = "Transaction was cancelled";				 
 			 }
+		});
+	}
+
+	async clearTransac(){	
+		let temp1 = await this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().take(1).subscribe(data=>{
+			for(let i = 0 ; i < data.length; i++){
+				if(data[i].payload.val().carowner.coID == this.userId){
+					this._arriving.unsubscribe();
+					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);					
+					this.returnCap();
+					  if(this._arriving){
+						this._arriving.unsubscribe();
+					}  
+				}
+			}
+		});	
+
+		let temp2 = await this.afdb.list<any>('requests/' + this.tempHoID + '/parkedNode').snapshotChanges().take(1).subscribe(data=>{
+			for(let i = 0 ; i < data.length; i++){
+				if(data[i].payload.val().carowner.coID == this.userId){
+					this.afdb.list('requests/' + this.tempHoID + '/parkedNode').remove(data[i].key);					
+					this.returnCap();
+					  if(this._arriving){
+						this._arriving.unsubscribe();
+						}	  
+				}
+			}
+		});
+	}
+	
+	async returnCap(){
+		var tempCap;
+		let temp =  await this.afdb.object<any>('requests/' + this.tempHoID ).valueChanges().subscribe(data=>{        
+			tempCap = data.available
+			temp.unsubscribe();
+			tempCap ++;        
+			this.afdb.object('requests/' + this.tempHoID ).update({
+			  available: tempCap
+			}); 
+
+			this.tempHoID = undefined;
+			this.removeAllMarker();					  
+			this.setMarkers();		
+			this.directions.removeRoutes();
+			this.markerListener();			
+			this.setMarkers();
+		  });
+	}
+
+	initCancelWholeTransac(){
+		let alert = this.alertCtrl.create({
+			title: 'Cancel Transaction',
+			subTitle: 'Do you want to cancel the transaction?',
+			buttons: [
+			  {
+				text: 'No',
+				role: 'no',
+				handler: () => {
+				}
+			  },
+			  {
+				text: 'Yes',
+				handler: () => {
+				  this.cancelWholeTransac();
+				}
+			  }
+			]
+		  });
+		  alert.present();
+	}		
+	cancelWholeTransac(){
+		let query = this.afdb.list<any>('requests/' + this.tempHoID +'/arrivingNode', ref=> ref.orderByChild("carowner")).snapshotChanges().take(1).subscribe(data=>{
+			for(let i = 0; i < data.length; i++){
+				if(data[i].payload.val().carowner.coID == this.userId){
+					this.afdb.list<any>('requests/' + this.tempHoID +'/arrivingNode').update(data[i].key,{
+						status: "cancelled"
+					});
+					if(this._arriving){
+						this._arriving.unsubscribe();
+					}					
+					this.tempHoID = undefined;
+					this.removeAllMarker();
+					this.setMarkers();		
+					this.directions.removeRoutes();
+					this.markerListener();
+				}
+			}
+		});
+	}
+	arrivedTransac(){
+		let query = this.afdb.list<any>('requests/' + this.tempHoID +'/arrivingNode', ref=> ref.orderByChild("carowner")).snapshotChanges().take(1).subscribe(data=>{
+			for(let i = 0; i < data.length; i++){
+				if(data[i].payload.val().carowner.coID == this.userId){
+					this.initParkedListener();   
+					this._arriving.unsubscribe();       
+					
+					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);
+					this.afdb.list('requests/' + this.tempHoID + '/parkedNode').push({
+						carowner:data[i].payload.val().carowner,
+						timeStart: "",
+						endTime: "",
+						payment: ""
+					  });
+					  this.navAddress = "You have arrived your destination";				 
+				}
+			}
 		});
 	}
 
@@ -219,10 +315,15 @@ export class CoHomePage {
 	parkedListener(key){
 		var start;
 		var end
+		console.log("parked listener is runing");
 		this._parked = this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().subscribe(data=>{
-			if(!data.timeStart && !data.endtime){
-				this.navAddress = "You have arrived your destination";
-			}else if(data.timeStart && !data.endTime){			                
+			if(this._arriving){
+				this._arriving.unsubscribe();
+			}			
+			if(!data.timeStart && !data.endtime && !data.status){
+				this.navAddress = "Wait to start Timer";
+			}else if(data.timeStart && !data.endTime){	
+						                
                 var d = new Date(data.timeStart);
                 start = d.toLocaleTimeString();
                 this.navAddress = "Timer started at: " + start;
@@ -250,6 +351,11 @@ export class CoHomePage {
 					        });
 					       confirm.present();
 				
+			}if(data.status){
+				if(data.status == "cancelled"){
+					this.navAddress ="Transaction was cancelled"
+					this._parked.unsubscribe();
+				}
 			}
 	   });
 	}
@@ -288,7 +394,7 @@ export class CoHomePage {
 		this.menuCtrl.toggle();
 	}
 
-		getRole() {
+	getRole() {
 		this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
 			var x = data.payload.val().role;
 			if (x === 1) {
@@ -307,7 +413,8 @@ export class CoHomePage {
 
 	destination() {
 		var geocoder = new MapboxGeocoder({
-			accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og'
+			accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og',
+			country: 'ph',
 		});
 		document.getElementById('geocoder').appendChild(geocoder.onAdd(this.map));
 	}
@@ -315,11 +422,12 @@ export class CoHomePage {
 	currentMarkers = [];
 	setHoMarkers = [];
 
-	markerListener(){
-		this._markers = this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
+	async markerListener(){
+		this._markers = await this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
+			this.setHoMarkers = [];
 			for (var a = 0; a < data.length; a++) {
 				if(data[a].payload.val().status && !data[a].payload.val().establishment){
-					if(data[a].payload.val().status == "offline"){						
+					if(data[a].payload.val().status == "offline" || data[a].key == this.userId){						
 						if(document.getElementById(data[a].key)){
 							this.removeMarker(data[a].key);				
 						}	
@@ -543,26 +651,36 @@ export class CoHomePage {
 					observable.next(location);
 					loading.dismiss();
 
-					
-					
+
+					this.removeAllMarker();
+					this.removeCarMarker();	
+
 					this._watch.subscribe((data) => {
 						this.LngLat = {
 							lng: data.coords.longitude,
 							lat: data.coords.latitude
 						}
 						this.removeCarMarker();
-						if(this.tempHoID && this.tempLocation){
-							
+						if(this.tempHoID && this.tempLocation){	
+							this.removeAllMarker();
+							this.removeCarMarker();				
 							this.setDestination(this.tempLocation.lng,this.tempLocation.lat);
 							this.setOrigin(this.LngLat);
 						}else{
+							this.markerListener();
 							this.directions.removeRoutes();
 							this.addCarMarker(this.LngLat);
 						}									
 					});
 
 				}).catch(error => {
-					alert('Error getting location, please try again');
+					if(error.code == 1) {
+						alert('Error in getting location. Please allow the application to access your location.');
+					} else if (error.code == 2 || error.code == 3 ) {
+						alert('Error in getting location. Please try restarting the application.')
+					} else {
+						alert('Error in getting location. Please try restarting the application.')
+					}
 					loading.dismiss();
 				});
 		});

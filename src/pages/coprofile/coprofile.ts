@@ -14,14 +14,14 @@ import 'rxjs/add/operator/take';
 export class CoprofilePage {
 	profileData:any;
   imgName;
-	userId;
+	userId = this.authProvider.userId;
+
 
   constructor(public navCtrl: NavController, 
   				public navParams: NavParams, 
   				private afdb:AngularFireDatabase,
   				private afs: AngularFireAuth,
   				private authProvider: AuthProvider) {
-		this.userId = this.authProvider.setID();
   }
 
   ionViewDidLoad() {

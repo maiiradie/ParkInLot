@@ -19,37 +19,37 @@ import 'rxjs/add/operator/take';
 export class HoEditGaragePage {
   userData;
   location;
-  garageForm:FormGroup;
+  garageForm: FormGroup;
   imgName;
   imgUrl;
   private imgPath;
   private userId;
   profile$: AngularFireObject<any>;
 
-  constructor(private afdb:AngularFireDatabase,
-    private afs:AngularFireAuth,
-    public navCtrl: NavController, 
+  constructor(private afdb: AngularFireDatabase,
+    private afs: AngularFireAuth,
+    public navCtrl: NavController,
     public navParams: NavParams,
     private authProvider: AuthProvider,
-    public loadingCtrl: LoadingController, 
-    private fb:FormBuilder,
+    public loadingCtrl: LoadingController,
+    private fb: FormBuilder,
     private fileChooser: FileChooser,
-		private file: File,
+    private file: File,
     private filePath: FilePath,
     private toastCtrl: ToastController) {
-      this.garageForm = this.fb.group({
-        'address':[null,Validators.compose([Validators.required, Validators.minLength(10)])],
-        'details':['']
-     });
+    this.garageForm = this.fb.group({
+      'address': [null, Validators.compose([Validators.required, Validators.minLength(10)])],
+      'details': ['']
+    });
     this.userId = this.authProvider.userId;
   }
 
   ionViewDidLoad() {
-    this.afdb.object(`/profile/` + this.userId).valueChanges().take(1).subscribe( data => {
+    this.afdb.object(`/profile/` + this.userId).valueChanges().take(1).subscribe(data => {
       this.userData = data;
       this.retrieveImg();
 
-      this.afdb.object(`/location/` + this.userId).valueChanges().take(1).subscribe( out => {
+      this.afdb.object(`/location/` + this.userId).valueChanges().take(1).subscribe(out => {
         this.location = out;
       })
     });
@@ -64,21 +64,21 @@ export class HoEditGaragePage {
   }
 
   retrieveImg() {
-    try{
-      firebase.storage().ref().child("images/" + this.userId + "/" + this.userData.garagePic).getDownloadURL().then(d=>{
+    try {
+      firebase.storage().ref().child("images/" + this.userId + "/" + this.userData.garagePic).getDownloadURL().then(d => {
         this.imgUrl = d;
       });
     }
-    catch(e){
+    catch (e) {
       console.log(e);
-    }   
+    }
   }
 
   // Open file chooser and select new picture
   changeImg() {
-    this.fileChooser.open().then((url)=>{
-      this.filePath.resolveNativePath(url).then((path)=>{
-        this.file.resolveLocalFilesystemUrl(path).then((newUrl)=>{
+    this.fileChooser.open().then((url) => {
+      this.filePath.resolveNativePath(url).then((path) => {
+        this.file.resolveLocalFilesystemUrl(path).then((newUrl) => {
           // this.imgUrl = newUrl;
 
           let dirPath = newUrl.nativeURL;
@@ -86,8 +86,8 @@ export class HoEditGaragePage {
           let dirPathSegments = dirPath.split('/'); //break string to array
           this.imgName = dirPathSegments.pop();  //remove last element
           dirPath = dirPathSegments.join('/');
-          this.imgPath = dirPath;           
-        }).catch((e)=>{
+          this.imgPath = dirPath;
+        }).catch((e) => {
           alert("error " + JSON.stringify(e));
         });
       });
@@ -96,11 +96,11 @@ export class HoEditGaragePage {
 
   // Upload new garage picture
   upload(path, name) {
-    this.file.readAsArrayBuffer(path, name).then((buffer)=>{
+    this.file.readAsArrayBuffer(path, name).then((buffer) => {
       let blob = new Blob([buffer], { type: 'image/jpeg' });
       let storageHere = firebase.storage();
 
-      storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
+      storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error) => {
         alert("error: " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
       });
     });
@@ -109,14 +109,14 @@ export class HoEditGaragePage {
   // Update garage details
   updateGarage() {
     const loading = this.loadingCtrl.create({
-      content:'Updating garage...'
+      content: 'Updating garage...'
     });
 
     loading.present(loading);
 
-    this.afdb.object(`/profile/` + this.userId).update({details: this.garageForm.value['details']}).then(d => {
-      this.afdb.object(`/location/` + this.userId).update({address: this.garageForm.value['address']}).then(d => {
-        this.afdb.object(`/profile/` + this.userId).update({garagePic: this.imgName});
+    this.afdb.object(`/profile/` + this.userId).update({ details: this.garageForm.value['details'] }).then(d => {
+      this.afdb.object(`/location/` + this.userId).update({ address: this.garageForm.value['address'] }).then(d => {
+        this.afdb.object(`/profile/` + this.userId).update({ garagePic: this.imgName });
         this.upload(this.imgPath, this.imgName);
       });
     });

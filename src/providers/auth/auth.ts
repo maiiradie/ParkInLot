@@ -27,16 +27,28 @@ export class AuthProvider {
     return this.afdb.object<any>('profile/' + this.userId).valueChanges().take(1);
   }
 
-  updateOnDisconnect() {
-    firebase.database().ref().child('profile/' + this.userId)
+  updateOnDisconnect(id) {
+    firebase.database().ref().child('profile/' + id)
       .onDisconnect()
       .update({ status: 'offline' });
   }
   
-  updateHOOnDisconnect() {
-    firebase.database().ref().child('location/' + this.userId)
+  updateHOOnDisconnect(id) {
+    firebase.database().ref().child('location/' + id)
       .onDisconnect()
       .update({ status: 'offline' });
+  }
+  
+  updateLogStatus(id,status){
+    firebase.database().ref().child('profile/' + id)
+      .update({ status: status });
+  }
+
+  updateLocationLog(id,status){
+    return this.afdb.object('location/' + id)
+      .update({
+        status: status
+      });
   }
 
  updateStatus(status) {

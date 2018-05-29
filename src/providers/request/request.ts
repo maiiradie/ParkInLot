@@ -6,7 +6,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import * as firebase from 'firebase/app';
 import * as mapboxgl from 'mapbox-gl';
 import { ToastController } from 'ionic-angular';
-import { ValidationPath } from '@firebase/database/dist/esm/src/core/util/Path';
+//import { ValidationPath } from '@firebase/database/dist/esm/src/core/util/Path';
 
 
 @Injectable()

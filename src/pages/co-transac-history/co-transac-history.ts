@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
+import { AuthProvider } from '../../providers/auth/auth';
 
 /**
  * Generated class for the CoTransacHistoryPage page.
@@ -22,9 +23,10 @@ export class CoTransacHistoryPage {
 
   transacQuery1;
   transacQuery2;
-  id = this.afs.auth.currentUser.uid;
+  userId = this.authProvider.userId;
 
   constructor(private afs: AngularFireAuth, 
+    private authProvider: AuthProvider,
     private afdb: AngularFireDatabase, 
     public navCtrl: NavController, 
     public navParams: NavParams) {
@@ -48,11 +50,10 @@ async getTransactions() {
       //   this.transactions = data
       // });
     this.transacQuery1 = await this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
-        console.log(this.id);
         for(let i = 0; i < data.length; i++){
 
           if(data[i].payload.val().carowner){            
-            if(data[i].payload.val().carowner.coID == this.id){
+            if(data[i].payload.val().carowner.coID == this.userId){
                this.afdb.object<any>('profile/' + data[i].payload.val().hoID).valueChanges().take(1).subscribe(prof=>{
                 var dateStart = new Date(data[i].payload.val().timeStart);
                 var date = dateStart.toLocaleDateString();
