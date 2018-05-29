@@ -52,8 +52,8 @@ export class CoHomePage {
 		public loadingCtrl: LoadingController,
 		private menuCtrl: MenuController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
-		this.requestProvider.saveToken();
-		this.onNotification();
+		// this.requestProvider.saveToken();
+		// this.onNotification();
 		menuCtrl.enable(true);
 	}
 

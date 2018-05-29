@@ -80,8 +80,8 @@ export class HoHomePage {
         });
       }
     });
-    this.requestProvider.saveToken();
-    this.onNotification();
+    // this.requestProvider.saveToken();
+    // this.onNotification();
     
     menuCtrl.enable(true);
   }
