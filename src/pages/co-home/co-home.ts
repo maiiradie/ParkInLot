@@ -413,7 +413,8 @@ export class CoHomePage {
 
 	destination() {
 		var geocoder = new MapboxGeocoder({
-			accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og'
+			accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og',
+			country: 'ph',
 		});
 		document.getElementById('geocoder').appendChild(geocoder.onAdd(this.map));
 	}
