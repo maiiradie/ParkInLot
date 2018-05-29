@@ -80,6 +80,9 @@ export class HoHomePage {
         });
       }
     });
+    this.requestProvider.saveToken();
+    this.onNotification();
+    
     menuCtrl.enable(true);
   }
   myVar = 'pic_angular.jpg'

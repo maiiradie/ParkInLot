@@ -52,6 +52,8 @@ export class CoHomePage {
 		public loadingCtrl: LoadingController,
 		private menuCtrl: MenuController) {
 		mapboxgl.accessToken = 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og';
+		this.requestProvider.saveToken();
+		this.onNotification();
 		menuCtrl.enable(true);
 	}
 
@@ -421,6 +423,7 @@ export class CoHomePage {
 
 	async markerListener(){
 		this._markers = await this.afdb.list<any>('location/').snapshotChanges().subscribe(data => {
+			this.setHoMarkers = [];
 			for (var a = 0; a < data.length; a++) {
 				if(data[a].payload.val().status && !data[a].payload.val().establishment){
 					if(data[a].payload.val().status == "offline" || data[a].key == this.userId){						
@@ -670,7 +673,13 @@ export class CoHomePage {
 					});
 
 				}).catch(error => {
-					alert('Error getting location, please try again');
+					if(error.code == 1) {
+						alert('Error in getting location. Please allow the application to access your location.');
+					} else if (error.code == 2 || error.code == 3 ) {
+						alert('Error in getting location. Please try restarting the application.')
+					} else {
+						alert('Error in getting location. Please try restarting the application.')
+					}
 					loading.dismiss();
 				});
 		});
