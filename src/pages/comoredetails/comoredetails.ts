@@ -331,6 +331,6 @@ export class ComoredetailsPage {
       }
       
       this._returnStatus.unsubscribe();
-     }, 50000);  
+     }, 60000);  
   }
 }

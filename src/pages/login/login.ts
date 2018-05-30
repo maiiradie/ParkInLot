@@ -75,7 +75,7 @@ export class LoginPage {
 		});
 
     loading.present(loading).then( () => {
-      if ((this.login.email != null) || (this.login.password != null)) {
+      if ((this.login.email != null) && (this.login.password != null)) {
         this.authProvider.loginUser(this.login).then(() => {
           this.authProvider.setID();
 
@@ -123,6 +123,8 @@ export class LoginPage {
             this.showToast('No user registered with the email');
           } else if (error.code === "auth/wrong-password") {
             this.showToast('The password is incorrect');
+          } else {
+            console.log(error); 
           }
         });
 
