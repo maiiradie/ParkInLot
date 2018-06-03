@@ -8,8 +8,6 @@ import { Transaction } from '../../models/transac/transaction.interface';
 import { User } from '../../models/user/user.interface';
 import { AuthProvider } from '../../providers/auth/auth';
 
-import { RequestProvider } from '../../providers/request/request';
-import { FCM } from '@ionic-native/fcm';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -48,10 +46,9 @@ export class HoHomePage {
   isEnabled:boolean = false;
   requestAlrtCtrl;
 
-  constructor(private requestProvider: RequestProvider,
-    private afAuth: AngularFireAuth,
-    private toastCtrl: ToastController,
-    private fcm: FCM,
+  constructor(
+    private afs: AngularFireAuth,
+    private toastCtrl: ToastController,    
     public navCtrl: NavController,
     public navParams: NavParams,
     private platform: Platform,
@@ -61,27 +58,32 @@ export class HoHomePage {
     private menuCtrl: MenuController) {
 
 
-    let temp = this.afdb.object<any>('profile/' + this.userId).valueChanges().subscribe(data=>{
-      if(data.reg_status != "approved" && this.parkedCarOwners.length == 0  && this.requestingCarOwners.length == 0 && this.arrivingCarOwners.length == 0){
+    let temp = this.afdb.object<any>('profile/' + this.afs.auth.currentUser.uid).valueChanges().subscribe(data=>{
+      if(data.reg_status != "approved"){
         temp.unsubscribe();
-        let toast = this.toastCtrl.create({
-          message: 'Account has been disabled',
-          duration: 4000,
-          position: 'top'
-        });
-        toast.present();
-        this.authProvider.logoutUser()
-        .then(() => {
-          this.authProvider.updateHOStatus('offline');
-           this.menuCtrl.close()
-           .then( () => {
-              this.navCtrl.setRoot('LoginPage');
-           });
-        });
+        console.log(data.reg_status)
+        let tmp = this.afdb.object<any>('requests/' + this.afs.auth.currentUser.uid).valueChanges().subscribe(profData=>{
+          if(profData.available == profData.capacity){
+            tmp.unsubscribe();
+            let toast = this.toastCtrl.create({
+              message: 'Account has been disabled',
+              duration: 4000,
+              position: 'top'
+            });
+            toast.present();
+            this.authProvider.logoutUser()
+            .then(() => {
+              this.authProvider.updateHOStatus('offline');
+               this.menuCtrl.close()
+               .then( () => {
+                  this.navCtrl.setRoot('LoginPage');
+               });
+            });
+          }
+        })
       }
     });
-    this.requestProvider.saveToken();
-    this.onNotification();
+
     
     menuCtrl.enable(true);
   }
@@ -92,6 +94,16 @@ export class HoHomePage {
     }).catch((error)=>{
       alert(JSON.stringify(error));
     });  
+}
+isTransacting(coID){
+  this.afdb.object('profile/' + coID).update({
+    isTransacting: true
+  });
+}
+isNotTransacting(coID){
+  this.afdb.object('profile/' + coID).update({
+    isTransacting: false,
+  });
 }
 
   ionViewDidLoad(){
@@ -134,7 +146,8 @@ export class HoHomePage {
     });
 
   }
-  initCancelParked(carowner,key){
+  initCancelParked(carowner,key,coID){
+    let tempCap;
     let alert = this.alertCtrl.create({
       title: 'Cancel Transaction',
       subTitle: 'Do you want to cancel the transaction?',
@@ -152,13 +165,23 @@ export class HoHomePage {
             this.afdb.list<any>('requests/' + this.userId + '/parkedNode').update(key,{
               status: 'cancelled'
             });
+                  // tempCap  
+              let temp = this.afdb.object<any>('requests/' + this.userId ).valueChanges().subscribe(data=>{        
+                tempCap = data.available
+                temp.unsubscribe();
+                tempCap ++;        
+                this.afdb.object('requests/' + this.userId ).update({
+                  available: tempCap
+                }); 
+              });
           }
         }
       ]
     });
     alert.present();
 }
-  initCancelArriving(carowner,key){
+  initCancelArriving(carowner,key,coID){
+    let tempCap
     let alert = this.alertCtrl.create({
       title: 'Cancel Transaction',
       subTitle: 'Do you want to cancel the transaction?',
@@ -176,6 +199,17 @@ export class HoHomePage {
             this.afdb.list<any>('requests/' + this.userId + '/arrivingNode').update(key,{
               status: 'hoCancelled'
             });
+            this.isNotTransacting(coID);
+                  // tempCap  
+            let temp = this.afdb.object<any>('requests/' + this.userId ).valueChanges().subscribe(data=>{        
+              tempCap = data.available
+              temp.unsubscribe();
+              tempCap ++;        
+              this.afdb.object('requests/' + this.userId ).update({
+                available: tempCap
+              }); 
+            });
+
           }
         }
       ]
@@ -183,18 +217,8 @@ export class HoHomePage {
     alert.present();
 }
 
-  clearArriving(key){
-    var tempCap;
+  clearArriving(key,coID){ 
     this.afdb.list('requests/' + this.userId + '/arrivingNode').remove(key);
-          // tempCap  
-      let temp = this.afdb.object<any>('requests/' + this.userId ).valueChanges().subscribe(data=>{        
-        tempCap = data.available
-        temp.unsubscribe();
-        tempCap ++;        
-        this.afdb.object('requests/' + this.userId ).update({
-          available: tempCap
-        }); 
-      });
   }
   ngOnDestroy() {
     //this.request.unsubscribe();
@@ -202,9 +226,10 @@ export class HoHomePage {
 
   //listens for incoming requests
 
-declineRequest(id){
+declineRequest(id,coID){
   this.afdb.list('requests/' + this.userId + '/requestNode').update(id,{status: "declined"});
   this.afdb.list('requests/' + this.userId + '/requestNode').remove(id);
+  this.isNotTransacting(coID);
 }
 async acceptRequest(carowner,id){
   var place = 0;
@@ -284,42 +309,6 @@ async acceptRequest(carowner,id){
     });
   }
 
-  async onNotification() {
-    try {
-      await this.platform.ready();
-
-      this.fcm.onNotification().subscribe(data => {
-        this.afdb.object<any>('profile/' + data.coID).valueChanges().take(1).subscribe(codata => {
-          var fname, lname, platenumber;
-          fname = codata.fname;
-          lname = codata.lname;
-
-          if (data.wasTapped) {
-            //toast Controller
-            let toast = this.toastCtrl.create({
-              message: 'You have a parkint request from ' + fname + ' ' + lname,
-              duration: 4000,
-              position: 'top'
-            });
-            toast.present();
-          } else {  
-            //toast Controller
-            let toast = this.toastCtrl.create({
-              message: 'You have a parkint request from ' + fname + ' ' + lname,
-              duration: 4000,
-              position: 'top'
-            });
-            toast.present();
-          }
-
-        });
-
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  }
-
   openMenu(evt) {
     if (evt === "coho-Menu") {
       this.menuCtrl.enable(true, 'coho-Menu');
@@ -362,7 +351,8 @@ async acceptRequest(carowner,id){
       timeStartFormat: this.start
     });
   }
-  stopTimer(carowner,key) {
+  stopTimer(carowner,key,coID) {
+    this.isNotTransacting(coID);
     var tempCap;
     this.startTime
     //get stopTime

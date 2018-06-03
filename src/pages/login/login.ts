@@ -75,7 +75,7 @@ export class LoginPage {
 		});
 
     loading.present(loading).then( () => {
-      if ((this.login.email != null) || (this.login.password != null)) {
+      if ((this.login.email != null) && (this.login.password != null)) {
         this.authProvider.loginUser(this.login).then(() => {
           this.authProvider.setID();
 
@@ -105,7 +105,11 @@ export class LoginPage {
                 } else if (data.establishment) {
                   this.navCtrl.setRoot("EstHomePage");
                   this.x.unsubscribe();
-                } else {
+                } else if(data.reg_status === "disabled"){
+                  this.showToast('Your account has been disabled contact ParkInLot for assistance');
+                  this.x.unsubscribe();
+                }else {
+                  this.x.unsubscribe();
                   this.showToast('Cannot login to application. Account request has not yet been approved by admin.');
                 }
                 loading.dismiss();
