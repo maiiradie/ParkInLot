@@ -112,7 +112,7 @@ export class ComoredetailsPage {
   sendRequest(HoToken){
     this.reqButton = false;
     let coID = this.authProvider.userId;   
-    this._homeownerStatus = this.afdb.object<any>('location/' + this.hoID).valueChanges().subscribe(locData=>{
+    this._homeownerStatus = this.afdb.object<any>('location/' + this.hoID).valueChanges().take(1).subscribe(locData=>{
       let temp = this.afdb.object<any>('requests/' + this.hoID ).valueChanges().subscribe(data => {
         if (data.available == 0) {
           this.reqButton = true;
@@ -121,7 +121,6 @@ export class ComoredetailsPage {
             buttons: ['Dismiss']
           });
           alert1.present();
-          this._homeownerStatus.unsubscribe();
           temp.unsubscribe();
         } else if(locData.status === "offline"){
           let alert2 = this.alertCtrl.create({
@@ -130,7 +129,6 @@ export class ComoredetailsPage {
           });
           alert2.present();
           this.reqButton = true;
-          this._homeownerStatus.unsubscribe();
           temp.unsubscribe();
         }else {
           this.isTransacting();

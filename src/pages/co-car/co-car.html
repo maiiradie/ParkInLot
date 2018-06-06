@@ -14,7 +14,12 @@
     <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="!imgName">
       <img [src]="imgName" class="rec" *ngIf="imgName">
       <hr>
-      <ion-list no-lines>
+      <ion-list no-lines *ngIf="userData != undefined">
+            <ion-list-header *ngIf="cars.length > 1">
+                    Car in use
+            </ion-list-header>  
+
+
           <ion-item>
               <ion-icon name="car" color="secondary" item-start></ion-icon>
               <p>Plate Number</p>
@@ -27,5 +32,17 @@
           </ion-item>
       </ion-list>
       <hr>
+      <ion-list *ngIf="cars.length >= 1" no-lines>
+        <ion-list-header>
+            Cars
+        </ion-list-header>
+        <ion-item *ngFor="let car of cars;let i = index">
+            <ion-icon name="car" color="secondary" item-start></ion-icon>
+            <p>{{car.payload.val().carmodel}}</p>
+            <span>{{car.payload.val().plateNumber}}</span>
+            <button ion-button clear item-end (tap)="switch(car.key)">Switch</button>
+        </ion-item>
+    </ion-list>
   </div>
+
 </ion-content>

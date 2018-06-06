@@ -359,13 +359,13 @@ export class CoHomePage {
 			}else if(data.timeStart && !data.endTime){	
 						                
                 var d = new Date(data.timeStart);
-                start = d.toLocaleTimeString();
+                start = d.toLocaleTimeString([],{hour12:true});
                 this.navAddress = "Timer started at: " + start;
 
 			}else if(data.endTime){
 				this._parked.unsubscribe();
 				var e = new Date(data.endTime);
-				end = e.toLocaleTimeString();
+				end = e.toLocaleTimeString([],{hour12:true});
 				this._parked.unsubscribe();
 					let confirm = this.alertCtrl.create({
 							title: 'Payment',
