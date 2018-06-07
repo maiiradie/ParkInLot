@@ -127,6 +127,8 @@ export class LoginPage {
             this.showToast('No user registered with the email');
           } else if (error.code === "auth/wrong-password") {
             this.showToast('The password is incorrect');
+          } else {
+            console.log(error); 
           }
         });
 

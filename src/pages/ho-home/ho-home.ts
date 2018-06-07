@@ -83,7 +83,6 @@ export class HoHomePage {
         })
       }
     });
-
     
     menuCtrl.enable(true);
   }

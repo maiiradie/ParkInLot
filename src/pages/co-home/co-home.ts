@@ -64,6 +64,7 @@ export class CoHomePage {
 						  
 						this.afs.auth.signOut();
 						this.navCtrl.setRoot('LoginPage');
+
 					}
 		});
 
