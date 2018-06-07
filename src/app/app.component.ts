@@ -38,7 +38,7 @@ export class MyApp {
     private authProvider: AuthProvider,
     private afdb: AngularFireDatabase,
     private afs: AngularFireAuth,
-    platform: Platform,
+    platform: Platform, 
     statusBar: StatusBar,
     splashScreen: SplashScreen) {
     platform.ready().then(() => {
@@ -51,7 +51,6 @@ export class MyApp {
       if (user) {
         this.afdb.object<any>(`profile/` + user.uid).valueChanges().take(1).subscribe(data => {
           this.profileData = data;
-          this.retrieveImg(user.uid);
           if (data.homeowner && !data.carowner) {
             console.log('one');
             this.authProvider.updateLocationLog(user.uid, 'online');
@@ -66,8 +65,6 @@ export class MyApp {
             this.authProvider.updateOnDisconnect(user.uid);
           } else if (data.carowner && data.homeower) {
             this.afdb.object<any>(`location/` + user.uid).valueChanges().take(1).subscribe(data => {
-
-              console.log('three');
               this.authProvider.updateLogStatus(user.uid, data.payload.val().status);
               this.authProvider.updateHOOnDisconnect(user.uid);
 

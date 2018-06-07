@@ -7,7 +7,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Geolocation } from '@ionic-native/geolocation';
 import { MyApp } from './app.component';
-import { FCM } from '@ionic-native/fcm';
 import { FIREBASE_CONFIG } from './app.firebase.config';
 import { AngularFireModule } from 'angularfire2';
 import { AngularFireAuthModule } from 'angularfire2/auth';
@@ -18,7 +17,6 @@ import { FilePath } from '@ionic-native/file-path';
 import { FileTransfer } from '@ionic-native/file-transfer';
 
 import { AuthProvider } from '../providers/auth/auth'; 
-import { RequestProvider } from '../providers/request/request'; 
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import { IonicStorageModule } from '@ionic/storage';
 
@@ -52,12 +50,10 @@ import { IonicStorageModule } from '@ionic/storage';
     FileChooser,
     FilePath,
     FileTransfer,
-    FCM,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     AuthProvider,
     Geolocation,
     AuthProvider,
-    RequestProvider,
   ]
 })
 

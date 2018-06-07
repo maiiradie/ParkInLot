@@ -22,7 +22,6 @@ export class AuthProvider {
   setID() {
     return this.userId = this.afs.auth.currentUser.uid;
   }
-
   getUser() {
     return this.afdb.object<any>('profile/' + this.userId).valueChanges().take(1);
   }
