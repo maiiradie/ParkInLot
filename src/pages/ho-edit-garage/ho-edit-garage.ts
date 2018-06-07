@@ -22,6 +22,8 @@ export class HoEditGaragePage {
   garageForm: FormGroup;
   imgName;
   imgUrl;
+  requestData;
+  transacting;
   private imgPath;
   private userId;
   profile$: AngularFireObject<any>;
@@ -39,7 +41,8 @@ export class HoEditGaragePage {
     private toastCtrl: ToastController) {
     this.garageForm = this.fb.group({
       'address': [null, Validators.compose([Validators.required, Validators.minLength(10)])],
-      'details': ['']
+      'details': [''],
+      'capacity': [null, Validators.compose([Validators.required, Validators.minLength(1), Validators.pattern('^[0-9]*')])]
     });
     this.userId = this.authProvider.userId;
   }
@@ -52,7 +55,14 @@ export class HoEditGaragePage {
       this.afdb.object(`/location/` + this.userId).valueChanges().take(1).subscribe(out => {
         this.location = out;
       })
+
+      this.afdb.object(`/requests/` + this.userId).valueChanges().take(1).subscribe(out2 => {
+        this.requestData = out2;
+        console.log('Reqoiasdf ' + JSON.stringify(this.requestData));
+      })
+
     });
+    this.ifTransacting();
   }
 
   showToast() {
@@ -116,12 +126,37 @@ export class HoEditGaragePage {
 
     this.afdb.object(`/profile/` + this.userId).update({ details: this.garageForm.value['details'] }).then(d => {
       this.afdb.object(`/location/` + this.userId).update({ address: this.garageForm.value['address'] }).then(d => {
-        this.afdb.object(`/profile/` + this.userId).update({ garagePic: this.imgName });
-        this.upload(this.imgPath, this.imgName);
+        this.afdb.object(`/requests/` + this.userId).update({ capacity: this.garageForm.value['capacity'] }).then(d => {
+          this.afdb.object(`/requests/` + this.userId).update({ available: this.garageForm.value['capacity'] }).then(d => {
+            this.afdb.object(`/profile/` + this.userId).update({ garagePic: this.imgName });
+            this.upload(this.imgPath, this.imgName);
+          });
+        });
       });
     });
     loading.dismiss();
     this.showToast();
     this.navCtrl.pop();
+  }
+
+  ifTransacting() {
+    this.afdb.object<any>('requests/' + this.userId).valueChanges().subscribe(data => {
+      if (data.arrivingNode || data.requestNode || data.parkedNode) {
+        this.transacting = true;
+      } else {
+        this.transacting = false;
+      }
+      console.log('rana toagal ' +JSON.stringify(data));
+      // console.log(JSON.stringify(this.transacting));
+    })
+    
+  }
+
+  showTransactingToast() {
+    let toast = this.toastCtrl.create({
+      message: 'Garage capacity may not be edited while there are ongoing transactions.',
+      duration: 3000
+    })
+    toast.present();
   }
 }

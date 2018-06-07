@@ -15,6 +15,7 @@ export class HoGaragePage {
   userData;
   location;
   imgName;
+  requestData;
   private userId = this.authProvider.userId;
   
 
@@ -33,6 +34,11 @@ export class HoGaragePage {
         this.afdb.object(`location/` + this.userId).valueChanges().take(1).subscribe( out => {
           this.location = out;
         });
+
+        this.afdb.object(`/requests/` + this.userId).valueChanges().take(1).subscribe(out2 => {
+          this.requestData = out2;
+          console.log('Reqoiasasdasddf ' + JSON.stringify(this.requestData));
+        })
       });
   }
 

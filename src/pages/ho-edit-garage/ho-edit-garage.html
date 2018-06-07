@@ -4,35 +4,39 @@
       <ion-title>Edit Garage</ion-title>
     </ion-navbar>
   </ion-header>
-  
+
   <div class="bg"></div>
   <div padding class="info">
-    <img  *ngIf="imgUrl" [src]="imgUrl" class="image">
+    <img *ngIf="imgUrl" [src]="imgUrl" class="image">
     <button type="button" ion-button block clear (click)="changeImg()">Change Photo</button>
-  
-      <!-- <div class="info"> -->
-          <form [formGroup]='garageForm' (ngSubmit)="updateGarage()">
-              <ion-list-header>
-                  Garage Details  
-                </ion-list-header>
-              <ion-list>
-                <ion-item>
-                  <ion-label stacked>Address</ion-label>  
-                  <ion-input type="text" formControlName = 'address' value="{{location?.address}}"></ion-input>
-                </ion-item>
-                
-              <!-- <ion-item>
-                                  <ion-label stacked>Capacity</ion-label> 
-                                <ion-input type="number" formControlName = 'capacity' value="{{userData?.capacity}}"></ion-input>
-                              </ion-item>	 -->
 
-                <ion-item>
-                    <ion-label stacked>Details</ion-label> 
-                    <ion-textarea formControlName = "details" value="{{userData?.details}}"></ion-textarea>
-                </ion-item>
-              </ion-list>
-              <button ion-button block class="save" type="submit" [disabled]='!garageForm.valid'>Save Changes</button>
-          </form>
-    </div>
+    <form [formGroup]='garageForm' (ngSubmit)="updateGarage()">
+      <ion-list-header>
+        Garage Details
+      </ion-list-header>
+      <ion-list>
+        <ion-item>
+          <ion-label stacked>Address</ion-label>
+          <ion-input type="text" formControlName='address' value="{{location?.address}}"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label stacked>Capacity</ion-label>
+          <ion-input type="number" formControlName='capacity' value="{{requestData?.capacity}}" *ngIf="transacting == false; else isTransacting"></ion-input>
+            <ng-template #isTransacting>
+              <ion-input type="number" (click)="showTransactingToast()" disabled formControlName='capacity' value="{{requestData?.capacity}}"></ion-input>
+            </ng-template>/
+
+
+        </ion-item>
+
+        <ion-item>
+          <ion-label stacked>Details</ion-label>
+          <ion-textarea formControlName="details" value="{{userData?.details}}"></ion-textarea>
+        </ion-item>
+      </ion-list>
+      <button ion-button block class="save" type="submit" [disabled]='!garageForm.valid'>Save Changes</button>
+    </form>
+  </div>
   <!-- </div> -->
 </ion-content>
