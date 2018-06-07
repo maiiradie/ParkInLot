@@ -17,9 +17,10 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content>
-<div class="geocoder" id="geocoder"></div>
+<ion-content no-bounce>
+
 <div id="map" class="map">
+    <div class="geocoder" id="geocoder"></div>
 </div>
 
 
@@ -27,23 +28,47 @@
     <ion-row>
       <ion-col>
         <ion-buttons end>
-       <button ion-button color='light' (click)='centerLocation()'>
-            <ion-icon name="locate"></ion-icon>
+       <button id="locate" ion-button clear large  (click)='centerLocation()'>
+            <ion-icon id="iconLocate" name="locate" color="secondary"></ion-icon>
         </button>
       </ion-buttons>
       </ion-col>        
     </ion-row>
-  </div>`
+  </div>
+
+  <div *ngIf="navAddress == 'Navigate to destination follow blue lines'" class="cancel">
+      <ion-row>
+        <ion-col>
+          <ion-buttons>
+         <button  (tap)="initCancelWholeTransac()" id='cancel' ion-button clear large  >
+              <ion-icon id="iconCancel" name="close-circle" color="danger"></ion-icon>
+          </button>
+        </ion-buttons>
+        </ion-col>        
+      </ion-row>
+    </div>
+
+    <div *ngIf="navAddress == 'Navigate to destination follow blue lines'" class="arrived">
+        <ion-row>
+          <ion-col>
+            <ion-buttons>
+           <button  (tap)="arrivedTransac()" id='arrived' ion-button clear large  >
+                <ion-icon id="iconArrived" name="checkmark-circle" color="secondary"></ion-icon>
+            </button>
+          </ion-buttons>
+          </ion-col>        
+        </ion-row>
+      </div>
 
   <div *ngIf="tempHoID">
       <div class="status_container">
         <div class="status_text">
-            <div *ngIf="navAddress">
+            <p *ngIf="navAddress">
               {{navAddress}}
-            </div>
-            <button *ngIf="navAddress == 'Navigate to destination follow blue lines'" ion-button  color="danger" (tap)="initCancelWholeTransac()">Cancel</button>
-            <button *ngIf="navAddress == 'Navigate to destination follow blue lines'" ion-button  color="secondary" (tap)="arrivedTransac()">Arrived</button>
-            <button *ngIf="navAddress == 'Transaction was cancelled'" ion-button  (tap)="clearTransac()">Continue</button>
+            </p>
+            <!-- <button *ngIf="navAddress == 'Navigate to destination follow blue lines'" ion-button  color="danger" (tap)="initCancelWholeTransac()">Cancel</button>
+            <button >Arrived</button>-->
+            <button *ngIf="navAddress == 'Transaction was cancelled'" ion-button  (tap)="clearTransac()">Continue</button> 
         </div>
       </div>
   </div>

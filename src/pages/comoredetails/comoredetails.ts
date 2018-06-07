@@ -2,11 +2,10 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController, AlertController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { FCM } from '@ionic-native/fcm';
-import { RequestProvider } from '../../providers/request/request';
 import { AuthProvider } from '../../providers/auth/auth';
 import { query } from '@angular/core/src/animation/dsl';
 import * as firebase from 'firebase/app';
+import { AngularFireAuth } from 'angularfire2/auth';
 
 @IonicPage()
 @Component({
@@ -16,6 +15,7 @@ import * as firebase from 'firebase/app';
 
 export class ComoredetailsPage {
   myData:any;
+  myCar: any;
   tempKey;
   reqButton:Boolean = true;
   reqFlag: Boolean = false;
@@ -30,17 +30,19 @@ export class ComoredetailsPage {
   myTimeout;
   garrageDet;
   _returnStatus;
+  _homeownerStatus;
   garrageDetTwo;
 
   
   private key = "key=AAAAQHrZv6o:APA91bFLp4qD4gS00FAYrzzJiCoLwTBm-B9vadJNsMMqblXkjCyCxYcMmPVAsRtMsMTASXbhLN6U_YylRe__2bZw7MKotfghVtfxfHNERoIulwrb1TdMV4cp-jNjxsZ88K-OuLdokxiM";
-  constructor(private requestProvider:RequestProvider, 
+  constructor(
+              private afs: AngularFireAuth,
               private authProvider:AuthProvider,
               private afdb:AngularFireDatabase,
               public navCtrl: NavController, 
               public navParams: NavParams,
               public toastCtrl: ToastController,
-              private fcm: FCM, 
+ 
               public http: HttpClient, 
               public alertCtrl: AlertController
             ) {
@@ -50,6 +52,7 @@ export class ComoredetailsPage {
     this.hoID = this.navParams.get('key');
     this.getGarrageData();
     this.getMyData();
+
     
     this.displayInfo();
     
@@ -58,14 +61,39 @@ export class ComoredetailsPage {
     this.retrieveImg();
   }
   ionViewDidLeave(){ 
+    if(this._homeownerStatus){
+      this._homeownerStatus.unsubscribe();
+    }
     if(this._returnStatus){
       this._returnStatus.unsubscribe();
     }
 
   }
+  isTransacting(){ 
+      this.afdb.object('profile/' + this.afs.auth.currentUser.uid).update({
+        isTransacting: true,
+    });
+
+    
+    
+  }
+  isNotTransacting(){
+    this.afdb.object('profile/' + this.afs.auth.currentUser.uid).update({
+      isTransacting: false
+    });
+  }
   getMyData(){
     this.afdb.object('profile/'+ this.authProvider.userId).valueChanges().take(1).subscribe( data => {
       this.myData = data;
+    });
+    this.afdb.list<any>('profile/' + this.afs.auth.currentUser.uid + '/cars').valueChanges().take(1).subscribe(plate=>{
+      for(let i = 0; i < plate.length; i ++){
+        console.log(plate[i]);
+        if(plate[i].isActive == true){
+          console.log(plate[i]);
+          this.myCar = plate[i];
+        }
+      }
     });
   }
   getGarrageData(){    
@@ -95,63 +123,53 @@ export class ComoredetailsPage {
   sendRequest(HoToken){
     this.reqButton = false;
     let coID = this.authProvider.userId;   
-    let temp = this.afdb.object<any>('requests/' + this.hoID ).valueChanges().subscribe(data => {
-      if (data.available == 0) {
-        this.reqButton = true;
-        alert('The homeowner is on an ongoin transaction at the moment');
-        temp.unsubscribe();
-      } 
-      else {
-        //add statusListener here 
-        this.statusListener();
-        var tempCap = data.available;
-        temp.unsubscribe();
-        for(var i = 0; i < data.capacity; i++){
-            var pic = this.imgName;
-            var name = this.myData.fname + ' ' + this.myData.lname
-            var plateNumber = this.myData.plateNumber;
-            this.afdb.list("requests/" + this.hoID + '/requestNode').push({    
-              coID,              
-              name,
-              plateNumber,
-              status:"pending"
-            }); 
-            tempCap --;            
-            this.showConfirm(i)
-            this.afdb.object('requests/' + this.hoID ).update({
-              available: tempCap
-            }); 
-            
-            break;
-        }        
+    this._homeownerStatus = this.afdb.object<any>('location/' + this.hoID).valueChanges().take(1).subscribe(locData=>{
+      let temp = this.afdb.object<any>('requests/' + this.hoID ).valueChanges().subscribe(data => {
+        if (data.available == 0) {
+          this.reqButton = true;
+          let alert1 = this.alertCtrl.create({
+            title: 'No space available',
+            buttons: ['Dismiss']
+          });
+          alert1.present();
+          temp.unsubscribe();
+        } else if(locData.status === "offline"){
+          let alert2 = this.alertCtrl.create({
+            title: 'Homeowner is Offline',
+            buttons: ['Dismiss']
+          });
+          alert2.present();
+          this.reqButton = true;
+          temp.unsubscribe();
+        }else {
+          this.isTransacting();
+          this.statusListener();
+          var tempCap = data.available;
+          temp.unsubscribe();
+          for(var i = 0; i < data.capacity; i++){
+              var pic = this.imgName;
+              var name = this.myData.fname + ' ' + this.myData.lname
+              var plateNumber = this.myCar.platenumber;
+              this.afdb.list("requests/" + this.hoID + '/requestNode').push({    
+                coID,              
+                name,
+                plateNumber,
+                status:"pending"
+              }); 
+              tempCap --;            
+              this.showConfirm(i)
+              this.afdb.object('requests/' + this.hoID ).update({
+                available: tempCap
+              }); 
+              
+              break;
+          }        
+          
+        }
         
-        let body = {
-          "notification": {
-            "title": "You have a parking request!",
-            "body": "",
-            "sound": "default",
-            "click_action": "FCM_PLUGIN_ACTIVITY",
-            "icon": "fcm_push_icon"
-          },
-          "data": {
-            "coID": coID,
-            "hoToken": HoToken,
-            "hoID": this.hoID
-          },
-          "to": HoToken,
-          "priority": "high",
-          "restricted_package_name": ""
-        };
-        let options = new HttpHeaders().set('Content-Type', 'application/json');
-        return this.http.post("https://fcm.googleapis.com/fcm/send", body, {
-          headers: options.set('Authorization', this.key),
-        }).subscribe();
-        
-      }
-      
+      });
     });
-    
-    //this.requestProvider.sendRequest(HoToken,coID, this.hoID);
+  
 
   }
 
@@ -170,6 +188,7 @@ export class ComoredetailsPage {
         for(var i = 0; i < data.length; i++){    
                 
           if(data[i].payload.val().status == "declined"){
+            this.isNotTransacting();
             this._returnStatus.unsubscribe();            
             clearTimeout(this.myTimeout);
             if(this.actrlFlag){
@@ -247,6 +266,7 @@ export class ComoredetailsPage {
           handler: () => {
             this.reqButton = true;
             clearTimeout(this.myTimeout);
+            this.isNotTransacting();
 
             let tempo = this.afdb.list('requests/' + this.hoID + '/requestNode/').snapshotChanges().subscribe(data=>{
               tempo.unsubscribe();
@@ -288,7 +308,7 @@ export class ComoredetailsPage {
    setTimeout(i){
      var tempCap;
     this.myTimeout = setTimeout(()=>{ 
-          
+      this.isNotTransacting();
       this._returnStatus.unsubscribe();
       this.reqButton = true;
       if(this.actrlFlag){
