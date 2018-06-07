@@ -36,11 +36,9 @@ retrieveCars(){
         this.userData = data[i].payload.val();
         this.retrieveImg();
       }else{
-        console.log(data[i]);
         this.cars.push(data[i]);
       }
     }
-    console.log(this.userData);
   })
 }
 switch(id){
@@ -51,15 +49,12 @@ switch(id){
         this.afdb.list<any>('profile/' + this.userId + '/cars').update(data[i].key,{
           isActive: false
         });
+        console.log("if");
       }else if(data[i].key == id){
+        console.log("else");
         this.afdb.list<any>('profile/' + this.userId + '/cars').update(id,{
           isActive: true
         });
-        this.afdb.object<any>('profile/' + this.userId).update({
-          carPic: data[i].payload.val().carPic,
-          carmodel: data[i].payload.val().carmodel,
-          plateNumber: data[i].payload.val().plateNumber
-        });    
         const toast = this.toastCtrl.create({
           message: 'Succesfully switched to ' + data[i].payload.val().carmodel + ': ' + data[i].payload.val().plateNumber,
           duration: 4000

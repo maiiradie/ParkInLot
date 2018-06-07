@@ -15,6 +15,7 @@ import { AngularFireAuth } from 'angularfire2/auth';
 
 export class ComoredetailsPage {
   myData:any;
+  myCar: any;
   tempKey;
   reqButton:Boolean = true;
   reqFlag: Boolean = false;
@@ -51,6 +52,7 @@ export class ComoredetailsPage {
     this.hoID = this.navParams.get('key');
     this.getGarrageData();
     this.getMyData();
+
     
     this.displayInfo();
     
@@ -83,6 +85,15 @@ export class ComoredetailsPage {
   getMyData(){
     this.afdb.object('profile/'+ this.authProvider.userId).valueChanges().take(1).subscribe( data => {
       this.myData = data;
+    });
+    this.afdb.list<any>('profile/' + this.afs.auth.currentUser.uid + '/cars').valueChanges().take(1).subscribe(plate=>{
+      for(let i = 0; i < plate.length; i ++){
+        console.log(plate[i]);
+        if(plate[i].isActive == true){
+          console.log(plate[i]);
+          this.myCar = plate[i];
+        }
+      }
     });
   }
   getGarrageData(){    
@@ -138,7 +149,7 @@ export class ComoredetailsPage {
           for(var i = 0; i < data.capacity; i++){
               var pic = this.imgName;
               var name = this.myData.fname + ' ' + this.myData.lname
-              var plateNumber = this.myData.plateNumber;
+              var plateNumber = this.myCar.platenumber;
               this.afdb.list("requests/" + this.hoID + '/requestNode').push({    
                 coID,              
                 name,
