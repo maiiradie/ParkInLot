@@ -20,12 +20,20 @@ export class HoTransacHistoryPage {
   month = ["January","February","March","April","May","June","July","August","September","October","November,","December"];
   transacQuery1;
   transacQuery2;
+  selected_month: any;
+  selected_year: any;
+  years: string[] = ['2018'];
+  months: string[] = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
 
   constructor(private afs:AngularFireAuth,
       public navCtrl: NavController,
       public navParams: NavParams,
       private afdb: AngularFireDatabase, 
-      private authProvider: AuthProvider) {   
+      private authProvider: AuthProvider) {
+        
+      this.selected_month = 'June';
+      this.selected_year = '2018';
   }
   ngOnDestroy() {
     if (this.transacQuery1) {
@@ -37,7 +45,7 @@ export class HoTransacHistoryPage {
   }
 
   ionViewDidLoad() {
-    this.getTransactions();
+    this.getTransactions(this.selected_month);
     this.getDueMonth()
     this.getDueAmount();
   }
@@ -77,12 +85,15 @@ export class HoTransacHistoryPage {
     });
   }
 
-  async getTransactions() {
+  async getTransactions(selected_month) {
+    this.transactions = [];
     this.transacQuery1 = await this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
-      for(let i = data.length - 1; i > -1; i--){        
+      for(let i = data.length - 1; i > -1; i--){
         if(data[i].payload.val().carowner){            
           if(data[i].payload.val().hoID == this.userId){
             var dateStart = new Date(data[i].payload.val().timeStart);
+            var moNu = dateStart.getMonth();
+            if (this.months[moNu] == selected_month) {
             var date = dateStart.toLocaleDateString();
             var start = dateStart.toLocaleTimeString();
             var dateEnd = new Date(data[i].payload.val().endTime);
@@ -102,6 +113,7 @@ export class HoTransacHistoryPage {
         }  
       }
     }
+  }
   });
 }
 }

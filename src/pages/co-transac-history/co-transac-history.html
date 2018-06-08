@@ -16,7 +16,25 @@
 </ion-header>
 
 <ion-content padding>
-  <ion-list>
+    <ion-list-header>
+      Due Amount For {{dateMonth}}: Php{{amount}}
+    </ion-list-header>
+    <ion-list>
+      <ion-item>
+        <ion-label>Month</ion-label>
+        <ion-select [(ngModel)]="selected_month" interface="popover" placeholder="March" (ionChange)="getTransactions(selected_month)">
+          <ion-option *ngFor="let m of months" value="{{m}}" [selected]="selected_month == m">{{ m }}</ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Year</ion-label>
+        <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
+          <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-list-header>
+        Transactions for the month of {{ selected_month }}
+      </ion-list-header>
     <ion-item *ngFor="let item of transactions">
         <h6>{{item?.name}}</h6>
         <p>Date: {{item?.date}}</p>

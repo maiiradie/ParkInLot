@@ -112,6 +112,7 @@ export class ComoredetailsPage {
       this.profileData = data.payload.val();
       if(this.profileData.establishment == true) {
         this.hown = false;
+        console.log(this.profileData.openingTime);
       }
     });
     this.afdb.object('location/'+ this.hoID).snapshotChanges().take(1).subscribe( data => {
