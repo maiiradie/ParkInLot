@@ -36,6 +36,8 @@ export class CoHomePage {
 	userId = this.authProvider.userId;
 	navAddress;
 	transacting;
+	activeCar;
+
 	constructor(private afs: AngularFireAuth,		
 		private toastCtrl: ToastController,   
 		public alertCtrl: AlertController,
@@ -128,7 +130,7 @@ export class CoHomePage {
 				 },this.transactionListener());
 				 
 		});
-
+		this.getActiveCar();
 	}
 
 
@@ -143,6 +145,19 @@ export class CoHomePage {
 		}else if(this.tempHoID && status == "parked"){
 			this.initParkedListener();	
 		}
+	}
+
+	_activeCar;
+
+	getActiveCar(){
+		this._activeCar = this.afdb.list<any>('profile/' + this.authProvider.userId + '/cars', ref => ref.orderByChild('isActive').equalTo(true))
+		.snapshotChanges().subscribe( data => {
+			for (let i = 0; i < data.length; i++) {
+				// console.log(JSON.stringify(data[i].payload.val()));
+				this.activeCar = data[i].payload.val().carmodel + ': ' + data[i].payload.val().platenumber;
+			}
+			this._activeCar.unsubscribe();
+		});
 	}
 
 	 checkOnGoingTransaction(){		 

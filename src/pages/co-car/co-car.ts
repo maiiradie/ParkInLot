@@ -56,7 +56,7 @@ switch(id){
           isActive: true
         });
         const toast = this.toastCtrl.create({
-          message: 'Succesfully switched to ' + data[i].payload.val().carmodel + ': ' + data[i].payload.val().plateNumber,
+          message: 'Successfully switched to ' + data[i].payload.val().carmodel + ': ' + data[i].payload.val().platenumber,
           duration: 4000
         });
         toast.present();
