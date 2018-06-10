@@ -515,7 +515,7 @@ export class CoHomePage {
 					el.className = "estabMarker";
 				}else if (data[i].payload.val().status == "offline"){
 					el.className = "closed";
-				}					
+				}				
 					var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
 					new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)

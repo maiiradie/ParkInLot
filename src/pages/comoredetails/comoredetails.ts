@@ -110,15 +110,29 @@ export class ComoredetailsPage {
     
     this.afdb.object('profile/'+ this.hoID).snapshotChanges().take(1).subscribe( data => {
       this.profileData = data.payload.val();
+      
       if(this.profileData.establishment == true) {
         this.hown = false;
-        console.log(this.profileData.openingTime);
+        this.profileData.openingTime = this.tConvert(this.profileData.openingTime);
+        this.profileData.closingTime = this.tConvert(this.profileData.closingTime);
       }
     });
     this.afdb.object('location/'+ this.hoID).snapshotChanges().take(1).subscribe( data => {
       this.userData = data.payload.val();
     });
 
+  }
+
+  tConvert(time) {
+      let hour = (time.split(':'))[0]
+      let min = (time.split(':'))[1]
+      let part = hour > 12 ? 'PM' : 'AM';
+
+      min = (min + '').length == 1 ? `0${min}` : min;
+      hour = hour > 12 ? hour - 12 : hour;
+      hour = (hour + '').length == 1 ? `0${hour}` : hour;
+
+      return (`${hour}:${min} ${part}`);
   }
 
   sendRequest(HoToken){

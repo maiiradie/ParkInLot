@@ -30,7 +30,7 @@ export class EstHomePage {
   }
 
   ionViewDidLoad() {
-      this.afdb.object<any>('location/'+ this.userId ).snapshotChanges().subscribe( data => {
+      this.afdb.object<any>('establishments/'+ this.userId ).snapshotChanges().subscribe( data => {
         this.profileData = data;
         this.myStatus = data.payload.val().status;
        	
@@ -48,10 +48,10 @@ export class EstHomePage {
 updateStat(){
   if(this.toggleValue){
   	this.OnOff = 'Available';
-    this.afdb.object('location/' + this.userId).update({status: "online"});
+    this.afdb.object('establishments/' + this.userId).update({status: "online"});
   }else{
   	this.OnOff = 'Full'
-    this.afdb.object('location/' + this.userId).update({status: "offline"});
+    this.afdb.object('establishments/' + this.userId).update({status: "offline"});
   }   
 }
 
@@ -61,7 +61,7 @@ updateStat(){
 
   logout() {
     //clear any cached data
-    this.authProvider.logoutUser()
+    this.authProvider.logoutUser();
     // .then( () => {
     this.navCtrl.setRoot('LoginPage');
     // });
