@@ -264,36 +264,11 @@ export class ComoredetailsPage {
             });
             alert.present();
 
-          } else if (data[i].payload.val().status == "timedOut"){
-            this.isNotTransacting();
-            this._returnStatus.unsubscribe();
-            clearTimeout(this.myTimeout);
-            if (this.actrlFlag) {
-              this.cancel.dismiss();
-              this.actrlFlag = false;
-            }
-
-            this.reqButton = true;
-
-            let alert = this.alertCtrl.create({
-              title: 'Request',
-              subTitle: 'Request Timed Out',
-              buttons: [
-                {
-                  text: 'Ok',
-                  handler: () => {
-                    console.log('ok');
-
-                  }
-                }
-              ]
-            });
-            alert.present();
           }
-        }     
-      }); 
-  } 
-//actioncontroller
+       }
+    });
+  }
+
   showConfirm(i) {
     var tempCap;
     this.cancel= this.alertCtrl.create({
@@ -316,6 +291,15 @@ export class ComoredetailsPage {
                 }
               }
             });
+
+            let temp = this.afdb.object<any>('requests/' + this.hoID).valueChanges().subscribe(data => {
+                tempCap = data.available
+                temp.unsubscribe();
+                tempCap++;
+                this.afdb.object('requests/' + this.hoID).update({	
+                    available: tempCap
+                });
+            });
   
             this._returnStatus.unsubscribe();
             if(this.actrlFlag){
@@ -329,6 +313,58 @@ export class ComoredetailsPage {
       this.cancel.present();
       this.actrlFlag = true;
     }  
+    this.setTimeout(i);
     this.statusListener();
   }
+
+  setTimeout(i){
+    var tempCap;
+       this.myTimeout = setTimeout(() => {
+            this.isNotTransacting();
+            this._returnStatus.unsubscribe();
+            this.reqButton = true;
+            if (this.actrlFlag) {
+                this.cancel.dismiss();
+                this.actrlFlag = false;
+            }
+
+            let tempo = this.afdb.list('requests/' + this.hoID + '/requestNode/').snapshotChanges().subscribe(data => {
+                tempo.unsubscribe();
+                for (var i = 0; i < data.length; i++) {
+                   if (data[i].payload.val().coID == this.authProvider.userId) {
+                       this.afdb.list('requests/' + this.hoID + '/requestNode/').remove(data[i].key);
+                      }
+                  }
+              });
+      
+              let temp = this.afdb.object<any>('requests/' + this.hoID).valueChanges().subscribe(data => {
+                  tempCap = data.available
+                  temp.unsubscribe();
+                  tempCap++;
+                  this.afdb.object('requests/' + this.hoID).update({	
+                      available: tempCap
+                  });
+              });
+    
+            let alert = this.alertCtrl.create({	
+               title: 'Request',
+               subTitle: 'Request Timeout',
+                buttons: [
+                  {	
+                 text: 'Ok',
+                    handler: () => {
+                      this.timeoutFlag = false;
+                    }	
+                  }	
+                ]
+            });
+      if (!this.timeoutFlag) {
+        alert.present();
+        this.timeoutFlag = true;
+      }
+
+      this._returnStatus.unsubscribe();
+     }, 60000);  
+  }
+  
 }

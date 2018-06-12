@@ -424,6 +424,9 @@ export class CoHomePage {
 		}if(this.hoMarkers){
 			this.hoMarkers.unsubscribe();
 		}
+		if(this.listOfHO){
+			this.listOfHO.unsubscribe();
+		}	
 		
 	}
 
@@ -504,6 +507,24 @@ export class CoHomePage {
 				}
 			}
 		});
+	}
+	listOfHO;
+
+	showHO(){
+	this.listOfHO =	this.afdb.list<any>('location', ref => ref.orderByChild('status').equalTo('online')).snapshotChanges().subscribe( data => {
+			for (let i = 0; i < data.length; i++) {
+				console.log(JSON.stringify(data[i].payload.val()));
+			}
+		});
+	}
+
+	flyToHO(){
+		this.map.flyTo({
+			center: [
+				120.5960,
+				16.4023
+			]
+		});	
 	}
 	setEstablishmentMarker(){
 		this.afdb.list<any>('establishments/').snapshotChanges().subscribe(data=>{
