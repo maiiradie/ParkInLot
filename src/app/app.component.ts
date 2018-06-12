@@ -20,6 +20,7 @@ import { CoHomePage } from '../pages/co-home/co-home';
 import { CoEditProfilePage } from '../pages/co-edit-profile/co-edit-profile';
 import { CoCarPage } from '../pages/co-car/co-car';
 import { CoTransacHistoryPage } from '../pages/co-transac-history/co-transac-history';
+import { CoParkingListPage } from '../pages/co-parking-list/co-parking-list';
 
 @Component({
   templateUrl: 'app.html'

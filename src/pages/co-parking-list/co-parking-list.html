@@ -1,0 +1,21 @@
+<!--
+  Generated template for the CoParkingListPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Parking List</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+  <ul *ngFor ='let data of onlineHO '>
+    <li>{{ data.address }}</li>
+    <button (click) = 'flyToHO(data.lat,data.lng)'>NAVIGATE</button>
+  </ul>
+</ion-content>

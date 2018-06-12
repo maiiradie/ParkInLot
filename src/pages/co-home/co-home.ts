@@ -8,7 +8,7 @@ import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-direct
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireAuth } from 'angularfire2/auth';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-
+import { Events } from 'ionic-angular';
 
 @IonicPage()
 @Component({
@@ -38,7 +38,8 @@ export class CoHomePage {
 	transacting;
 	activeCar;
 
-	constructor(private afs: AngularFireAuth,		
+	constructor(private afs: AngularFireAuth,	
+		private events:Events,	
 		private toastCtrl: ToastController,   
 		public alertCtrl: AlertController,
 		public navParams: NavParams,
@@ -87,8 +88,23 @@ export class CoHomePage {
 			}
 		})
 	}
+
+	navigateToHO(){
+		this.events.subscribe('location', (location) => {
+			// console.log(JSON.stringify(location));
+			this.map.flyTo({
+		        center: [
+		            location.lng,
+		            location.lat
+		            ]
+		    });
+			// this.events.unsubscribe('locastion');
+		});
+		
+	}
 	
 	ionViewDidLoad() {
+		this.navigateToHO();
 		this.map = this.initMap();
 		this.map.on('load', () => {		
 			this.setDirections();
@@ -511,21 +527,9 @@ export class CoHomePage {
 	listOfHO;
 
 	showHO(){
-	this.listOfHO =	this.afdb.list<any>('location', ref => ref.orderByChild('status').equalTo('online')).snapshotChanges().subscribe( data => {
-			for (let i = 0; i < data.length; i++) {
-				console.log(JSON.stringify(data[i].payload.val()));
-			}
-		});
+		this.navCtrl.push("CoParkingListPage");
 	}
 
-	flyToHO(){
-		this.map.flyTo({
-			center: [
-				120.5960,
-				16.4023
-			]
-		});	
-	}
 	setEstablishmentMarker(){
 		this.afdb.list<any>('establishments/').snapshotChanges().subscribe(data=>{
 			for(var i = 0; i < data.length; i ++){
