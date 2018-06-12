@@ -35,7 +35,8 @@
 
     <ion-item clear> 
       <ion-label>Availability</ion-label>
-      <ion-toggle color="secondary" (ionChange)="updateStat()" [(ngModel)]="toggleValue"></ion-toggle>
+      <ion-toggle color="secondary" (ionChange)="updateStat()" [(ngModel)]="toggleValue" *ngIf="OnOff != 'Closed'"></ion-toggle>
+      <ion-toggle color="secondary" *ngIf="OnOff == 'Closed'" disabled></ion-toggle>
     </ion-item>
   </ion-content>
   
