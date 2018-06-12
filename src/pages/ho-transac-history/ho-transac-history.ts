@@ -50,7 +50,6 @@ export class HoTransacHistoryPage {
 
   ionViewDidLoad() {
     this.retrieveCars();
-    console.log(this.selected_car);
     this.getTransactions(this.selected_month, this.selected_car, this.selected_year);
     this.getDueMonth()
     this.getDueAmount();
@@ -97,7 +96,6 @@ export class HoTransacHistoryPage {
   }
 
   async getTransactions(selected_month, selected_car, selected_year) {
-    console.log('get transactions');
     this.transactions = [];
     this.transacQuery1 = await this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
       for (let i = data.length - 1; i > -1; i--) {
@@ -105,9 +103,6 @@ export class HoTransacHistoryPage {
           var dateStart = new Date(data[i].payload.val().timeStart);
           var moNu = dateStart.getMonth();
           if (this.role == 'homeowner') {
-            console.log('nasa homeowner');
-
-
 
             if (this.months[moNu] == selected_month && data[i].payload.val().hoID == this.userId) {
               var date = dateStart.toLocaleDateString();
@@ -130,9 +125,6 @@ export class HoTransacHistoryPage {
           else if (this.role == 'both') {
 
             if (data[i].payload.val().carowner) {
-              console.log('n' +data[i].payload.val().carowner.platenumber);
-              console.log('N' +data[i].payload.val().carowner.plateNumber);
-
               if (this.months[moNu] == selected_month && data[i].payload.val().carowner.plateNumber == this.selected_car && data[i].payload.val().carowner.coID == this.userId) {
                 this.afdb.object<any>('profile/' + data[i].payload.val().hoID).valueChanges().take(1).subscribe(prof => {
                   var dateStart = new Date(data[i].payload.val().timeStart);
@@ -185,7 +177,6 @@ export class HoTransacHistoryPage {
         this.plateNumbers.push(data[i].payload.val().platenumber);
       }
           this.selected_car = this.plateNumbers[0];
-          console.log('aslkdf' + this.plateNumbers);
     });
   }
 }
