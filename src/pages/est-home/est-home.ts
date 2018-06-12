@@ -14,6 +14,7 @@ import { AuthProvider } from '../../providers/auth/auth';
 export class EstHomePage {
   status
   profileData:any;
+  timeData: any;
   myStatus: boolean;
   toggleValue:boolean;
   OnOff: string;
@@ -29,20 +30,39 @@ export class EstHomePage {
 
   }
 
-  ionViewDidLoad() {
-      this.afdb.object<any>('establishments/'+ this.userId ).snapshotChanges().subscribe( data => {
-        this.profileData = data;
-        this.myStatus = data.payload.val().status;
-       	
-       	if (data.payload.val().status == 'online') {
-		  	this.toggleValue = true;
-		  	this.updateStat();
-       	}else{
-       		this.toggleValue = false;
-       		this.updateStat();
-       	}
-      });
+  ionViewDidEnter() {
+    this.afdb.object<any>('profile/' + this.userId).snapshotChanges().subscribe(data => {
+      this.timeData = data;
+    })
 
+    this.afdb.object<any>('establishments/'+ this.userId ).snapshotChanges().subscribe( data => {
+      this.profileData = data;
+      this.myStatus = data.payload.val().status;
+        
+      if(this.checkTime()) {
+        if (data.payload.val().status == 'online') {
+          this.toggleValue = true;
+          this.updateStat();
+        } else {
+          this.toggleValue = false;
+          this.updateStat();
+        }
+      } else {
+        this.OnOff = 'Closed'
+        this.afdb.object('establishments/' + this.userId).update({status: "offline"});
+      }
+
+      this.updateTime();
+    });
+  }
+
+updateTime() {
+  setInterval(() => {
+    if(!this.checkTime()) {
+      this.OnOff = 'Closed'
+      this.afdb.object('establishments/' + this.userId).update({status: "offline"});
+    } 
+  }, 60000);
 }
 
 updateStat(){
@@ -53,6 +73,23 @@ updateStat(){
   	this.OnOff = 'Full'
     this.afdb.object('establishments/' + this.userId).update({status: "offline"});
   }   
+}
+
+checkTime() {
+  var result = false;
+  var today = new Date();
+  var todayH = today.getHours();
+  var todayM = today.getMinutes();
+
+  var openH = parseInt(this.timeData.payload.val().openingTime.substring(0, this.timeData.payload.val().openingTime.indexOf(':')));
+  var openM = parseInt(this.timeData.payload.val().openingTime.substring(this.timeData.payload.val().openingTime.indexOf(':')+1));
+  var closeH = parseInt(this.timeData.payload.val().closingTime.substring(0, this.timeData.payload.val().closingTime.indexOf(':')));
+  var closeM = parseInt(this.timeData.payload.val().closingTime.substring(this.timeData.payload.val().closingTime.indexOf(':')+1));
+
+  if ((todayH > openH && todayH < closeH) || ((todayH == openH) && (todayM >= openM)) || ((todayH == closeH) && (todayM <= closeM))) {
+    result = true;
+  } 
+  return result;
 }
 
 	openEstbProfile(){

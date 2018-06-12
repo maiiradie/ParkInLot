@@ -1,4 +1,3 @@
-
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams , LoadingController, ToastController} from 'ionic-angular';
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
@@ -32,12 +31,12 @@ export class EstEditProfilePage {
     private authProvider: AuthProvider,
     private fb:FormBuilder) {
       this.userForm = this.fb.group({
-        'email':[null,Validators.compose([Validators.required, Validators.email])],
-    		'capacity':[null,Validators.compose([Validators.required])],
-    		'rate':[''],
+        'email':[null,Validators.compose([Validators.required, Validators.pattern('[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$')])],
+    		'capacity':[null,Validators.compose([Validators.pattern('^[1-9][0-9.]*$')])],
+    		'rate':[null,Validators.compose([Validators.pattern('^[1-9][0-9.]*$')])],
     		'regularPrice':[null,Validators.compose([Validators.required])],
-    		'overnightPrice':[null,Validators.compose([Validators.required])],
-        'openingTime':[null,Validators.compose([Validators.required, this.isBeforeClosing('closingTime')])],
+    		'overnightPrice':[null,Validators.compose([Validators.pattern('^[1-9][0-9.]*$')])],
+        'openingTime':[null,Validators.compose([Validators.required])],
         'closingTime':[null,Validators.compose([Validators.required, this.isAfterOpening('openingTime')])]
      });
   }
@@ -45,10 +44,16 @@ export class EstEditProfilePage {
   ionViewDidLoad(){
       this.afdb.object(`/profile/` + this.userId).valueChanges().take(1).subscribe( data => {
         this.profileData = data;
-        this.opening = this.profileData.openingTime; 
+        this.opening = this.profileData.openingTime;
         this.closing = this.profileData.closingTime;
         console.log(this.opening + " " + this.closing);
       });
+
+      this.userForm.get('openingTime').valueChanges.subscribe(
+        (openingTime: string) => {
+          this.userForm.get('closingTime').updateValueAndValidity();
+        }
+      )
   }
 
   isAfterOpening(field): ValidatorFn {
@@ -65,28 +70,6 @@ export class EstEditProfilePage {
         } else {
           console.log("false");
           return {'isAfterOpening': false};
-        }
-      } catch (e) {
-        console.log("null");
-        return null;
-      }
-    }
-  }
-
-  isBeforeClosing(field): ValidatorFn {
-    return (control: AbstractControl): {[key: string]: any} => {
-      try {
-        var openH = parseInt(control.value.substring(0, control.value.indexOf(":")));
-        var closeH = parseInt(control.root.value[field].substring(0, control.root.value[field].indexOf(":")));
-        var openM = parseInt(control.value.substring(control.value.indexOf(":") + 1));
-        var closeM = parseInt(control.root.value[field].substring(control.root.value[field].indexOf(":") + 1));
-            
-        if ((closeH > openH) || ((closeH == openH) && (closeM > openM))) {
-          console.log("true");
-          return null;
-        } else {
-          console.log("false");
-          return {'isBeforeClosing': false};
         }
       } catch (e) {
         console.log("null");

@@ -26,17 +26,17 @@
             <span>{{profileData?.capacity}}</span>
         </ion-item>
 
-        <ion-item *ngIf="profileData?.rate">
-            <p>Rate Per Hour</p> 
-            <span>{{profileData?.rate}}</span>
-        </ion-item>
-
         <ion-item>
             <p>Regular Price</p> 
             <span>{{profileData?.regularPrice}}</span>  
         </ion-item>
 
-        <ion-item>
+        <ion-item *ngIf="profileData?.rate">
+            <p>Rate Per Hour</p> 
+            <span>{{profileData?.rate}}</span>
+        </ion-item>
+
+        <ion-item *ngIf="profileData?.overnightPrice">
             <p>Overnight Price</p> 
             <span>{{profileData?.overnightPrice}}</span>
         </ion-item>
