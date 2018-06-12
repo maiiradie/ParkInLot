@@ -439,7 +439,8 @@ export class HoHomePage {
       var startTimeF = startDateH.toLocaleTimeString();
       var endTimeF = endDateH.toLocaleTimeString();
       var acceptedStartTime = acceptedTimeH.toLocaleTimeString();
-      this.updateRequests(key, endDate, payment, carowner.payload.val().carowner.coID);
+      var total_payment = incurredCharge + payment;
+      this.updateRequests(key, endDate, total_payment, carowner.payload.val().carowner.coID);
       this.showPayment(startTimeF, endTimeF, payment, key, incurredCharge, acceptedStartTime);
 
       // tempCap  

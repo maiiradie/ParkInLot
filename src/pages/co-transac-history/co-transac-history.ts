@@ -73,7 +73,7 @@ export class CoTransacHistoryPage {
                   name: prof.fname,
                   payment:data[i].payload.val().payment,
                   date,
-                  start,
+                  start,  
                   end
                 }
                 this.transactions.push(obj);

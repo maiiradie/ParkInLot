@@ -418,14 +418,18 @@ export class CoHomePage {
 				var acceptedTimeMin = acceptedTimeH.getMinutes();
 				console.log('acceptedTimeMin' + acceptedTimeMin);
 				var incurredCharge;
+				console.log('payment: ' +data.payment);
 				
-					if (acceptedTimeMin > timeStartH.getMinutes()) {
-						incurredCharge = (calculattedInccuredHrs - 1) * this.incurring_charge;
-					} else {
-						incurredCharge = calculattedInccuredHrs * this.incurring_charge;
-					}
+				if (acceptedTimeMin > timeStartH.getMinutes()) {
+					incurredCharge = (calculattedInccuredHrs - 1) * this.incurring_charge;
+				} else {
+					incurredCharge = calculattedInccuredHrs * this.incurring_charge;
+				}
+
+				console.log('incuredcarhge: ' + incurredCharge);
 					var acceptedStartTime = acceptedTimeH.toLocaleTimeString();
 
+   
 					let confirm = this.alertCtrl.create({
 							title: 'Payment',
 						subTitle: '<b>Arriving</b> <br><br> Rate: P5/hr <br> Time started: '
@@ -433,9 +437,9 @@ export class CoHomePage {
 							+ '<br>Time ended: ' + start + '<br>Incurred Charges: P' + incurredCharge
 							+ '<br><br> <b>Parking</b> <br><br> Time parked: '
 							+ start
-							+ '<br>Time ended: ' + end + '<br>Incurred Charges: P' + data.payment
+							+ '<br>Time ended: ' + end + '<br>Incurred Charges: P' + (data.payment - incurredCharge)
 							+ '<br><br> <b> TOTAL PAYMENT: </b>'
-							+ (incurredCharge + data.payment)
+							+ (data.payment)
 						,
 					        enableBackdropDismiss: false,
 					        buttons: [{
