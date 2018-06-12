@@ -17,6 +17,7 @@ import { Events } from 'ionic-angular';
 })
 
 export class CoHomePage {
+	incurring_charge = 10;
 	LngLat;
 	_watch;
 	_markers;
@@ -340,10 +341,7 @@ export class CoHomePage {
 					this.navAddress = undefined;		
 					this.directions.removeRoutes();
 					this.initMarkers();
-					this.isNotTransacting();
-					
-					
-									
+					this.isNotTransacting();		
 				}
 			}
 		});
@@ -355,13 +353,14 @@ export class CoHomePage {
 					this.initParkedListener();   
 					this._arriving.unsubscribe();       
 					
-					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);
 					this.afdb.list('requests/' + this.tempHoID + '/parkedNode').push({
 						carowner:data[i].payload.val().carowner,
 						timeStart: "",
 						endTime: "",
-						payment: ""
-					  });
+						payment: "",
+						timeAccepted: data[i].payload.val().timeAccepted,
+					});
+					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);
 					  this.navAddress = "You have arrived your destination";				 
 				}
 			}
@@ -402,9 +401,45 @@ export class CoHomePage {
 				var e = new Date(data.endTime);
 				end = e.toLocaleTimeString([],{hour12:true});
 				this._parked.unsubscribe();
+
+				this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().subscribe(data2 => {
+				var timeStartH = new Date(data.timeStart);
+				var timeStartHour = timeStartH.getHours();
+
+
+
+				console.log(JSON.stringify(data2));
+				var acceptedTimeH = new Date(data.timeAccepted);
+				console.log('acceptedTimeH' + acceptedTimeH);
+				// start time for accepted time
+				var acceptedTimeHour = acceptedTimeH.getHours();
+				console.log('acceptedTimeHour' + acceptedTimeHour);
+				// calculating the hours between where startHour is the end time of the accepted time 
+					var calculattedInccuredHrs = timeStartHour - acceptedTimeHour;
+				console.log('calculattedInccuredHrs' + calculattedInccuredHrs);
+				// getting the minutes of the time accepted
+				var acceptedTimeMin = acceptedTimeH.getMinutes();
+				console.log('acceptedTimeMin' + acceptedTimeMin);
+				var incurredCharge;
+				
+					if (acceptedTimeMin > timeStartH.getMinutes()) {
+						incurredCharge = (calculattedInccuredHrs - 1) * this.incurring_charge;
+					} else {
+						incurredCharge = calculattedInccuredHrs * this.incurring_charge;
+					}
+					var acceptedStartTime = acceptedTimeH.toLocaleTimeString();
+
 					let confirm = this.alertCtrl.create({
 							title: 'Payment',
-					        subTitle: 'Start time: ' + start+ '<br>End time: ' + end + '<br>Amount: P' + data.payment,
+						subTitle: '<b>Arriving</b> <br><br> Rate: P5/hr <br> Time started: '
+							+ acceptedStartTime
+							+ '<br>Time ended: ' + start + '<br>Incurred Charges: P' + incurredCharge
+							+ '<br><br> <b>Parking</b> <br><br> Time parked: '
+							+ start
+							+ '<br>Time ended: ' + end + '<br>Incurred Charges: P' + data.payment
+							+ '<br><br> <b> TOTAL PAYMENT: </b>'
+							+ (incurredCharge + data.payment)
+						,
 					        enableBackdropDismiss: false,
 					        buttons: [{
 					       	 text: 'Finish',
@@ -415,6 +450,7 @@ export class CoHomePage {
 					        	},]
 					        });
 					       confirm.present();
+				        });
 				
 			}if(data.status){
 				if(data.status == "cancelled"){
