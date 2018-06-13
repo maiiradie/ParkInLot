@@ -32,7 +32,7 @@
        <button id="locate" ion-button clear large  (click)='centerLocation()'>
             <ion-icon id="iconLocate" name="locate" color="secondary"></ion-icon>
         </button>
-        <button id="locate" ion-button clear large (click)='showHO()'>
+        <button *ngIf="btn_parkingListFlag" id="locate" ion-button clear large (click)='showHO()'>
           <ion-icon name="arrow-dropdown-circle"></ion-icon>
         </button>
       </ion-buttons>

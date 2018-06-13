@@ -100,6 +100,8 @@ export class CoHomePage {
 		});
 		
 	}
+
+	btn_parkingListFlag:boolean = true;
 	
 	ionViewDidLoad() {
 		this.navigateToHO();
@@ -121,7 +123,7 @@ export class CoHomePage {
 					let temp = {
 						lng: position.coords.longitude,
 						lat: position.coords.latitude
-					}
+					};
 					
 							this.removeCarMarker();
 							this.addCarMarker(temp);	
@@ -130,6 +132,7 @@ export class CoHomePage {
 									if(this.tempLocation){
 										this.setDestination(this.tempLocation);
 										this.setOrigin(temp);
+										this.btn_parkingListFlag = false;
 									}	
 
 								}else if(!this.tempHoID){
