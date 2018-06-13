@@ -1,8 +1,6 @@
-import { Component,ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams, App, AlertController} from 'ionic-angular';
+import { Component } from '@angular/core';
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
-import firebase from 'firebase';
 import { AuthProvider } from '../../providers/auth/auth';
 
 
@@ -21,11 +19,8 @@ export class EstHomePage {
   userId = this.authProvider.userId;
 
   constructor(public navCtrl: NavController,
-    private alertCtrl: AlertController, 
-    private app:App,
     public navParams: NavParams,
     public afdb: AngularFireDatabase, 
-    private afs:AngularFireAuth, 
     private authProvider: AuthProvider) {
 
   }

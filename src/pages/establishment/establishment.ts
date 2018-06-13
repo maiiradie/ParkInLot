@@ -19,7 +19,6 @@ export class EstablishmentPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad EstablishmentPage');
   }
 
 }

@@ -1,10 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
 import { IonicPage, NavController, NavParams, Nav } from 'ionic-angular';
-
-// import { HoHomePage } from '../ho-home/ho-home';
-// import { GaragePage } from '../garage/garage';
-// import { TransacHistoryPage } from '../transac-history/transac-history';
-
 export interface PageInterface {
   title: string;
   pageName: string;
@@ -34,7 +29,6 @@ export class MenuHoPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad MenuHoPage');
   }
 
   openPage(page: PageInterface){
@@ -44,15 +38,6 @@ export class MenuHoPage {
   }
 
   isActive(page: PageInterface){
-    // let childNav = this.nav.getActiveChildNav();
-
-    // if (childNav){
-    //   if (childNav.getSelected() && childNav.getSelected().root === page.tabComponent){
-    //     return 'primary';
-    //   }
-    //   return;
-    // }
-
     if (this.nav.getActive() && this.nav.getActive().name === page.pageName){
       return 'primary';
     }

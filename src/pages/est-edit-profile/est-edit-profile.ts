@@ -5,7 +5,6 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
 import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import firebase from 'firebase';
-import moment from 'moment';
 import 'rxjs/add/operator/take';
 
 @IonicPage()
@@ -46,7 +45,6 @@ export class EstEditProfilePage {
         this.profileData = data;
         this.opening = this.profileData.openingTime;
         this.closing = this.profileData.closingTime;
-        console.log(this.opening + " " + this.closing);
       });
 
       this.userForm.get('openingTime').valueChanges.subscribe(
@@ -65,14 +63,11 @@ export class EstEditProfilePage {
         var openM = parseInt(control.root.value[field].substring(control.root.value[field].indexOf(":") + 1));
             
         if ((closeH > openH) || ((closeH == openH) && (closeM > openM))) {
-          console.log("true");
           return null;
         } else {
-          console.log("false");
           return {'isAfterOpening': false};
         }
       } catch (e) {
-        console.log("null");
         return null;
       }
     }

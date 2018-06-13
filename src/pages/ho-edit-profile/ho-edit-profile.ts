@@ -28,7 +28,6 @@ export class HoEditProfilePage {
   profile$: AngularFireObject<any>;
 
   constructor(private afdb:AngularFireDatabase,
-    private afs:AngularFireAuth,
     public navCtrl: NavController, 
     public nav: Nav,
     public navParams: NavParams,
@@ -107,7 +106,7 @@ export class HoEditProfilePage {
             }
           })       
         }).catch((error)=>{
-          console.log("error in resolving picture url: " + JSON.stringify(error));
+          this.showAlert('Error', 'There was an error in resolving the picture URL.');
         })
       })
     })

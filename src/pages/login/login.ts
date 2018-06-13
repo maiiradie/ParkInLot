@@ -1,11 +1,8 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController,LoadingController } from 'ionic-angular';
-import { RegisterPage } from '../register/register';
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { Profile } from '../../models/profile';
-// import { Garage } from '../../models/garage';
 
 @IonicPage()
 @Component({
@@ -41,7 +38,7 @@ export class LoginPage {
           });
         }
       }catch(e){
-        console.log(e);
+        alert(e);
       }
       
   }
@@ -82,7 +79,6 @@ export class LoginPage {
           if (this.authProvider.setID().length != 0) {
             this.x = this.authProvider.getUser().subscribe((data) => {
               if (data.isNew) {
-                console.log("new user");
                 this.navCtrl.setRoot("ResetPassPage");
                 loading.dismiss();
               } else {
@@ -128,7 +124,7 @@ export class LoginPage {
           } else if (error.code === "auth/wrong-password") {
             this.showToast('The password is incorrect');
           } else {
-            console.log(error); 
+            alert(error); 
           }
         });
 

@@ -3,15 +3,7 @@ import { IonicPage, NavController, NavParams, Platform, AlertController, MenuCon
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import firebase from 'firebase';
-
-import { Transaction } from '../../models/transac/transaction.interface';
-import { User } from '../../models/user/user.interface';
 import { AuthProvider } from '../../providers/auth/auth';
-
-
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
-import { CoTransacHistoryPage } from '../co-transac-history/co-transac-history';
 
 @IonicPage()
 @Component({
@@ -54,7 +46,6 @@ export class HoHomePage {
     private toastCtrl: ToastController,
     public navCtrl: NavController,
     public navParams: NavParams,
-    private platform: Platform,
     private afdb: AngularFireDatabase,
     private authProvider: AuthProvider,
     private alertCtrl: AlertController,
@@ -64,7 +55,6 @@ export class HoHomePage {
     let temp = this.afdb.object<any>('profile/' + this.afs.auth.currentUser.uid).valueChanges().subscribe(data => {
       if (data.reg_status != "approved") {
         temp.unsubscribe();
-        console.log(data.reg_status)
         let tmp = this.afdb.object<any>('requests/' + this.afs.auth.currentUser.uid).valueChanges().subscribe(profData => {
           if (profData.available == profData.capacity) {
             tmp.unsubscribe();
@@ -126,7 +116,6 @@ export class HoHomePage {
     this.afdb.object<any>('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
       this.parkingRates.push(data.payload.val().parkingRate);
     });
-    console.log(this.parkingRates);
   }
 
   getTransactions() {
@@ -167,7 +156,6 @@ export class HoHomePage {
           text: 'No',
           role: 'no',
           handler: () => {
-            //console.log('Cancel clicked');
           }
         },
         {
@@ -201,7 +189,6 @@ export class HoHomePage {
           text: 'No',
           role: 'no',
           handler: () => {
-            //console.log('Cancel clicked');
           }
         },
         {
@@ -243,7 +230,6 @@ export class HoHomePage {
     this.isNotTransacting(coID);
   }
   async acceptRequest(carowner, id) {
-    var place = 0;
     this.acceptedTime = Date.now();
     //remove list in request
     this.afdb.list('requests/' + this.userId + '/requestNode').update(id, { status: "accepted" });
@@ -385,20 +371,14 @@ export class HoHomePage {
           startDate = data[i].payload.val().timeStart;
           //to date of start date
           var startDateH = new Date(startDate);
-          console.log('startDateH' + startDateH);
           //get the hours of the start date
           var startHour = startDateH.getHours();
-          console.log('starthour' + startHour);
           //compute for time
           computedHours = endHour - startHour;
-          console.log('endHour' + endHour);
-          console.log('computedHours' + computedHours);
           // start time minutes
           var startMin = startDateH.getMinutes();
-          console.log('startMin' + startMin);
           //end time minutes
           var endMin = endDateH.getMinutes();
-          console.log('endMin' + endMin);
           // compute for payment
           if (computedHours < 2) {
             payment = 20;
@@ -414,16 +394,12 @@ export class HoHomePage {
           // involves getting the time between accepted time and time parked
 
           var acceptedTimeH = new Date(this.acceptedTime);
-          console.log('acceptedTimeH' + acceptedTimeH);
           // start time for accepted time
           var acceptedTimeHour = acceptedTimeH.getHours();
-          console.log('acceptedTimeHour' + acceptedTimeHour);
           // calculating the hours between where startHour is the end time of the accepted time 
           var calculattedInccuredHrs = startHour - acceptedTimeHour;
-          console.log('calculattedInccuredHrs' + calculattedInccuredHrs);
           // getting the minutes of the time accepted
           var acceptedTimeMin = acceptedTimeH.getMinutes();
-          console.log('acceptedTimeMin' + acceptedTimeMin);
           var incurredCharge;
 
           if (acceptedTimeMin > startMin) {
@@ -431,8 +407,6 @@ export class HoHomePage {
           } else {
             incurredCharge = calculattedInccuredHrs * this.incurring_charge;
           }
-
-          console.log('incurredCharge' + incurredCharge);
 
         }
       }
@@ -456,7 +430,6 @@ export class HoHomePage {
     });
   }
   async updateRequests(key, endDate, payment, carowner) {
-    var push;
     let temp = await this.afdb.list('requests/' + this.userId + '/parkedNode').update(key,
       {
         status: "pending",
@@ -504,7 +477,6 @@ export class HoHomePage {
   getRole() {
     this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
       var x = data.payload.val().role;
-      //console.log(x);
       if (x === 1) {
         this.role = "carowner";
       } else if (x === 2) {
@@ -514,7 +486,6 @@ export class HoHomePage {
       } else {
         this.role = undefined;
       }
-      console.log('ho eto yung role: ' + this.role);
     });
   }
 

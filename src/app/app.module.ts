@@ -15,9 +15,7 @@ import { File } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
 import { FileTransfer } from '@ionic-native/file-transfer';
-
 import { AuthProvider } from '../providers/auth/auth'; 
-import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import { IonicStorageModule } from '@ionic/storage';
 
 @NgModule({

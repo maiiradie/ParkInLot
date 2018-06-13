@@ -17,7 +17,6 @@ export class HoprofilePage {
   userId;
 
   constructor(private afdb:AngularFireDatabase,
-    private afs:AngularFireAuth,
     private authProvider: AuthProvider,
     public navCtrl: NavController, 
     public navParams: NavParams) {

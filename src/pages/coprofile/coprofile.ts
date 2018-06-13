@@ -20,7 +20,6 @@ export class CoprofilePage {
   constructor(public navCtrl: NavController, 
   				public navParams: NavParams, 
   				private afdb:AngularFireDatabase,
-  				private afs: AngularFireAuth,
   				private authProvider: AuthProvider) {
   }
 

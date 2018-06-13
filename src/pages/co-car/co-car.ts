@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
 import firebase from 'firebase';
 import 'rxjs/add/operator/take';
@@ -18,7 +17,6 @@ export class CoCarPage {
   userId = this.authProvider.userId;
 
   constructor(private afdb:AngularFireDatabase, 
-              private afs:AngularFireAuth, 
               private authProvider:AuthProvider, 
               public navCtrl: NavController, 
               public navParams: NavParams,
@@ -49,9 +47,7 @@ switch(id){
         this.afdb.list<any>('profile/' + this.userId + '/cars').update(data[i].key,{
           isActive: false
         });
-        console.log("if");
       }else if(data[i].key == id){
-        console.log("else");
         this.afdb.list<any>('profile/' + this.userId + '/cars').update(id,{
           isActive: true
         });

@@ -29,7 +29,6 @@ export class HoEditGaragePage {
   profile$: AngularFireObject<any>;
 
   constructor(private afdb: AngularFireDatabase,
-    private afs: AngularFireAuth,
     public navCtrl: NavController,
     public navParams: NavParams,
     private authProvider: AuthProvider,
@@ -58,7 +57,6 @@ export class HoEditGaragePage {
 
       this.afdb.object(`/requests/` + this.userId).valueChanges().take(1).subscribe(out2 => {
         this.requestData = out2;
-        console.log('Reqoiasdf ' + JSON.stringify(this.requestData));
       })
 
     });
@@ -80,7 +78,6 @@ export class HoEditGaragePage {
       });
     }
     catch (e) {
-      console.log(e);
     }
   }
 
@@ -146,8 +143,6 @@ export class HoEditGaragePage {
       } else {
         this.transacting = false;
       }
-      console.log('rana toagal ' +JSON.stringify(data));
-      // console.log(JSON.stringify(this.transacting));
     })
     
   }

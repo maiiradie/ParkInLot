@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController, AlertController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { AuthProvider } from '../../providers/auth/auth';
-import { query } from '@angular/core/src/animation/dsl';
 import * as firebase from 'firebase/app';
 import { AngularFireAuth } from 'angularfire2/auth';
 
@@ -88,9 +87,7 @@ export class ComoredetailsPage {
     });
     this.afdb.list<any>('profile/' + this.afs.auth.currentUser.uid + '/cars').valueChanges().take(1).subscribe(plate=>{
       for(let i = 0; i < plate.length; i ++){
-        console.log(plate[i]);
         if(plate[i].isActive == true){
-          console.log(plate[i]);
           this.myCar = plate[i];
         }
       }
@@ -99,7 +96,6 @@ export class ComoredetailsPage {
   getGarrageData(){    
     this.afdb.object('requests/'+ this.hoID).valueChanges().take(1).subscribe( data => {
       this.garrageDet = data
-      console.log(data);
     });
     this.afdb.object('location/'+ this.hoID).valueChanges().take(1).subscribe( data => {
       this.garrageDetTwo = data
@@ -219,8 +215,6 @@ export class ComoredetailsPage {
                 {
                 text: 'Ok',
                 handler: () => {
-                    console.log('ok');  
-                    
                 }
               }
             ]

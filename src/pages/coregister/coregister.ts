@@ -5,9 +5,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { File, FileEntry, Entry } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
-import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
-// import { LoginPage } from '../login/login';
-
 import { AuthProvider } from '../../providers/auth/auth';
 
 import firebase from 'firebase';
@@ -42,7 +39,6 @@ export class CoregisterPage {
 		private fileChooser: FileChooser,
 		private file: File,
  		private filePath: FilePath,
- 		private transfer: FileTransfer,
 		private toastCtrl: ToastController) {
       this.userForm = this.fb.group({
         'fname':[null,Validators.compose([Validators.required, Validators.pattern('[^0-9]*')])],

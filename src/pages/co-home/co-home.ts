@@ -74,7 +74,6 @@ export class CoHomePage {
 
 	}
 	isNotTransacting(){
-		console.log("is not transacting");
 		this.afdb.object('profile/' + this.userId).update({
 		  isTransacting: false
 		});
@@ -92,14 +91,12 @@ export class CoHomePage {
 
 	navigateToHO(){
 		this.events.subscribe('location', (location) => {
-			// console.log(JSON.stringify(location));
 			this.map.flyTo({
 		        center: [
 		            location.lng,
 		            location.lat
-		            ]
+					]
 		    });
-			// this.events.unsubscribe('locastion');
 		});
 		
 	}
@@ -169,8 +166,7 @@ export class CoHomePage {
 	getActiveCar(){
 		this._activeCar = this.afdb.list<any>('profile/' + this.authProvider.userId + '/cars', ref => ref.orderByChild('isActive').equalTo(true))
 		.snapshotChanges().subscribe( data => {
-			for (let i = 0; i < data.length; i++) {
-				// console.log(JSON.stringify(data[i].payload.val()));
+		for (let i = 0; i < data.length; i++) {
 				this.activeCar = data[i].payload.val().carmodel + ': ' + data[i].payload.val().platenumber;
 			}
 			this._activeCar.unsubscribe();
@@ -185,7 +181,6 @@ export class CoHomePage {
 					for(let a = 0; a < dataProf.length; a++){
 						if(dataProf[a].payload.val().status != "cancelled"){
 							if(dataProf[a].payload.val().carowner.coID == this.userId){	
-								console.log("arriving")							
 								this.tempHoID = data[i].key	
 								this.removeAllMarker();	
 								//this._markers.unsubscribe();
@@ -218,7 +213,6 @@ export class CoHomePage {
 		});
 	  }
 	  async getTempLocation(homeowner){		  	
-		console.log('2');
 		let subs = await this.afdb.object<any>('location/' + homeowner).valueChanges().take(1).subscribe(data => {
 			let temp = {
 				lng: data.lng,
@@ -235,8 +229,6 @@ export class CoHomePage {
 	}
 	initListener(){
 		var key;
-		var start;
-		var end;
 		this._init = this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().subscribe(data=>{		
 			for(var i = 0; i < data.length; i++){				
 				if(data[i].payload.val().carowner.coID == this.userId){					
@@ -380,7 +372,6 @@ export class CoHomePage {
 	parkedListener(key){
 		var start;
 		var end
-		console.log("parked listener is runing");
 		this._parked = this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().subscribe(data=>{
 			if(this._arriving){
 				this._arriving.unsubscribe();
@@ -405,20 +396,14 @@ export class CoHomePage {
 
 
 
-				console.log(JSON.stringify(data2));
 				var acceptedTimeH = new Date(data.timeAccepted);
-				console.log('acceptedTimeH' + acceptedTimeH);
 				// start time for accepted time
 				var acceptedTimeHour = acceptedTimeH.getHours();
-				console.log('acceptedTimeHour' + acceptedTimeHour);
 				// calculating the hours between where startHour is the end time of the accepted time 
 					var calculattedInccuredHrs = timeStartHour - acceptedTimeHour;
-				console.log('calculattedInccuredHrs' + calculattedInccuredHrs);
 				// getting the minutes of the time accepted
 				var acceptedTimeMin = acceptedTimeH.getMinutes();
-				console.log('acceptedTimeMin' + acceptedTimeMin);
 				var incurredCharge;
-				console.log('payment: ' +data.payment);
 				
 				if (acceptedTimeMin > timeStartH.getMinutes()) {
 					incurredCharge = (calculattedInccuredHrs - 1) * this.incurring_charge;
@@ -538,24 +523,24 @@ export class CoHomePage {
 
 					el.addEventListener('click', (e) => {
 					var tmp = e.srcElement.id;
-					let actionSheet = this.actionSheetCtrl.create({
-						title: '',
-						buttons: [
-							{
-								text: 'Request',
-								handler: () => {
+					// let actionSheet = this.actionSheetCtrl.create({
+					// 	title: '',
+					// 	buttons: [
+					// 		{
+					// 			text: 'Request',
+					// 			handler: () => {
 									this.navCtrl.push("ComoredetailsPage", { key: tmp });
-								}
-							},
-							{
-								text: 'Cancel',
-								role: 'cancel',
-								handler: () => {
-								}
-							}
-						]
-					});
-					actionSheet.present();
+					// 			}
+					// 		},
+					// 		{
+					// 			text: 'Cancel',
+					// 			role: 'cancel',
+					// 			handler: () => {
+					// 			}
+					// 		}
+					// 	]
+					// });
+					// actionSheet.present();
 				});
 				}
 				else if(data[i].payload.val().status == "offline"){
@@ -588,24 +573,24 @@ export class CoHomePage {
 
 					el.addEventListener('click', (e) => {
 						var tmp = e.srcElement.id;
-						let actionSheet = this.actionSheetCtrl.create({
-							title: '',
-							buttons: [
-								{
-									text: 'More Details',
-									handler: () => {
+						// let actionSheet = this.actionSheetCtrl.create({
+						// 	title: '',
+						// 	buttons: [
+						// 		{
+						// 			text: 'More Details',
+						// 			handler: () => {
 										this.navCtrl.push("ComoredetailsPage", { key: tmp });
-									}
-								},
-								{
-									text: 'Cancel',
-									role: 'cancel',
-									handler: () => {
-									}
-								}
-							]
-						});
-						actionSheet.present();
+						// 			}
+						// 		},
+						// 		{
+						// 			text: 'Cancel',
+						// 			role: 'cancel',
+						// 			handler: () => {
+						// 			}
+						// 		}
+						// 	]
+						// });
+						// actionSheet.present();
 					});
 				
 			}

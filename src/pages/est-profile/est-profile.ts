@@ -18,7 +18,6 @@ export class EstProfilePage {
   userId = this.authProvider.userId;
 
   constructor(private afdb:AngularFireDatabase,
-    private afs:AngularFireAuth,
     public navCtrl: NavController,
     public navParams: NavParams,
     public authProvider:AuthProvider) {

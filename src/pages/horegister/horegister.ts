@@ -81,31 +81,12 @@ export class HoregisterPage {
           handler: () => {
             var index = this.files.indexOf(file);
             this.files.splice(index, 1);
-            // console.log('Remove clicked');
           }
         },
-        // {
-        //   text: 'Change',
-        //   handler: () => {
-        //     var arrLength = this.files.length;
-        //     this.chooseFile();
-        //     alert(this.files.length);
-
-        //     if (arrLength != this.files.length) {
-        //       var index = this.files.indexOf(file);
-        //       this.files.splice(index, 1);
-        //     }
-          
-        //     actionSheet.dismiss();
-        //     // console.log('Change clicked');
-        //   }
-        // },  
         {
           text: 'Cancel',
           role: 'cancel',
-          // handler: () => {
-          //   console.log('Cancel clicked');
-          // }
+         
         }
       ]
     });

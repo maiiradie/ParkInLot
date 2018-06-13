@@ -3,7 +3,6 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
-import { query } from '@angular/core/src/animation/dsl';
 
 @IonicPage()
 @Component({
@@ -30,7 +29,8 @@ export class HoTransacHistoryPage {
   selected_car;
 
 
-  constructor(private afs: AngularFireAuth,
+  constructor(
+    
     public navCtrl: NavController,
     public navParams: NavParams,
     private afdb: AngularFireDatabase,
