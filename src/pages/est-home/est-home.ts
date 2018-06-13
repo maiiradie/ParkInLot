@@ -33,7 +33,7 @@ export class EstHomePage {
   ionViewDidEnter() {
     this.afdb.object<any>('profile/' + this.userId).snapshotChanges().subscribe(data => {
       this.timeData = data;
-    })
+    });
 
     this.afdb.object<any>('establishments/'+ this.userId ).snapshotChanges().subscribe( data => {
       this.profileData = data;
@@ -68,10 +68,14 @@ updateTime() {
 updateStat(){
   if(this.toggleValue){
   	this.OnOff = 'Available';
-    this.afdb.object('establishments/' + this.userId).update({status: "online"});
+    this.afdb.object('establishments/' + this.userId).update({status: "online"}).then( () => {
+      this.afdb.object('profile/'+ this.userId).update({availability:true});
+    });
   }else{
   	this.OnOff = 'Full'
-    this.afdb.object('establishments/' + this.userId).update({status: "offline"});
+    this.afdb.object('establishments/' + this.userId).update({status: "offline"}).then( () => {
+      this.afdb.object('profile/' + this.userId).update({ availability: false });
+    });
   }   
 }
 

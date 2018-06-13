@@ -65,7 +65,7 @@
       <ion-list no-lines text-wrap>
         <ion-item>
           <ion-icon name="car" color="secondary" item-start></ion-icon>
-          <h3 id = 'available'*ngIf="profileData?.availability == false; else novacant">Available</h3>
+          <h3 id = 'available'*ngIf="profileData?.availability == true; else novacant">Available</h3>
           <ng-template #novacant>
             <h3 id = 'full'>Full</h3>
           </ng-template>
