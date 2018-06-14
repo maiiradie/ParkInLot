@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { Events } from 'ionic-angular';
+import { AuthProvider } from '../../providers/auth/auth';
 
 /**
  * Generated class for the CoParkingListPage page.
@@ -17,7 +18,7 @@ import { Events } from 'ionic-angular';
 })
 export class CoParkingListPage {
 
-  constructor(public events: Events, private afdb:AngularFireDatabase,public navCtrl: NavController, public navParams: NavParams) {
+  constructor(private authProvider:AuthProvider,public events: Events, private afdb:AngularFireDatabase,public navCtrl: NavController, public navParams: NavParams) {
   }
 
   listOfHO;
@@ -34,7 +35,9 @@ export class CoParkingListPage {
         this.onlineHO = [];
 
 			for (let i = 0; i < data.length; i++) {
-        this.onlineHO[i] = data[i].payload.val();
+        if (data[i].key != this.authProvider.userId) {
+          this.onlineHO[i] = data[i].payload.val();
+        }
       }
 		});
   }

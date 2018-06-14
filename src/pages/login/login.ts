@@ -38,7 +38,7 @@ export class LoginPage {
           });
         }
       }catch(e){
-        alert(e);
+        console.log(e);
       }
       
   }

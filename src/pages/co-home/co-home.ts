@@ -102,8 +102,38 @@ export class CoHomePage {
 	}
 
 	btn_parkingListFlag:boolean = true;
+	hoPageFlag:boolean = true;
+	navigateToRequests(){
+
+		this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
+			if (data.payload.val().role == 3) {
+				this.afdb.list<any>('requests/' + this.userId + '/requestNode').snapshotChanges().subscribe(data2 => {
+					
+					if (data2.length !=0) {
+						let toast = this.toastCtrl.create({
+							message: 'Carowner Request!',
+							duration: 3000,
+							position: 'top'
+						});
+
+						toast.onDidDismiss(() => {
+							// if (this.hoPageFlag = true) {
+							// 	this.navCtrl.push("CoHomePage");
+							// 	this.hoPageFlag = false;
+							// }
+							console.log('did dismiss');
+						});
+
+						toast.present();
+					}
+
+				});
+			}
+		});
+	}
 	
 	ionViewDidLoad() {
+		this.navigateToRequests();
 		this.navigateToHO();
 		this.map = this.initMap();
 		this.map.on('load', () => {		
@@ -470,8 +500,7 @@ export class CoHomePage {
 		}
 		if(this.listOfHO){
 			this.listOfHO.unsubscribe();
-		}	
-		
+		}			
 	}
 
 	openMenu(evt) {
@@ -711,6 +740,7 @@ export class CoHomePage {
 						alert('Error in getting location. Please try restarting the application.')
 					}
 					loading.dismiss();
+					this.btn_parkingListFlag = false;
 				});
 		});
 		return locationsObs;
