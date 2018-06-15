@@ -39,6 +39,7 @@ export class CoHomePage {
 	transacting;
 	activeCar;
 
+
 	constructor(private afs: AngularFireAuth,	
 		private events:Events,	
 		private toastCtrl: ToastController,   
@@ -131,7 +132,7 @@ export class CoHomePage {
 
 			 this.location = this.getCurrentLocation().take(1).subscribe(location => {
 				 this.initMarkers();
-				 this.centerLocation(this.LngLat);
+				 this.centerLocation(location);
 
 				setTimeout(()=> {	
 					const watch = this.geolocation.watchPosition()
@@ -260,6 +261,7 @@ export class CoHomePage {
 				  }
 			}
 		});
+		this.btn_parkingListFlag = false;
 	}
 
 	arrivingListener(key){
@@ -355,6 +357,8 @@ export class CoHomePage {
 					this.isNotTransacting();		
 				}
 			}
+		this.btn_parkingListFlag = true;
+
 		});
 	}
 	arrivedTransac(){
@@ -453,6 +457,7 @@ export class CoHomePage {
 					        buttons: [{
 					       	 text: 'Finish',
 					         	handler: () => {
+									this.btn_parkingListFlag = true;
 						            this.tempHoID = undefined;  	
 									this.directions.removeRoutes();								
 					            }
@@ -699,6 +704,7 @@ export class CoHomePage {
 	}
 
 	getCurrentLocation() {
+		console.log('get current location');
 		let loading = this.loadingCtrl.create({
 			content: 'Locating...'
 		});
@@ -742,7 +748,7 @@ export class CoHomePage {
 			this.map.panTo(location);
 		} else {
 			this.map.setZoom(15);
-			this.location = this.getCurrentLocation().subscribe(currentLocation => {
+			this.location = this.getCurrentLocation().take(1).subscribe(currentLocation => {
 				this.map.panTo(currentLocation);
 			});
 		}

@@ -72,8 +72,5 @@ switch(id){
       alert(JSON.stringify(error));
     });
   }
-
-  switchCar(){
-
-  }
+  
 }
