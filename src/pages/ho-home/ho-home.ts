@@ -84,9 +84,10 @@ export class HoHomePage {
     await firebase.storage().ref().child("images/" + coID + "/" + coPic).getDownloadURL().then(d => {
       return d;
     }).catch((error) => {
-      alert(JSON.stringify(error));
+      this.showAlert("There was an error in retrieving the image.", "");
     });
   }
+
   isTransacting(coID) {
     this.afdb.object('profile/' + coID).update({
       isTransacting: true
@@ -321,10 +322,10 @@ export class HoHomePage {
     this.menuCtrl.toggle();
   }
 
-  showAlert() {
+  showAlert(title, subtitle) {
     let alert = this.alertCtrl.create({
-      title: 'hey you just entered this',
-      subTitle: 'Your email is already taken or used.',
+      title: title,
+      subTitle: subtitle,
       buttons: ['OK']
     });
     alert.present();

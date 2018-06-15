@@ -119,7 +119,7 @@ export class CoEditProfilePage {
     let storageHere = firebase.storage();
 
     storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
-      alert("error in upload picture: " + JSON.stringify(error));
+      this.showAlert("There was an error in uploading the image.", "");
     })
   }
 

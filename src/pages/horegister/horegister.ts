@@ -121,7 +121,7 @@ export class HoregisterPage {
             }
           })  
         }).catch((e)=>{
-          alert("error " + JSON.stringify(e));
+          this.showAlert("There was an error in retrieving the image.", "");
         })
       })
     })
@@ -166,7 +166,7 @@ export class HoregisterPage {
     let storageHere = firebase.storage();
 
     storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
-      alert("error" + JSON.stringify(error));
+      this.showAlert("There was an error in uploading the image.", "");
     })
   }
 
@@ -178,7 +178,7 @@ export class HoregisterPage {
 
       storageHere.ref('files/' + this.userId + "/" + name).put(blob);
     }).catch((error)=>{
-      alert("error(1): " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      this.showAlert("There was an error in uploading the image.", "");
     })
   }
 

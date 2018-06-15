@@ -729,17 +729,26 @@ export class CoHomePage {
 
 				}).catch(error => {
 					if(error.code == 1) {
-						alert('Error in getting location. Please allow the application to access your location.');
+						this.showAlert('Error in getting location.', 'Please allow the application to access your location.');
 					} else if (error.code == 2 || error.code == 3 ) {
-						alert('Error in getting location. Please try restarting the application.')
+						this.showAlert('Error in getting location.', 'Please try restarting the application.')
 					} else {
-						alert('Error in getting location. Please try restarting the application.')
+						this.showAlert('Error in getting location.', 'Please try restarting the application.')
 					}
 					loading.dismiss();
 					this.btn_parkingListFlag = false;
 				});
 		});
 		return locationsObs;
+	}
+
+	showAlert(title, subtitle) {
+		let alert = this.alertCtrl.create({
+			title: title,
+			subTitle: subtitle,
+			buttons: ['OK']
+		});
+		alert.present();
 	}
 
 	centerLocation(location) {

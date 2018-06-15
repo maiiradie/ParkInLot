@@ -1,3 +1,4 @@
+import { AlertController } from 'ionic-angular';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Geolocation } from '@ionic-native/geolocation';
@@ -12,7 +13,7 @@ export class AuthProvider {
   //Logged in user ID
   userId: any;
 
-  constructor(private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
+  constructor(private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase, private alertCtrl: AlertController) {
   }
 
   myId(id){
@@ -146,11 +147,21 @@ export class AuthProvider {
           let location = { lat, lng };
           observable.next(location);
         }).catch(error => {
-          alert('Error getting location' +error);
+          this.showAlert("There was an error getting your location.", "");
         });
     });
     return locationsObs;
   }
+
+  showAlert(title, subtitle) {
+    let alert = this.alertCtrl.create({
+      title: title,
+      subTitle: subtitle,
+      buttons: ['OK']
+    });
+    alert.present();
+  }
+
 
   registerHomeOwner(uForm, gForm, img, location) {
     return this.afs.auth.createUserWithEmailAndPassword(uForm.email, uForm.password)
