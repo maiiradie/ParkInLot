@@ -23,7 +23,7 @@
           <ion-item>
               <ion-icon name="car" color="secondary" item-start></ion-icon>
               <p>Plate Number</p>
-              <span>{{userData?.platenumber}}</span>
+              <span>{{userData?.plateNumber}}</span>
           </ion-item>
           <ion-item>
               <ion-icon name="car" color="secondary" item-start></ion-icon>
@@ -39,7 +39,7 @@
         <ion-item *ngFor="let car of cars;let i = index">
             <ion-icon name="car" color="secondary" item-start></ion-icon>
             <p>{{car.payload.val().carmodel}}</p>
-            <span>{{car.payload.val().platenumber}}</span>
+            <span>{{car.payload.val().plateNumber}}</span>
             <button ion-button clear item-end (tap)="switch(car.key)">Switch</button>
         </ion-item>
     </ion-list>

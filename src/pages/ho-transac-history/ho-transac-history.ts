@@ -179,7 +179,7 @@ export class HoTransacHistoryPage {
   retrieveCars() {
     this.afdb.list<any>('profile/' + this.userId + '/cars').snapshotChanges().take(1).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
-        this.plateNumbers.push(data[i].payload.val().platenumber);
+        this.plateNumbers.push(data[i].payload.val().plateNumber);
       }
           this.selected_car = this.plateNumbers[0];
     });
