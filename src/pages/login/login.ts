@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController,LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController,LoadingController, AlertController } from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -22,7 +22,8 @@ export class LoginPage {
     private afdb:AngularFireDatabase,
     private afs:AngularFireAuth,
     private toastCtrl:ToastController,
-    private loadingCtrl:LoadingController) {
+    private loadingCtrl:LoadingController, 
+    private alertCtrl:AlertController) {
 
       try{
         if(this.afs.auth.currentUser.uid){
@@ -130,7 +131,7 @@ export class LoginPage {
           } else if (error.code === "auth/wrong-password") {
             this.showToast('The password is incorrect');
           } else {
-            alert(error); 
+            this.showAlert("There was an error while logging in.", "");
           }
         });
 
@@ -140,6 +141,15 @@ export class LoginPage {
       }
 
     });
+  }
+
+showAlert(title, subtitle) {
+    let alert = this.alertCtrl.create({
+      title: title,
+      subTitle: subtitle,
+      buttons: ['OK']
+    });
+    alert.present();
   }
 
   forgotPassword() {

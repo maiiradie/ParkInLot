@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams , LoadingController, ToastController} from 'ionic-angular';
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
 import { FormBuilder, FormGroup, Validators, ValidatorFn, AbstractControl } from '@angular/forms';
 import firebase from 'firebase';
@@ -22,7 +21,6 @@ export class EstEditProfilePage {
   closing:any;
 
   constructor(private afdb:AngularFireDatabase,
-    private afs:AngularFireAuth,
     public navCtrl: NavController, 
     public loadingCtrl: LoadingController,
     public toastCtrl: ToastController,

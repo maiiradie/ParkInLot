@@ -188,7 +188,6 @@ export class ComoredetailsPage {
       await firebase.storage().ref().child("images/" + this.hoID + "/" + this.profileData.garagePic).getDownloadURL().then(d=>{
         this.imgName = d;
       }).catch((error)=>{
-        // alert(JSON.stringify(error));
         this.imgName = null;
       });  
   }

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, ToastController, AlertController } from 'ionic-angular';
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import firebase from 'firebase';
@@ -40,7 +39,8 @@ export class HoEditGaragePage {
     private fileChooser: FileChooser,
     private file: File,
     private filePath: FilePath,
-    private toastCtrl: ToastController) {
+    private toastCtrl: ToastController,
+    private alertCtrl: AlertController) {
     this.garageForm = this.fb.group({
       'address': [null, Validators.compose([Validators.required])],
       'details': [''],
@@ -117,6 +117,15 @@ export class HoEditGaragePage {
     console.log("outside " + this.details);
   }
 
+  showAlert(title, subtitle) {
+    let alert = this.alertCtrl.create({
+      title: title,
+      subTitle: subtitle,
+      buttons: ['OK']
+    });
+    alert.present();
+  }
+
   // Open file chooser and select new picture
   changeImg() {
     this.fileChooser.open().then((url) => {
@@ -131,7 +140,7 @@ export class HoEditGaragePage {
           dirPath = dirPathSegments.join('/');
           this.imgPath = dirPath;
         }).catch((e) => {
-          alert("error " + JSON.stringify(e));
+          this.showAlert("There was an error in retrieving the image.", "");
         });
       });
     });
@@ -145,12 +154,13 @@ export class HoEditGaragePage {
         let storageHere = firebase.storage();
   
         storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error) => {
-          alert("error: " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
+          this.showAlert("There was an error in uploading the image.", "");
         });
       });
     })
   }
 
+  
   // Update garage details
   async updateGarage() {
     const loading = this.loadingCtrl.create({
