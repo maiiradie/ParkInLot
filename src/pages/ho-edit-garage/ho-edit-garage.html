@@ -26,14 +26,26 @@
             <ng-template #isTransacting>
               <ion-input type="number" (click)="showTransactingToast()" disabled formControlName='capacity' value="{{requestData?.capacity}}"></ion-input>
             </ng-template>/
-
-
         </ion-item>
 
         <ion-item>
           <ion-label stacked>Details</ion-label>
-          <ion-textarea formControlName="details" value="{{userData?.details}}"></ion-textarea>
         </ion-item>
+
+        <ion-item *ngFor="let choice of choices">
+          <ion-label class="cbox">{{choice.description}}</ion-label>
+          <ion-checkbox checked="{{choice.checked}}" (click)="onChange(choice)"></ion-checkbox>
+        </ion-item>
+
+        <!-- <ion-item>
+          <ion-label>With gate</ion-label>
+          <ion-checkbox (ionChange)="getDetails('With gate')"></ion-checkbox>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Cemented</ion-label>
+          <ion-checkbox (ionChange)="getDetails('Cemented')"></ion-checkbox>
+        </ion-item> -->
       </ion-list>
       <button ion-button block class="save" type="submit" [disabled]='!garageForm.valid'>Save Changes</button>
     </form>

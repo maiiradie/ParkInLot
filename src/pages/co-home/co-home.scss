@@ -106,4 +106,26 @@ page-co-home {
 		border-radius: 30px;
 		min-width:100%; 		
 	}
+	.mapboxgl-ctrl-top-right {
+		top: 0;
+		left: 0;
+	}
+
+	.toolbar-background {
+		background-color: color($colors, secondary, base);
+		// color: color($colors, dark, base);
+	}
+	
+	ion-title {
+		ion-icon {
+			color: #424242;
+		}
+	}
+
+	ion-navbar {
+		span {
+			font-size: 0.90em;
+			font-weight: 400;
+		}
+	}
 }

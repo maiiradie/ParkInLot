@@ -30,4 +30,8 @@ page-ho-home {
         font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
         color: #696a6d;
     }
+
+    .toolbar-background {
+        background-color: color($colors, secondary, base);
+    }
 }

@@ -18,9 +18,10 @@
         <ion-badge item-end>{{requestNo}}</ion-badge>
       </ion-item>
     </ion-title>
-    <p>{{activeCar}}</p> 
-    
-    
+    <button type="button" ion-button round small color="primary" outline (click)="goToCars()">
+      <ion-icon name="car" item-start></ion-icon>
+      <span>{{activeCar}}</span>
+    </button>
   </ion-navbar>
 </ion-header>
 
@@ -35,9 +36,9 @@
     <ion-row>
       <ion-col>
         <ion-buttons end>
-       <button id="locate" ion-button clear large  (click)='centerLocation()'>
+       <!-- <button id="locate" ion-button clear large  (click)='centerLocation()'>
             <ion-icon id="iconLocate" name="locate" color="secondary"></ion-icon>
-        </button>
+        </button> -->
         <button *ngIf="btn_parkingListFlag" id="locate" ion-button clear large (click)='showHO()'>
           <ion-icon name="arrow-dropdown-circle"></ion-icon>
         </button>

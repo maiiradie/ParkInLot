@@ -178,6 +178,10 @@ export class CoHomePage {
 		this.getRole();
 	}
 
+	goToCars() {
+		this.navCtrl.push("CoCarPage");
+	}
+
 	hasTransaction(status:String){
 		if(this.tempHoID && status == "arriving"){	
 			this.initListener();
@@ -193,7 +197,7 @@ export class CoHomePage {
 		this._activeCar = this.afdb.list<any>('profile/' + this.authProvider.userId + '/cars', ref => ref.orderByChild('isActive').equalTo(true))
 		.snapshotChanges().subscribe( data => {
 		for (let i = 0; i < data.length; i++) {
-				this.activeCar = data[i].payload.val().carmodel + ': ' + data[i].payload.val().plateNumber;
+				this.activeCar = data[i].payload.val().carmodel + ": " + data[i].payload.val().plateNumber; 
 			}
 			this._activeCar.unsubscribe();
 		});
@@ -702,6 +706,13 @@ export class CoHomePage {
 			zoom: 14,			
 			attributionControl: false,
 		});
+
+		map.addControl(new mapboxgl.GeolocateControl({
+			positionOptions: {
+				enableHighAccuracy: true
+			},
+			trackUserLocation: true
+		}), 'bottom-right');
 		
 		return map;
 	}
@@ -732,17 +743,26 @@ export class CoHomePage {
 
 				}).catch(error => {
 					if(error.code == 1) {
-						alert('Error in getting location. Please allow the application to access your location.');
+						this.showAlert('Error in getting location.', 'Please allow the application to access your location.');
 					} else if (error.code == 2 || error.code == 3 ) {
-						alert('Error in getting location. Please try restarting the application.')
+						this.showAlert('Error in getting location.', 'Please try restarting the application.')
 					} else {
-						alert('Error in getting location. Please try restarting the application.')
+						this.showAlert('Error in getting location.', 'Please try restarting the application.')
 					}
 					loading.dismiss();
 					this.btn_parkingListFlag = false;
 				});
 		});
 		return locationsObs;
+	}
+
+	showAlert(title, subtitle) {
+		let alert = this.alertCtrl.create({
+			title: title,
+			subTitle: subtitle,
+			buttons: ['OK']
+		});
+		alert.present();
 	}
 
 	centerLocation(location) {

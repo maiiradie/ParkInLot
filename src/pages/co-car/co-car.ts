@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, AlertController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthProvider } from '../../providers/auth/auth';
 import firebase from 'firebase';
@@ -20,7 +20,8 @@ export class CoCarPage {
               private authProvider:AuthProvider, 
               public navCtrl: NavController, 
               public navParams: NavParams,
-              public toastCtrl: ToastController
+              public toastCtrl: ToastController,
+              private alertCtrl: AlertController
             ) {
   }
 
@@ -69,8 +70,17 @@ switch(id){
     firebase.storage().ref().child("images/" + this.userId + "/" + this.userData.carPic).getDownloadURL().then(d => {
       this.imgName = d;
     }).catch((error) => {
-      alert(JSON.stringify(error));
+      this.showAlert('There was an error in retrieving the image', '');
     });
   }
-  
+
+  showAlert(title, subtitle) {
+    let alert = this.alertCtrl.create({
+      title: title,
+      subTitle: subtitle,
+      buttons: ['OK']
+    });
+    alert.present();
+  }
+
 }
