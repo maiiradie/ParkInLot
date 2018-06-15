@@ -59,11 +59,12 @@
           </ion-list-header>
           <ion-item *ngFor="let item of transactions">
             <div>
-              <h6>{{item?.name}}</h6>
+              <h5>{{item?.name}}</h5>
+              <h6>Address: {{item?.address}}</h6>
               <p>Date: {{item?.date}}</p>
               <p>Time Parked: {{item?.start}}</p>
               <p>Time Finished: {{item?.end}}</p>
-              <p>Total Amount: Php{{item?.payment}}</p>
+              <p>Total Amount: P{{item?.payment}}.00</p>
             </div>
           </ion-item>
         </ion-list>
@@ -90,7 +91,8 @@
           </ion-list-header>
           <ion-item *ngFor="let item of transactions">
             <div>
-              <h6>{{item?.name}}</h6>
+              <h5>{{item?.name}}</h5>
+              <h6>Address: {{item?.address}}</h6>
               <p>Date: {{item?.date}}</p>
               <p>Start Time: {{item?.start}}</p>
               <p>End Time: {{item?.end}}</p>

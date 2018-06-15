@@ -401,13 +401,15 @@ export class HoHomePage {
           // getting the minutes of the time accepted
           var acceptedTimeMin = acceptedTimeH.getMinutes();
           var incurredCharge;
-
-          if (acceptedTimeMin > startMin) {
-            incurredCharge = (calculattedInccuredHrs - 1) * this.incurring_charge;
+          if (calculattedInccuredHrs < 2) {
+            incurredCharge = 10;
           } else {
-            incurredCharge = calculattedInccuredHrs * this.incurring_charge;
+            if (acceptedTimeMin > startMin) {
+              incurredCharge = (calculattedInccuredHrs - 1) * this.incurring_charge;
+            } else {
+              incurredCharge = calculattedInccuredHrs * this.incurring_charge;
+            }
           }
-
         }
       }
       var startTimeF = startDateH.toLocaleTimeString();
@@ -453,15 +455,15 @@ export class HoHomePage {
   showPayment(start, end, payment, key, incurredCharge, acceptedStartTime) {
     let confirm = this.alertCtrl.create({
       title: 'Payment',
-      subTitle: '<b>Arriving</b> <br><br> Rate: P5/hr <br> Time started: ' 
-                          + acceptedStartTime 
-                          + '<br>Time ended: ' + start + '<br>Incurred Charges: P' + incurredCharge
-                          + '<br><br> <b>Parking</b> <br><br> Time parked: ' 
-                          + start 
-                          + '<br>Time ended: ' + end + '<br>Incurred Charges: P' + payment
-                          + '<br><br> <b> TOTAL PAYMENT: </b>'
-                          + (incurredCharge+payment)
-                          ,
+      subTitle: '<b>Arriving</b> <br><br> Rate: P10.00/hr <br> Time started: '
+        + acceptedStartTime
+        + '<br>Time ended: ' + start + '<br>Incurred Charges: P' + incurredCharge + '.00'
+        + '<br><br> <b>Parking</b> <br><br> Time parked: '
+        + start
+        + '<br>Time ended: ' + end + '<br>Incurred Charges: P' + payment
+        + '<br><br> <b> TOTAL PAYMENT: </b>'
+        + (incurredCharge + payment) +'.00'
+      ,
       enableBackdropDismiss: false,
       buttons: [{
         text: 'Finish',

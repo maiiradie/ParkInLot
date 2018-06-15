@@ -160,7 +160,7 @@ export class ComoredetailsPage {
           for(var i = 0; i < data.capacity; i++){
               var pic = this.imgName;
               var name = this.myData.fname + ' ' + this.myData.lname
-              var plateNumber = this.myCar.platenumber;
+              var plateNumber = this.myCar.plateNumber;
               this.afdb.list("requests/" + this.hoID + '/requestNode').push({    
                 coID,              
                 name,

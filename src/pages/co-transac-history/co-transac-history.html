@@ -37,11 +37,12 @@
         Transactions for the month of {{ selected_month }}
       </ion-list-header>
     <ion-item *ngFor="let item of transactions">
-        <h6>{{item?.name}}</h6>
+        <h5>{{item?.name}}</h5>
+        <h6>Address: {{item?.address}}</h6>
         <p>Date: {{item?.date}}</p>
         <p>Time Parked: {{item?.start}}</p>
         <p>Time Finished:  {{item?.end}}</p>
-        <p>Total Amount: {{item?.payment}}php</p>
+        <p>Total Amount: P{{item?.payment}.00</p>
     </ion-item> 
   </ion-list>
 </ion-content>
