@@ -450,14 +450,14 @@ export class CoHomePage {
    
 					let confirm = this.alertCtrl.create({
 							title: 'Payment',
-						subTitle: '<b>Arriving</b> <br><br> Rate: P5/hr <br> Time started: '
+						subTitle: '<b>Arriving</b> <br><br> Rate: P10.00/hr <br> Time started: '
 							+ acceptedStartTime
-							+ '<br>Time ended: ' + start + '<br>Incurred Charges: P' + incurredCharge
+							+ '<br>Time ended: ' + start + '<br>Incurred Charges: P' + incurredCharge +'.00'
 							+ '<br><br> <b>Parking</b> <br><br> Time parked: '
 							+ start
 							+ '<br>Time ended: ' + end + '<br>Incurred Charges: P' + (data.payment - incurredCharge)
 							+ '<br><br> <b> TOTAL PAYMENT: </b>'
-							+ (data.payment)
+							+ (data.payment) +'.00'
 						,
 					        enableBackdropDismiss: false,
 					        buttons: [{
