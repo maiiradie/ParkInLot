@@ -127,6 +127,7 @@ export class HoTransacHistoryPage {
             if (data[i].payload.val().carowner) {
               if (this.months[moNu] == selected_month && data[i].payload.val().carowner.plateNumber == this.selected_car && data[i].payload.val().carowner.coID == this.userId) {
                 this.afdb.object<any>('profile/' + data[i].payload.val().hoID).valueChanges().take(1).subscribe(prof => {
+                  this.afdb.object<any>('location/' + data[i].payload.val().hoID).valueChanges().take(1).subscribe(locationNode => {
                   var dateStart = new Date(data[i].payload.val().timeStart);
                   var moNu = dateStart.getMonth();
                   if (this.months[moNu] == selected_month) {
@@ -135,16 +136,20 @@ export class HoTransacHistoryPage {
                     var dateEnd = new Date(data[i].payload.val().endTime);
                     var end = dateEnd.toLocaleTimeString();
                     var timeStart = dateStart.toLocaleTimeString();
+
+                    var address = locationNode.address;
                     var obj = {
                       data: data[i].payload.val().hoID,
-                      name: prof.fname,
+                      name: prof.fname  + ' ' +prof.lname,
                       payment: data[i].payload.val().payment,
                       date,
                       start,
-                      end
+                      end, 
+                      address
                     }
                     this.transactions.push(obj);
                   }
+                });
                 });
               }
             }
