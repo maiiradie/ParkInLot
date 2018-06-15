@@ -104,6 +104,8 @@ export class CoHomePage {
 
 	btn_parkingListFlag:boolean = true;
 	hoPageFlag:boolean = true;
+	requestNo = 0;
+
 	navigateToRequests(){
 		this.afdb.list<any>('requests/' + this.userId + '/requestNode', ref => ref.orderByChild('status').equalTo('pending')).snapshotChanges().subscribe(data2 => {
 			if (data2.length !=0) {
@@ -119,6 +121,7 @@ export class CoHomePage {
 				});
 				toast.present();
 			}
+			this.requestNo = data2.length;
 		});
 	}
 	

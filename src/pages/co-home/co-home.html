@@ -13,8 +13,14 @@
 
     <ion-title>
       ParkInLot
+      <ion-item *ngIf="role == 'both'">
+        <ion-icon name="car" item-start></ion-icon>
+        <ion-badge item-end>{{requestNo}}</ion-badge>
+      </ion-item>
     </ion-title>
     <p>{{activeCar}}</p> 
+    
+    
   </ion-navbar>
 </ion-header>
 
