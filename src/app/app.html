@@ -86,7 +86,7 @@
             </button>
             <button ion-item menuClose (click)="openPage('HoHomePage', 'both')">
                 <ion-icon item-start name="home" [color]="isActive('HoHomePage')"></ion-icon>
-                Homeowner 
+                Homeowner <ion-badge item-end>{{ cohoRequests}}</ion-badge> 
             </button>
             <button ion-item menuClose (click)="openPage('HoprofilePage', 'both')">
                 <ion-icon item-start name="contact" [color]="isActive('HoProfilePage')"></ion-icon>

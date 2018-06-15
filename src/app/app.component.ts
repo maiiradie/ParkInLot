@@ -18,6 +18,7 @@ export class MyApp {
 
   profileData;
   imgName;
+  cohoRequests;
 
   constructor(private menuCtrl: MenuController,
     private authProvider: AuthProvider,
@@ -54,6 +55,7 @@ export class MyApp {
             });
           }
         });
+        this.getcohoRequests(user);
 
       } else {
         this.profileData = null;
@@ -61,6 +63,14 @@ export class MyApp {
         this.rootPage = "LoginPage";
       }
     });
+
+    
+  }
+
+  getcohoRequests(user){
+    this.afdb.list<any>('requests/' + user.uid + '/requestNode', ref => ref.orderByChild('status').equalTo('pending')).valueChanges().subscribe(data => {
+      this.cohoRequests = data.length;
+    }); 
   }
 
   openPage(page: string, role) {
