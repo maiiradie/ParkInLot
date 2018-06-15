@@ -341,11 +341,15 @@ export class HoHomePage {
   }
 
   startTimer(carowner, key) {
-
     this.startTime = true;
     var startTemp = Date.now();
     var tempD = new Date(startTemp);
-    this.start = tempD.toLocaleTimeString();
+    var options = {
+      hour: "2-digit",
+      minute: "2-digit"
+    }
+    
+    this.start = tempD.toLocaleTimeString("en-us", options);
     this.afdb.list('requests/' + this.userId + '/parkedNode').update(key, {
       timeStart: startTemp,
       timeStartFormat: this.start,

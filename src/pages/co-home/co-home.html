@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar>
-      <ion-buttons start left>
-          <button *ngIf="role == 'carowner' || role == undefined; else x" ion-button icon-only (click)="openMenu('Co-Menu')">
+    <ion-buttons start left>
+      <button *ngIf="role == 'carowner' || role == undefined; else x" ion-button icon-only (click)="openMenu('Co-Menu')">
         <ion-icon name="menu"></ion-icon>
       </button>
       <ng-template #x>
@@ -9,13 +9,10 @@
           <ion-icon name="menu"></ion-icon>
         </button>
       </ng-template>
-        </ion-buttons>
+    </ion-buttons>
 
     <ion-title>
       ParkInLot
-      <!-- <br> 
-      <ion-icon name="car" item-start></ion-icon>
-      <span>{{activeCar}}</span>  -->
     </ion-title>
     <button type="button" ion-button round small color="primary" outline (click)="goToCars()">
       <ion-icon name="car" item-start></ion-icon>
@@ -25,62 +22,71 @@
 </ion-header>
 
 <ion-content no-bounce>
-
-<div id="map" class="map">
+  <div id="map" class="map">
     <div class="geocoder" id="geocoder"></div>
-</div>
-
+  </div>
 
   <div class="bottom">
     <ion-row>
       <ion-col>
-        <ion-buttons end>
-       <!-- <button id="locate" ion-button clear large  (click)='centerLocation()'>
-            <ion-icon id="iconLocate" name="locate" color="secondary"></ion-icon>
-        </button> -->
-        <button *ngIf="btn_parkingListFlag" id="locate" ion-button clear large (click)='showHO()'>
-          <ion-icon name="arrow-dropdown-circle"></ion-icon>
-        </button>
-      </ion-buttons>
+        <ion-fab class="btn-list">
+          <button *ngIf="btn_parkingListFlag" id="locate" ion-fab color="secondary" (click)='showHO()'>
+            <ion-icon name="list-box"></ion-icon>
+          </button>
+        </ion-fab>
+        <ion-fab class="btn-locate">
+          <button id="locate" ion-fab color="light" (click)='centerLocation()'>
+            <ion-icon name="locate"></ion-icon>
+          </button>
+        </ion-fab>
       </ion-col>        
     </ion-row>
   </div>
 
-  <div *ngIf="navAddress == 'Navigate to destination follow blue lines'" class="cancel">
-      <ion-row>
-        <ion-col>
-          <ion-buttons>
-         <button (tap)="initCancelWholeTransac()" id='cancel' ion-button clear large  >
-              <ion-icon id="iconCancel" name="close-circle" color="danger"></ion-icon>
+  <div *ngIf="navAddress == 'Follow the blue lines to your destination'" class="cancel">
+    <ion-row>
+      <ion-col>
+        <!-- <ion-buttons>
+          <button (tap)="initCancelWholeTransac()" id='cancel' ion-button clear large  >
+            <ion-icon id="iconCancel" name="close-circle" color="danger"></ion-icon>
           </button>
-        </ion-buttons>
-        </ion-col>        
-      </ion-row>
-    </div>
-
-    <div *ngIf="navAddress == 'Navigate to destination follow blue lines'" class="arrived">
-        <ion-row>
-          <ion-col>
-            <ion-buttons>
-           <button (tap)="arrivedTransac()" id='arrived' ion-button clear large >
-                <ion-icon id="iconArrived" name="checkmark-circle" color="secondary"></ion-icon>
-            </button>
-          </ion-buttons>
-          </ion-col>        
-        </ion-row>
-      </div>
-
-  <div *ngIf="tempHoID">
-      <div class="status_container">
-        <div class="status_text">
-            <p *ngIf="navAddress">
-              {{navAddress}}
-            </p>
-            <!-- <button *ngIf="navAddress == 'Navigate to destination follow blue lines'" ion-button  color="danger" (tap)="initCancelWholeTransac()">Cancel</button>
-            <button >Arrived</button>-->
-            <button *ngIf="navAddress == 'Transaction was cancelled'" ion-button  (tap)="clearTransac()">Continue</button> 
-        </div>
-      </div>
+        </ion-buttons> -->
+        <ion-fab class="btn-cancel">
+          <button id="cancel" ion-fab color="danger" (tap)="initCancelWholeTransac()">
+            <ion-icon name="close"></ion-icon>
+          </button>
+        </ion-fab>
+      </ion-col>        
+    </ion-row>
   </div>
 
+  <div *ngIf="navAddress == 'Follow the blue lines to your destination'" class="arrived">
+    <ion-row>
+      <ion-col>
+        <!-- <ion-buttons>
+          <button (tap)="arrivedTransac()" id='arrived' ion-button clear large >
+            <ion-icon id="iconArrived" name="checkmark-circle" color="secondary"></ion-icon>
+          </button>
+        </ion-buttons> -->
+        <ion-fab class="btn-arrive">
+          <button id="arrived" ion-fab color="success" (tap)="arrivedTransac()">
+            <ion-icon name="checkmark"></ion-icon>
+          </button>
+        </ion-fab>
+      </ion-col>        
+    </ion-row>
+  </div>
+
+  <div *ngIf="tempHoID">
+    <div class="status_container">
+      <div class="status_text">
+        <p *ngIf="navAddress">
+          {{navAddress}}
+        </p>
+        <!-- <button *ngIf="navAddress == 'Navigate to destination follow blue lines'" ion-button  color="danger" (tap)="initCancelWholeTransac()">Cancel</button>
+        <button >Arrived</button>-->
+        <button *ngIf="navAddress == 'Transaction was cancelled'" ion-button round small color="secondary" (tap)="clearTransac()">Continue</button> 
+      </div>
+    </div>
+  </div>
 </ion-content>

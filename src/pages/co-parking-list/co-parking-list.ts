@@ -30,9 +30,9 @@ export class CoParkingListPage {
 
 
   listOnlineHO(){
-      this.listOfHO =	this.afdb.list<any>('location', ref => ref.orderByChild('status').equalTo('online'))
-      .snapshotChanges().subscribe( data => {
-        this.onlineHO = [];
+    this.listOfHO =	this.afdb.list<any>('location', ref => ref.orderByChild('status').equalTo('online'))
+    .snapshotChanges().subscribe( data => {
+      this.onlineHO = [];
 
 			for (let i = 0; i < data.length; i++) {
         if (data[i].key != this.authProvider.userId) {

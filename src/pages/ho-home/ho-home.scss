@@ -34,4 +34,8 @@ page-ho-home {
     .toolbar-background {
         background-color: color($colors, secondary, base);
     }
+
+    h2 {
+        font-weight: 600 !important;
+    }
 }

@@ -271,7 +271,7 @@ export class CoHomePage {
 	arrivingListener(key){
 		this._arriving= this.afdb.object<any>('requests/' + this.tempHoID + '/arrivingNode/' + key).valueChanges().subscribe(data=>{
 			  if(data.status == "arriving"){
-				 this.navAddress = "Navigate to destination follow blue lines";
+				 this.navAddress = "Follow the blue lines to your destination";
 			 }else if (data.status == "hoCancelled"){
 				 this.navAddress = "Transaction was cancelled";				 
 			 }
@@ -380,7 +380,7 @@ export class CoHomePage {
 						timeAccepted: data[i].payload.val().timeAccepted,
 					});
 					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);
-					  this.navAddress = "You have arrived your destination";				 
+					  this.navAddress = "You have arrived to your destination";				 
 				}
 			}
 		});
@@ -408,12 +408,16 @@ export class CoHomePage {
 				this._arriving.unsubscribe();
 			}			
 			if(!data.timeStart && !data.endtime && !data.status){
-				this.navAddress = "Wait to start Timer";
+				this.navAddress = "Waiting for homeowner to start timer...";
 			}else if(data.timeStart && !data.endTime){	
 						                
                 var d = new Date(data.timeStart);
-                start = d.toLocaleTimeString([],{hour12:true});
-                this.navAddress = "Timer started at: " + start;
+				var options = {
+					hour: "2-digit",
+					minute: "2-digit"
+				}
+                start = d.toLocaleTimeString("en-us", options);
+				this.navAddress = "Timer started at: " + start;
 
 			}else if(data.endTime){
 				this._parked.unsubscribe();
@@ -703,13 +707,6 @@ export class CoHomePage {
 			zoom: 14,			
 			attributionControl: false,
 		});
-
-		map.addControl(new mapboxgl.GeolocateControl({
-			positionOptions: {
-				enableHighAccuracy: true
-			},
-			trackUserLocation: true
-		}), 'bottom-right');
 		
 		return map;
 	}
