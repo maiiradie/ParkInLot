@@ -174,6 +174,10 @@ export class CoHomePage {
 		this.getRole();
 	}
 
+	goToCars() {
+		this.navCtrl.push("CoCarPage");
+	}
+
 	hasTransaction(status:String){
 		if(this.tempHoID && status == "arriving"){	
 			this.initListener();
@@ -189,7 +193,7 @@ export class CoHomePage {
 		this._activeCar = this.afdb.list<any>('profile/' + this.authProvider.userId + '/cars', ref => ref.orderByChild('isActive').equalTo(true))
 		.snapshotChanges().subscribe( data => {
 		for (let i = 0; i < data.length; i++) {
-				this.activeCar = data[i].payload.val().carmodel + ': ' + data[i].payload.val().plateNumber;
+				this.activeCar = data[i].payload.val().carmodel + ": " + data[i].payload.val().plateNumber; 
 			}
 			this._activeCar.unsubscribe();
 		});
@@ -694,6 +698,13 @@ export class CoHomePage {
 			zoom: 14,			
 			attributionControl: false,
 		});
+
+		map.addControl(new mapboxgl.GeolocateControl({
+			positionOptions: {
+				enableHighAccuracy: true
+			},
+			trackUserLocation: true
+		}), 'bottom-right');
 		
 		return map;
 	}

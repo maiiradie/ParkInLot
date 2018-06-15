@@ -13,6 +13,7 @@ import 'rxjs/add/operator/take';
 })
 export class HoGaragePage {
   userData;
+  details = "";
   location;
   imgName;
   requestData;
@@ -30,6 +31,17 @@ export class HoGaragePage {
       this.afdb.object(`profile/` + this.userId).valueChanges().take(1).subscribe( data => {
         this.userData = data;
         this.retrieveImg();
+
+        // for(var i = 0; i < this.userData.details.length; i++) {
+        //   console.log(this.userData.details)
+        //   this.details = this.details + this.userData.details[i];
+        //   console.log(this.userData.details[i])
+        //   var temp = i + 1;
+        //   if(temp < this.userData.details.length) {
+        //     this.details = this.details + ", ";
+        //   }
+        // }
+        console.log(this.details);
 
         this.afdb.object(`location/` + this.userId).valueChanges().take(1).subscribe( out => {
           this.location = out;

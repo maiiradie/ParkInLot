@@ -20,8 +20,11 @@ export class HoEditGaragePage {
   userData;
   location;
   garageForm: FormGroup;
+  choices: any;
   imgName;
+  // oldImg;
   imgUrl;
+  details = [];
   requestData;
   transacting;
   private imgPath;
@@ -39,17 +42,35 @@ export class HoEditGaragePage {
     private filePath: FilePath,
     private toastCtrl: ToastController) {
     this.garageForm = this.fb.group({
-      'address': [null, Validators.compose([Validators.required, Validators.minLength(10)])],
+      'address': [null, Validators.compose([Validators.required])],
       'details': [''],
-      'capacity': [null, Validators.compose([Validators.required, Validators.minLength(1), Validators.pattern('^[0-9]*')])]
+      'capacity': [null, Validators.compose([Validators.required, Validators.pattern('^[1-9][0-9]*$')])]
     });
     this.userId = this.authProvider.userId;
+    this.choices = [
+      {description: 'With roof'},
+      {description: 'With gate'},
+      {description: 'Cemented'}
+    ];
   }
 
   ionViewDidLoad() {
     this.afdb.object(`/profile/` + this.userId).valueChanges().take(1).subscribe(data => {
       this.userData = data;
       this.retrieveImg();
+      this.details = this.userData.details;
+      this.choices.forEach(choice => {
+        var index = this.details.indexOf(choice.description);
+        // console.log(index);
+        if(index == -1) {
+          choice.checked = false;
+        } else {
+          choice.checked = true;
+        }
+        console.log(index);
+      })
+      console.log(this.details);
+      console.log(this.choices);
 
       this.afdb.object(`/location/` + this.userId).valueChanges().take(1).subscribe(out => {
         this.location = out;
@@ -75,10 +96,25 @@ export class HoEditGaragePage {
     try {
       firebase.storage().ref().child("images/" + this.userId + "/" + this.userData.garagePic).getDownloadURL().then(d => {
         this.imgUrl = d;
+        // this.oldImg = d;
       });
     }
     catch (e) {
     }
+  }
+
+  onChange(choice) {
+    var index = this.details.indexOf(choice.description);
+    // console.log(this.choices[index]);
+    if(!choice.checked) {
+      this.details.push(choice.description);
+      choice.checked = true;
+    } else {
+      this.details.splice(index, 1);
+      choice.checked = false;
+    }
+    // choice.checked = true;
+    console.log("outside " + this.details);
   }
 
   // Open file chooser and select new picture
@@ -102,38 +138,47 @@ export class HoEditGaragePage {
   }
 
   // Upload new garage picture
-  upload(path, name) {
-    this.file.readAsArrayBuffer(path, name).then((buffer) => {
-      let blob = new Blob([buffer], { type: 'image/jpeg' });
-      let storageHere = firebase.storage();
-
-      storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error) => {
-        alert("error: " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
+  async upload(path, name) {
+    await new Promise(resolve => {
+      this.file.readAsArrayBuffer(path, name).then((buffer) => {
+        let blob = new Blob([buffer], { type: 'image/jpeg' });
+        let storageHere = firebase.storage();
+  
+        storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error) => {
+          alert("error: " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
+        });
       });
-    });
+    })
   }
 
   // Update garage details
-  updateGarage() {
+  async updateGarage() {
     const loading = this.loadingCtrl.create({
       content: 'Updating garage...'
     });
 
     loading.present(loading);
 
-    this.afdb.object(`/profile/` + this.userId).update({ details: this.garageForm.value['details'] }).then(d => {
+    this.afdb.object(`/profile/` + this.userId).update({ details: this.details }).then(d => {
       this.afdb.object(`/location/` + this.userId).update({ address: this.garageForm.value['address'] }).then(d => {
         this.afdb.object(`/requests/` + this.userId).update({ capacity: this.garageForm.value['capacity'] }).then(d => {
-          this.afdb.object(`/requests/` + this.userId).update({ available: this.garageForm.value['capacity'] }).then(d => {
-            this.afdb.object(`/profile/` + this.userId).update({ garagePic: this.imgName });
-            this.upload(this.imgPath, this.imgName);
+          this.afdb.object(`/requests/` + this.userId).update({ available: this.garageForm.value['capacity'] }).then(async d => {
+            if(this.imgName != undefined) {
+              this.afdb.object(`/profile/` + this.userId).update({ garagePic: this.imgName });
+              await this.upload(this.imgPath, this.imgName).then(() => {
+                loading.dismiss();
+                this.showToast();
+                this.navCtrl.setRoot('HoGaragePage');
+              })
+            } else {
+              loading.dismiss();
+              this.showToast();
+              this.navCtrl.pop();
+            }
           });
         });
       });
     });
-    loading.dismiss();
-    this.showToast();
-    this.navCtrl.pop();
   }
 
   ifTransacting() {
