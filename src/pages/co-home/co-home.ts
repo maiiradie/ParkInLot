@@ -104,30 +104,19 @@ export class CoHomePage {
 	btn_parkingListFlag:boolean = true;
 	hoPageFlag:boolean = true;
 	navigateToRequests(){
-
-		this.afdb.object('profile/' + this.userId).snapshotChanges().take(1).subscribe(data => {
-			if (data.payload.val().role == 3) {
-				this.afdb.list<any>('requests/' + this.userId + '/requestNode').snapshotChanges().subscribe(data2 => {
-					
-					if (data2.length !=0) {
-						let toast = this.toastCtrl.create({
-							message: 'Carowner Request!',
-							duration: 3000,
-							position: 'top'
-						});
-
-						toast.onDidDismiss(() => {
-							// if (this.hoPageFlag = true) {
-							// 	this.navCtrl.push("CoHomePage");
-							// 	this.hoPageFlag = false;
-							// }
-							console.log('did dismiss');
-						});
-
-						toast.present();
-					}
-
+		this.afdb.list<any>('requests/' + this.userId + '/requestNode', ref => ref.orderByChild('status').equalTo('pending')).snapshotChanges().subscribe(data2 => {
+			if (data2.length !=0) {
+				let toast = this.toastCtrl.create({
+					message: 'Carowner Request!',
+					duration: 3000,
+					position: 'bottom'
 				});
+
+				toast.onDidDismiss(() => {
+					// this.navCtrl.push("CoHomePage");
+					console.log('did dismiss');
+				});
+				toast.present();
 			}
 		});
 	}
@@ -200,7 +189,7 @@ export class CoHomePage {
 		this._activeCar = this.afdb.list<any>('profile/' + this.authProvider.userId + '/cars', ref => ref.orderByChild('isActive').equalTo(true))
 		.snapshotChanges().subscribe( data => {
 		for (let i = 0; i < data.length; i++) {
-				this.activeCar = data[i].payload.val().carmodel + ': ' + data[i].payload.val().platenumber;
+				this.activeCar = data[i].payload.val().carmodel + ': ' + data[i].payload.val().plateNumber;
 			}
 			this._activeCar.unsubscribe();
 		});
@@ -404,7 +393,8 @@ export class CoHomePage {
 
 	parkedListener(key){
 		var start;
-		var end
+		var end;
+
 		this._parked = this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().subscribe(data=>{
 			if(this._arriving){
 				this._arriving.unsubscribe();
