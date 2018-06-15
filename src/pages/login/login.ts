@@ -14,6 +14,7 @@ export class LoginPage {
   login = {} as any;
   profileData;
   x;
+  splash = true;
 
   constructor(public authProvider:AuthProvider, 
     public navCtrl: NavController, 
@@ -44,7 +45,12 @@ export class LoginPage {
   }
 
   ionViewDidLoad() {
+    setTimeout(() => {
+      this.splash = false;
+      // this.tabBarElement.style.display = 'flex';
+    }, 4000);
   }
+
   profile = []
   transactions = []
   async getProfile(profile,amount){
