@@ -514,7 +514,7 @@ export class CoHomePage {
 					// this.navAddress ="Transaction was cancelled";
 					let toast = this.toastCtrl.create({
 						message: 'Transaction Cancelled!',
-						duration: 3000,
+						duration: 5000,
 						position: 'top'
 					});
 
