@@ -38,7 +38,12 @@ export class CoHomePage {
 	navAddress;
 	transacting;
 	activeCar;
-
+	btn_parkingListFlag:boolean = true;
+	hoPageFlag:boolean = true;
+	requestNo = 0;
+	_activeCar;
+	requestTimer = false;
+	btns=true;
 
 	constructor(private afs: AngularFireAuth,	
 		private events:Events,	
@@ -71,57 +76,6 @@ export class CoHomePage {
 						this.navCtrl.setRoot('LoginPage');
 
 					}
-		});
-
-	}
-	isNotTransacting(){
-		this.afdb.object('profile/' + this.userId).update({
-		  isTransacting: false
-		});
-	  }
-
-	transactionListener(){
-		let temp = this.afdb.object<any>('profile/' + this.userId).valueChanges().subscribe(data=>{
-			if(data.isTransacting == true){
-				this.checkOnGoingTransaction();
-			}else{
-
-			}
-		})
-	}
-
-	navigateToHO(){
-		this.events.subscribe('location', (location) => {
-			this.map.flyTo({
-		        center: [
-		            location.lng,
-		            location.lat
-					]
-		    });
-		});
-		
-	}
-
-	btn_parkingListFlag:boolean = true;
-	hoPageFlag:boolean = true;
-	requestNo = 0;
-
-	navigateToRequests(){
-		this.afdb.list<any>('requests/' + this.userId + '/requestNode', ref => ref.orderByChild('status').equalTo('pending')).snapshotChanges().subscribe(data2 => {
-			if (data2.length !=0) {
-				let toast = this.toastCtrl.create({
-					message: 'Carowner Request!',
-					duration: 3000,
-					position: 'bottom'
-				});
-
-				toast.onDidDismiss(() => {
-					// this.navCtrl.push("CoHomePage");
-					console.log('did dismiss');
-				});
-				toast.present();
-			}
-			this.requestNo = data2.length;
 		});
 	}
 	
@@ -164,8 +118,6 @@ export class CoHomePage {
 									this.removeCarMarker();
 									this.addCarMarker(temp);													
 						});	
-
-					
 					});			
 				 },this.transactionListener());
 				 
@@ -173,6 +125,52 @@ export class CoHomePage {
 		this.getActiveCar();
 	}
 
+	isNotTransacting(){
+		this.afdb.object('profile/' + this.userId).update({
+		  isTransacting: false
+		});
+	}
+
+	transactionListener(){
+		let temp = this.afdb.object<any>('profile/' + this.userId).valueChanges().subscribe(data=>{
+			if(data.isTransacting == true){
+				this.checkOnGoingTransaction();
+			}else{
+
+			}
+		})
+	}
+
+	navigateToHO(){
+		this.events.subscribe('location', (location) => {
+			this.map.flyTo({
+		        center: [
+		            location.lng,
+		            location.lat
+					]
+		    });
+		});
+		
+	}
+
+	navigateToRequests(){
+		this.afdb.list<any>('requests/' + this.userId + '/requestNode', ref => ref.orderByChild('status').equalTo('pending')).snapshotChanges().subscribe(data2 => {
+			if (data2.length !=0) {
+				let toast = this.toastCtrl.create({
+					message: 'Carowner Request!',
+					duration: 3000,
+					position: 'bottom'
+				});
+
+				toast.onDidDismiss(() => {
+					// this.navCtrl.push("CoHomePage");
+					console.log('did dismiss');
+				});
+				toast.present();
+			}
+			this.requestNo = data2.length;
+		});
+	}
 
 	ionViewWillEnter() {
 		this.getRole();
@@ -191,8 +189,6 @@ export class CoHomePage {
 		}
 	}
 
-	_activeCar;
-
 	getActiveCar(){
 		this._activeCar = this.afdb.list<any>('profile/' + this.authProvider.userId + '/cars', ref => ref.orderByChild('isActive').equalTo(true))
 		.snapshotChanges().subscribe( data => {
@@ -204,18 +200,20 @@ export class CoHomePage {
 	}
 
 	 checkOnGoingTransaction(){		 
-		let query =  this.afdb.list('requests/').snapshotChanges().take(1).subscribe(data=>{						
+		this.afdb.list('requests/').snapshotChanges().take(1).subscribe(data=>{						
 		  for(let i = 0; i < data.length; i++){
 			if(data[i].payload.val().arrivingNode){		
 				this.afdb.list<any>('requests/' + data[i].key + '/arrivingNode').snapshotChanges().take(1).subscribe(dataProf=>{
 					for(let a = 0; a < dataProf.length; a++){
 						if(dataProf[a].payload.val().status != "cancelled"){
 							if(dataProf[a].payload.val().carowner.coID == this.userId){	
-								this.tempHoID = data[i].key	
+								this.tempHoID = data[i].key;	
 								this.removeAllMarker();	
-								//this._markers.unsubscribe();
 								this.hasTransaction("arriving");							
-								this.getTempLocation(this.tempHoID);																
+								this.getTempLocation(this.tempHoID);
+								// this.map.remove();	
+								// this.requestTimer = true;
+								// this.btns = false;															
 							}
 						}
 					}
@@ -227,11 +225,14 @@ export class CoHomePage {
 						this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf=>{
 							for(let a = 0; a < dataProf.length; a++){
 								if(dataProf[0].payload.val().carowner.coID == this.userId){
-									this.tempHoID = data[i].key		
+									this.tempHoID = data[i].key;		
 									this.removeAllMarker();							
-									//this._markers.unsubscribe();
 									this.hasTransaction("parked");									
 									this.getTempLocation(this.tempHoID);
+									// this.map.remove();
+									// this.requestTimer = true;
+									// this.btns = false;	
+
 								}
 							}
 						});	
@@ -242,6 +243,7 @@ export class CoHomePage {
 		  }
 		});
 	  }
+
 	  async getTempLocation(homeowner){		  	
 		let subs = await this.afdb.object<any>('location/' + homeowner).valueChanges().take(1).subscribe(data => {
 			let temp = {
@@ -276,28 +278,45 @@ export class CoHomePage {
 			  if(data.status == "arriving"){
 				 this.navAddress = "Follow the blue lines to your destination";
 			 }else if (data.status == "hoCancelled"){
-				 this.navAddress = "Transaction was cancelled";				 
+				  let toast = this.toastCtrl.create({
+					  message: 'Transaction Cancelled!',
+					  duration: 3000,
+					  position: 'top'
+				  });
+
+				  toast.onDidDismiss(() => {
+					  console.log('Dismissed toast');
+				  });
+
+				  toast.present().then ( () => {
+					  this.clearTransac();
+					  this.navAddress = undefined;
+				  });		 
 			 }
 		});
 	}
 
 	async clearTransac(){	
 		this.isNotTransacting();
-		let temp1 = await this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().take(1).subscribe(data=>{
+		 await this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().take(1).subscribe(data=>{
 			for(let i = 0 ; i < data.length; i++){
 				if(data[i].payload.val().carowner.coID == this.userId){	
 									
 					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);					
-					  if(this._arriving){
+					if(this._arriving){
 						this._arriving.unsubscribe();
 					}					
 					this.tempHoID = undefined;  
-					this.directions.removeRoutes();					
+					this.directions.removeRoutes();		
+					this.ionViewDidLoad();
+					this.btns = true;
+					this.requestTimer = false;		
+					this.btn_parkingListFlag = true;
 				}
 			}
 		});	
 
-		let temp2 = await this.afdb.list<any>('requests/' + this.tempHoID + '/parkedNode').snapshotChanges().take(1).subscribe(data=>{
+		await this.afdb.list<any>('requests/' + this.tempHoID + '/parkedNode').snapshotChanges().take(1).subscribe(data=>{
 			for(let i = 0 ; i < data.length; i++){
 				if(data[i].payload.val().carowner.coID == this.userId){
 					this.afdb.list('requests/' + this.tempHoID + '/parkedNode').remove(data[i].key);					
@@ -305,7 +324,11 @@ export class CoHomePage {
 						this._arriving.unsubscribe();
 						}
 						this.tempHoID = undefined;
-						this.directions.removeRoutes();	  
+						this.directions.removeRoutes();	 
+						this.ionViewDidLoad();
+						this.btns = true;
+						this.requestTimer = false;
+						this.btn_parkingListFlag = true; 
 				}
 			}
 		});
@@ -386,6 +409,9 @@ export class CoHomePage {
 					  this.navAddress = "You have arrived to your destination";				 
 				}
 			}
+			this.map.remove();
+			this.requestTimer = true;
+			this.btns = false;
 		});
 	}
 
@@ -401,6 +427,9 @@ export class CoHomePage {
 			}
 		});	
 	}
+
+	timeStart;
+	timeEnd;
 
 	parkedListener(key){
 		var start;
@@ -421,6 +450,7 @@ export class CoHomePage {
 				}
                 start = d.toLocaleTimeString("en-us", options);
 				this.navAddress = "Timer started at: " + start;
+				this.timeStart = "Timer started at: " + start;
 
 			}else if(data.endTime){
 				this._parked.unsubscribe();
@@ -432,7 +462,7 @@ export class CoHomePage {
 				var timeStartH = new Date(data.timeStart);
 				var timeStartHour = timeStartH.getHours();
 
-
+				this.timeEnd = "Timer Stop at: " + end;
 
 				var acceptedTimeH = new Date(data.timeAccepted);
 				// start time for accepted time
@@ -449,7 +479,6 @@ export class CoHomePage {
 					incurredCharge = calculattedInccuredHrs * this.incurring_charge;
 				}
 
-				console.log('incuredcarhge: ' + incurredCharge);
 					var acceptedStartTime = acceptedTimeH.toLocaleTimeString();
 
    
@@ -470,7 +499,10 @@ export class CoHomePage {
 					         	handler: () => {
 									this.btn_parkingListFlag = true;
 						            this.tempHoID = undefined;  	
-									this.directions.removeRoutes();								
+									this.directions.removeRoutes();	
+									this.ionViewDidLoad();
+									this.btns =	 true;
+									this.requestTimer = false;						
 					            }
 					        	},]
 					        });
@@ -479,7 +511,21 @@ export class CoHomePage {
 				
 			}if(data.status){
 				if(data.status == "cancelled"){
-					this.navAddress ="Transaction was cancelled"
+					// this.navAddress ="Transaction was cancelled";
+					let toast = this.toastCtrl.create({
+						message: 'Transaction Cancelled!',
+						duration: 3000,
+						position: 'top'
+					});
+
+					toast.onDidDismiss(() => {
+						console.log('Dismissed toast');
+					});
+
+					toast.present().then(() => {
+						this.clearTransac();
+					});	
+					this.navAddress = undefined;
 					this._parked.unsubscribe();
 				}
 			}
@@ -540,11 +586,10 @@ export class CoHomePage {
 	}
 
 	destination() {
-		var geocoder = new MapboxGeocoder({
+		this.map.addControl(new MapboxGeocoder({
 			accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og',
-			country: 'ph',
-		});
-		document.getElementById('geocoder').appendChild(geocoder.onAdd(this.map));
+			country: 'ph'
+		}));
 	}
 
 	async setHomeownerMarker(){
@@ -715,7 +760,6 @@ export class CoHomePage {
 	}
 
 	getCurrentLocation() {
-		console.log('get current location');
 		let loading = this.loadingCtrl.create({
 			content: 'Locating...'
 		});
@@ -764,7 +808,7 @@ export class CoHomePage {
 
 	centerLocation(location) {
 		if (location) {
-			this.map.setZoom(10);
+			this.map.setZoom(15);
 			this.map.panTo(location);
 		} else {
 			this.map.setZoom(15);
