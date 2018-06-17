@@ -26,21 +26,17 @@ export class ResetPassPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad ResetPassPage');
   }
 
   isMatch(field): ValidatorFn {
     return (control: AbstractControl): {[key: string]: any} => {
       try {            
         if (control.value === control.root.value[field]) {
-          console.log("true");
           return null;
         } else {
-          console.log("false");
           return {'isMatch': false};
         }
       } catch (e) {
-        console.log("null");
         return null;
       }
     }
@@ -52,11 +48,9 @@ export class ResetPassPage {
 
     var x = this.authProvider.getUser().subscribe( data => {
       if(data.role == 3) {
-        console.log('role: ' + data.role);
         this.navCtrl.setRoot("CoHomePage");
         x.unsubscribe();
       } else if (data.carowner && (data.role == 1 || data.role == undefined)) {
-         console.log('nakapasok !!!');
         this.navCtrl.setRoot("CoHomePage");
         x.unsubscribe();
       } else if (data.homeowner && (data.role == 2 || data.role == undefined)) {

@@ -81,31 +81,12 @@ export class HoregisterPage {
           handler: () => {
             var index = this.files.indexOf(file);
             this.files.splice(index, 1);
-            // console.log('Remove clicked');
           }
         },
-        // {
-        //   text: 'Change',
-        //   handler: () => {
-        //     var arrLength = this.files.length;
-        //     this.chooseFile();
-        //     alert(this.files.length);
-
-        //     if (arrLength != this.files.length) {
-        //       var index = this.files.indexOf(file);
-        //       this.files.splice(index, 1);
-        //     }
-          
-        //     actionSheet.dismiss();
-        //     // console.log('Change clicked');
-        //   }
-        // },  
         {
           text: 'Cancel',
           role: 'cancel',
-          // handler: () => {
-          //   console.log('Cancel clicked');
-          // }
+         
         }
       ]
     });
@@ -140,7 +121,7 @@ export class HoregisterPage {
             }
           })  
         }).catch((e)=>{
-          alert("error " + JSON.stringify(e));
+          this.showAlert("There was an error in retrieving the image.", "");
         })
       })
     })
@@ -185,7 +166,7 @@ export class HoregisterPage {
     let storageHere = firebase.storage();
 
     storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
-      alert("error" + JSON.stringify(error));
+      this.showAlert("There was an error in uploading the image.", "");
     })
   }
 
@@ -197,7 +178,7 @@ export class HoregisterPage {
 
       storageHere.ref('files/' + this.userId + "/" + name).put(blob);
     }).catch((error)=>{
-      alert("error(1): " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      this.showAlert("There was an error in uploading the image.", "");
     })
   }
 

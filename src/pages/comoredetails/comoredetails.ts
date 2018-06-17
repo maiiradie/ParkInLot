@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController, AlertController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { AuthProvider } from '../../providers/auth/auth';
-import { query } from '@angular/core/src/animation/dsl';
 import * as firebase from 'firebase/app';
 import { AngularFireAuth } from 'angularfire2/auth';
 
@@ -88,9 +87,7 @@ export class ComoredetailsPage {
     });
     this.afdb.list<any>('profile/' + this.afs.auth.currentUser.uid + '/cars').valueChanges().take(1).subscribe(plate=>{
       for(let i = 0; i < plate.length; i ++){
-        console.log(plate[i]);
         if(plate[i].isActive == true){
-          console.log(plate[i]);
           this.myCar = plate[i];
         }
       }
@@ -99,7 +96,6 @@ export class ComoredetailsPage {
   getGarrageData(){    
     this.afdb.object('requests/'+ this.hoID).valueChanges().take(1).subscribe( data => {
       this.garrageDet = data
-      console.log(data);
     });
     this.afdb.object('location/'+ this.hoID).valueChanges().take(1).subscribe( data => {
       this.garrageDetTwo = data
@@ -110,14 +106,29 @@ export class ComoredetailsPage {
     
     this.afdb.object('profile/'+ this.hoID).snapshotChanges().take(1).subscribe( data => {
       this.profileData = data.payload.val();
+      
       if(this.profileData.establishment == true) {
         this.hown = false;
+        this.profileData.openingTime = this.tConvert(this.profileData.openingTime);
+        this.profileData.closingTime = this.tConvert(this.profileData.closingTime);
       }
     });
     this.afdb.object('location/'+ this.hoID).snapshotChanges().take(1).subscribe( data => {
       this.userData = data.payload.val();
     });
 
+  }
+
+  tConvert(time) {
+      let hour = (time.split(':'))[0]
+      let min = (time.split(':'))[1]
+      let part = hour > 12 ? 'PM' : 'AM';
+
+      min = (min + '').length == 1 ? `0${min}` : min;
+      hour = hour > 12 ? hour - 12 : hour;
+      hour = (hour + '').length == 1 ? `0${hour}` : hour;
+
+      return (`${hour}:${min} ${part}`);
   }
 
   sendRequest(HoToken){
@@ -149,7 +160,7 @@ export class ComoredetailsPage {
           for(var i = 0; i < data.capacity; i++){
               var pic = this.imgName;
               var name = this.myData.fname + ' ' + this.myData.lname
-              var plateNumber = this.myCar.platenumber;
+              var plateNumber = this.myCar.plateNumber;
               this.afdb.list("requests/" + this.hoID + '/requestNode').push({    
                 coID,              
                 name,
@@ -177,7 +188,6 @@ export class ComoredetailsPage {
       await firebase.storage().ref().child("images/" + this.hoID + "/" + this.profileData.garagePic).getDownloadURL().then(d=>{
         this.imgName = d;
       }).catch((error)=>{
-        // alert(JSON.stringify(error));
         this.imgName = null;
       });  
   }
@@ -204,8 +214,6 @@ export class ComoredetailsPage {
                 {
                 text: 'Ok',
                 handler: () => {
-                    console.log('ok');  
-                    
                 }
               }
             ]
@@ -250,15 +258,15 @@ export class ComoredetailsPage {
             alert.present();
 
           }
-        }     
-      }); 
-  } 
-//actioncontroller
+       }
+    });
+  }
+
   showConfirm(i) {
     var tempCap;
     this.cancel= this.alertCtrl.create({
       title: 'Request',
-      message: 'Requesting...',
+      message: 'Requesting (60s)...',
       enableBackdropDismiss: false,
       buttons: [
         {
@@ -276,20 +284,16 @@ export class ComoredetailsPage {
                 }
               }
             });
-      
-            
-            
-            
-            //returning capacity
-            let temp = this.afdb.object<any>('requests/' + this.hoID ).valueChanges().subscribe(data=>{        
-              tempCap = data.available
-              temp.unsubscribe();
-              tempCap ++;        
-              this.afdb.object('requests/' + this.hoID ).update({
-                available: tempCap
-              }); 
-            });
 
+            let temp = this.afdb.object<any>('requests/' + this.hoID).valueChanges().subscribe(data => {
+                tempCap = data.available
+                temp.unsubscribe();
+                tempCap++;
+                this.afdb.object('requests/' + this.hoID).update({	
+                    available: tempCap
+                });
+            });
+  
             this._returnStatus.unsubscribe();
             if(this.actrlFlag){
               this.actrlFlag = false;
@@ -305,52 +309,55 @@ export class ComoredetailsPage {
     this.setTimeout(i);
     this.statusListener();
   }
-   setTimeout(i){
-     var tempCap;
-    this.myTimeout = setTimeout(()=>{ 
-      this.isNotTransacting();
-      this._returnStatus.unsubscribe();
-      this.reqButton = true;
-      if(this.actrlFlag){
-        this.cancel.dismiss();
-        this.actrlFlag = false;
-      }       
-      let tempo = this.afdb.list('requests/' + this.hoID + '/requestNode/').snapshotChanges().subscribe(data=>{
-        tempo.unsubscribe();
-        for(var i = 0; i < data.length;i ++){
-          if(data[i].payload.val().coID == this.authProvider.userId){
-            this.afdb.list('requests/' + this.hoID + '/requestNode/').remove(data[i].key);
-          }
-        }
-      });
 
-      let temp = this.afdb.object<any>('requests/' + this.hoID ).valueChanges().subscribe(data=>{        
-        tempCap = data.available
-        temp.unsubscribe();
-        tempCap ++;        
-        this.afdb.object('requests/' + this.hoID ).update({
-          available: tempCap
-        }); 
-      });
+  setTimeout(i){
+    var tempCap;
+       this.myTimeout = setTimeout(() => {
+            this.isNotTransacting();
+            this._returnStatus.unsubscribe();
+            this.reqButton = true;
+            if (this.actrlFlag) {
+                this.cancel.dismiss();
+                this.actrlFlag = false;
+            }
 
-      let alert = this.alertCtrl.create({
-        title: 'Request',
-        subTitle: 'Request Timeout',
-        buttons: [          
-          {
-          text: 'Ok',
-          handler: () => {
-          this.timeoutFlag = false;            
-        }
-      }
-        ]
-      });
-      if(!this.timeoutFlag){
+            let tempo = this.afdb.list('requests/' + this.hoID + '/requestNode/').snapshotChanges().subscribe(data => {
+                tempo.unsubscribe();
+                for (var i = 0; i < data.length; i++) {
+                   if (data[i].payload.val().coID == this.authProvider.userId) {
+                       this.afdb.list('requests/' + this.hoID + '/requestNode/').remove(data[i].key);
+                      }
+                  }
+              });
+      
+              let temp = this.afdb.object<any>('requests/' + this.hoID).valueChanges().subscribe(data => {
+                  tempCap = data.available
+                  temp.unsubscribe();
+                  tempCap++;
+                  this.afdb.object('requests/' + this.hoID).update({	
+                      available: tempCap
+                  });
+              });
+    
+            let alert = this.alertCtrl.create({	
+               title: 'Request',
+               subTitle: 'Request Timeout',
+                buttons: [
+                  {	
+                 text: 'Ok',
+                    handler: () => {
+                      this.timeoutFlag = false;
+                    }	
+                  }	
+                ]
+            });
+      if (!this.timeoutFlag) {
         alert.present();
         this.timeoutFlag = true;
       }
-      
+
       this._returnStatus.unsubscribe();
-     }, 50000);  
+     }, 60000);  
   }
+  
 }

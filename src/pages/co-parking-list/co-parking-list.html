@@ -1,0 +1,21 @@
+<ion-content parallax-header no-bounce class="bg-modal transparent-header">
+  <ion-header>
+    <ion-navbar>
+      <ion-title>Parking List</ion-title>
+    </ion-navbar>    
+  </ion-header>
+
+  <div class="header-image"></div>
+  
+  <ion-card *ngFor ='let data of onlineHO'>
+    <ion-item>
+      <ion-icon name="pin" color="secondary" item-start large></ion-icon>
+      <h2>{{data.address}}</h2>
+      <p>Price: P20.00 </p>
+      <button ion-button icon-start round color="secondary" (click)='flyToHO(data.lat,data.lng)'>
+        <ion-icon name="map"></ion-icon>
+        &nbsp;<span>Show on map</span>
+      </button>
+    </ion-item>
+  </ion-card>
+</ion-content>

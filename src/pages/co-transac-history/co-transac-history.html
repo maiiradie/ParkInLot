@@ -14,15 +14,35 @@
     <ion-title>Transactions</ion-title>
   </ion-navbar>
 </ion-header>
-
+<ion-tabs>
+  <ion-tab [root]="tab1Root"></ion-tab>
+  <ion-tab [root]="tab2Root"></ion-tab>
+  <ion-tab [root]="tab3Root"></ion-tab>
+</ion-tabs>
 <ion-content padding>
-  <ion-list>
+    <ion-list>
+      <ion-item>
+        <ion-label>Month</ion-label>
+        <ion-select [(ngModel)]="selected_month" interface="popover" placeholder="March" (ionChange)="getTransactions(selected_month)">
+          <ion-option *ngFor="let m of months" value="{{m}}" [selected]="selected_month == m">{{ m }}</ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-item>
+        <ion-label>Year</ion-label>
+        <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
+          <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
+        </ion-select>
+      </ion-item>
+      <ion-list-header>
+        Transactions for the month of {{ selected_month }}
+      </ion-list-header>
     <ion-item *ngFor="let item of transactions">
-        <h6>{{item?.name}}</h6>
+        <h5>{{item?.name}}</h5>
+        <h6>Address: {{item?.address}}</h6>
         <p>Date: {{item?.date}}</p>
-        <p>Start Time: {{item?.start}}</p>
-        <p>End Time:  {{item?.end}}</p>
-        <p> Amount: {{item?.payment}}php</p>
+        <p>Time Parked: {{item?.start}}</p>
+        <p>Time Finished:  {{item?.end}}</p>
+        <p>Total Amount: P{{item?.payment}.00</p>
     </ion-item> 
   </ion-list>
 </ion-content>

@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, AlertController } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthProvider } from '../../providers/auth/auth';
 import firebase from 'firebase';
 import 'rxjs/add/operator/take';
@@ -18,11 +17,11 @@ export class CoCarPage {
   userId = this.authProvider.userId;
 
   constructor(private afdb:AngularFireDatabase, 
-              private afs:AngularFireAuth, 
               private authProvider:AuthProvider, 
               public navCtrl: NavController, 
               public navParams: NavParams,
-              public toastCtrl: ToastController
+              public toastCtrl: ToastController,
+              private alertCtrl: AlertController
             ) {
   }
 
@@ -49,14 +48,12 @@ switch(id){
         this.afdb.list<any>('profile/' + this.userId + '/cars').update(data[i].key,{
           isActive: false
         });
-        console.log("if");
       }else if(data[i].key == id){
-        console.log("else");
         this.afdb.list<any>('profile/' + this.userId + '/cars').update(id,{
           isActive: true
         });
         const toast = this.toastCtrl.create({
-          message: 'Succesfully switched to ' + data[i].payload.val().carmodel + ': ' + data[i].payload.val().plateNumber,
+          message: 'Successfully switched to ' + data[i].payload.val().carmodel + ': ' + data[i].payload.val().plateNumber,
           duration: 4000
         });
         toast.present();
@@ -73,11 +70,17 @@ switch(id){
     firebase.storage().ref().child("images/" + this.userId + "/" + this.userData.carPic).getDownloadURL().then(d => {
       this.imgName = d;
     }).catch((error) => {
-      alert(JSON.stringify(error));
+      this.showAlert('There was an error in retrieving the image', '');
     });
   }
 
-  switchCar(){
-
+  showAlert(title, subtitle) {
+    let alert = this.alertCtrl.create({
+      title: title,
+      subTitle: subtitle,
+      buttons: ['OK']
+    });
+    alert.present();
   }
+
 }

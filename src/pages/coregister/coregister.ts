@@ -5,9 +5,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { File, FileEntry, Entry } from '@ionic-native/file';
 import { FileChooser } from '@ionic-native/file-chooser';
 import { FilePath } from '@ionic-native/file-path';
-import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer';
-// import { LoginPage } from '../login/login';
-
 import { AuthProvider } from '../../providers/auth/auth';
 
 import firebase from 'firebase';
@@ -42,7 +39,6 @@ export class CoregisterPage {
 		private fileChooser: FileChooser,
 		private file: File,
  		private filePath: FilePath,
- 		private transfer: FileTransfer,
 		private toastCtrl: ToastController) {
       this.userForm = this.fb.group({
         'fname':[null,Validators.compose([Validators.required, Validators.pattern('[^0-9]*')])],
@@ -122,7 +118,7 @@ export class CoregisterPage {
             }
           })  
         }).catch((e)=>{
-          alert("error " + JSON.stringify(e));
+         this.showAlert("There was an error in retrieving the image.", "");
         })
       })
     })
@@ -167,7 +163,7 @@ export class CoregisterPage {
     let storageHere = firebase.storage();
 
     storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
-      alert("error" + JSON.stringify(error));
+      this.showAlert("There was an error in uploading the image.", "");
     })
   }
 
@@ -179,7 +175,7 @@ export class CoregisterPage {
 
       storageHere.ref('files/' + this.userId + "/" + name).put(blob);
     }).catch((error)=>{
-      alert("error(1): " + JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      this.showAlert("There was an error in uploading the image.", "");
     })
   }
 

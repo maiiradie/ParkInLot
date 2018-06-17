@@ -1,8 +1,8 @@
+import { AlertController } from 'ionic-angular';
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Observable } from 'rxjs/Observable';
-
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
 import * as firebase from 'firebase/app';
@@ -13,7 +13,7 @@ export class AuthProvider {
   //Logged in user ID
   userId: any;
 
-  constructor(private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase) {
+  constructor(private geolocation: Geolocation, public http: HttpClient, private afs: AngularFireAuth, private afdb: AngularFireDatabase, private alertCtrl: AlertController) {
   }
 
   myId(id){
@@ -63,10 +63,7 @@ export class AuthProvider {
         //   this.afs.auth.signOut();
         // });
       } else if(x == 3) {
-        // this.afdb.object('profile/' + this.userId)
-        // .update({
-        //   status: status
-        // }).then( () => {
+  
           
           
           this.afdb.object('location/' + this.userId)
@@ -75,7 +72,6 @@ export class AuthProvider {
             }).then(() => {
               this.afs.auth.signOut();
             }); 
-        // });
 
       }
     });
@@ -116,12 +112,7 @@ export class AuthProvider {
     return this.afs.auth.currentUser.updatePassword(pass);
   }
 
-  // logoutUser() {
-  //    this.updateStatus('offline')
-  //   .then( () => {
-  //       this.afs.auth.signOut();
-  //   });
-  // }
+
   registerCarOwner(uForm, cForm, img){
     return this.afs.auth.createUserWithEmailAndPassword(uForm.email,uForm.password)
      .then((user) => {
@@ -156,11 +147,21 @@ export class AuthProvider {
           let location = { lat, lng };
           observable.next(location);
         }).catch(error => {
-          console.log('Error getting location', error);
+          this.showAlert("There was an error getting your location.", "");
         });
     });
     return locationsObs;
   }
+
+  showAlert(title, subtitle) {
+    let alert = this.alertCtrl.create({
+      title: title,
+      subTitle: subtitle,
+      buttons: ['OK']
+    });
+    alert.present();
+  }
+
 
   registerHomeOwner(uForm, gForm, img, location) {
     return this.afs.auth.createUserWithEmailAndPassword(uForm.email, uForm.password)
@@ -170,7 +171,6 @@ export class AuthProvider {
           lname: uForm.lname,
           email: uForm.email,
           mobile: uForm.mobile,
-          // capacity: gForm.capacity,
           details: gForm.details,
           homeowner: true,
           garagePic: img,

@@ -28,7 +28,6 @@ export class HoEditProfilePage {
   profile$: AngularFireObject<any>;
 
   constructor(private afdb:AngularFireDatabase,
-    private afs:AngularFireAuth,
     public navCtrl: NavController, 
     public nav: Nav,
     public navParams: NavParams,
@@ -107,7 +106,7 @@ export class HoEditProfilePage {
             }
           })       
         }).catch((error)=>{
-          console.log("error in resolving picture url: " + JSON.stringify(error));
+          this.showAlert('Error', 'There was an error in resolving the picture URL.');
         })
       })
     })
@@ -118,7 +117,7 @@ export class HoEditProfilePage {
       let storageHere = firebase.storage();
 
       storageHere.ref('images/' + this.userId + "/" + name).put(blob).catch((error)=>{
-        alert("error in upload picture: " + JSON.stringify(error));
+        this.showAlert("There was an error in retrieving the image.", "");
       })
   }
 

@@ -1,11 +1,8 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController,LoadingController } from 'ionic-angular';
-import { RegisterPage } from '../register/register';
+import { IonicPage, NavController, NavParams, ToastController,LoadingController, AlertController } from 'ionic-angular';
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
-import { Profile } from '../../models/profile';
-// import { Garage } from '../../models/garage';
 
 @IonicPage()
 @Component({
@@ -17,6 +14,7 @@ export class LoginPage {
   login = {} as any;
   profileData;
   x;
+  splash = true;
 
   constructor(public authProvider:AuthProvider, 
     public navCtrl: NavController, 
@@ -24,7 +22,8 @@ export class LoginPage {
     private afdb:AngularFireDatabase,
     private afs:AngularFireAuth,
     private toastCtrl:ToastController,
-    private loadingCtrl:LoadingController) {
+    private loadingCtrl:LoadingController, 
+    private alertCtrl:AlertController) {
 
       try{
         if(this.afs.auth.currentUser.uid){
@@ -47,7 +46,12 @@ export class LoginPage {
   }
 
   ionViewDidLoad() {
+    setTimeout(() => {
+      this.splash = false;
+      // this.tabBarElement.style.display = 'flex';
+    }, 4000);
   }
+
   profile = []
   transactions = []
   async getProfile(profile,amount){
@@ -82,7 +86,6 @@ export class LoginPage {
           if (this.authProvider.setID().length != 0) {
             this.x = this.authProvider.getUser().subscribe((data) => {
               if (data.isNew) {
-                console.log("new user");
                 this.navCtrl.setRoot("ResetPassPage");
                 loading.dismiss();
               } else {
@@ -127,6 +130,8 @@ export class LoginPage {
             this.showToast('No user registered with the email');
           } else if (error.code === "auth/wrong-password") {
             this.showToast('The password is incorrect');
+          } else {
+            this.showAlert("There was an error while logging in.", "");
           }
         });
 
@@ -136,6 +141,15 @@ export class LoginPage {
       }
 
     });
+  }
+
+showAlert(title, subtitle) {
+    let alert = this.alertCtrl.create({
+      title: title,
+      subTitle: subtitle,
+      buttons: ['OK']
+    });
+    alert.present();
   }
 
   forgotPassword() {

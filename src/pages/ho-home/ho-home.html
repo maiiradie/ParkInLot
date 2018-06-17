@@ -36,11 +36,12 @@
             <ion-item >
               <h2>{{carowner.payload.val().name}}</h2>
               <p>{{carowner.payload.val().plateNumber}}</p>
+              <ion-icon name="arrow-dropleft-circle" item-end small color="secondary"></ion-icon>
             </ion-item>
             <ion-item-options>            
               <button ion-button color="danger" icon-start (tap)="declineRequest(carowner.key,carowner.payload.val().coID)">
                 <ion-icon name="close-circle"></ion-icon>
-                Reject
+                Decline
               </button>
               <button ion-button color="secondary" icon-start (tap)="acceptRequest(carowner.payload.val(),carowner.key)">
                   <ion-icon name="checkmark-circle"></ion-icon>
@@ -58,8 +59,16 @@
               <ion-item *ngIf="carowner.payload.val().status != 'hoCancelled'">
                   <h2>{{carowner.payload.val().carowner.name}}</h2>
                   <p>{{carowner.payload.val().carowner.plateNumber}}</p>
-                  <p *ngIf="carowner.payload.val().status == 'cancelled' || carowner.payload.val().status == 'hoCancelled'" item-end>Cancelled  <ion-icon name="alert" color="danger"></ion-icon></p>
-                  <p *ngIf="carowner.payload.val().status == 'arrived'" item-end>Arrived  <ion-icon name="checkmark-circle" color="secondary"></ion-icon></p>
+                  <p *ngIf="carowner.payload.val().status == 'cancelled' || carowner.payload.val().status == 'hoCancelled'" item-end>
+                    <ion-icon name="alert" color="danger"></ion-icon>
+                    Cancelled
+                    <!-- <ion-icon name="arrow-dropleft-circle" item-end small color="secondary"></ion-icon>   -->
+                  </p>
+                  <p *ngIf="carowner.payload.val().status == 'arrived'" item-end>
+                    <ion-icon name="checkmark-circle" color="success"></ion-icon>
+                    Arrived
+                  </p>
+                  <ion-icon name="arrow-dropleft-circle" item-end small color="secondary"></ion-icon> 
               </ion-item>
               <ion-item-options>            
                 <button *ngIf="carowner.payload.val().status == 'cancelled'" ion-button color="light" icon-start (tap)="clearArriving(carowner.key)">
@@ -83,9 +92,16 @@
               <ion-item *ngIf="carowner.payload.val().status != 'cancelled'">
                   <h2>{{carowner.payload.val().carowner.name}}</h2>
                 <h3>{{carowner.payload.val().carowner.plateNumber}}</h3>  
-                <p *ngIf="carowner.payload.val().status == 'cancelled' || carowner.payload.val().status == 'hoCancelled'" item-end>Cancelled  <ion-icon name="alert" color="danger"></ion-icon></p>            
+                <p *ngIf="carowner.payload.val().status == 'cancelled' || carowner.payload.val().status == 'hoCancelled'" item-end>
+                  <ion-icon name="alert" color="danger"></ion-icon>
+                  Cancelled  
+                </p>            
                   <p *ngIf="carowner.payload.val().timeStart && !carowner.payload.val().endTime">Time Start: {{carowner.payload.val().timeStartFormat }}</p>
-                  <p *ngIf="!carowner.payload.val().timeStart && !carowner.payload.val().endTime && carowner.payload.val().status != 'cancelled' && carowner.payload.val().status != 'hoCancelled'" item-end>Arrived  <ion-icon name="checkmark-circle" color="secondary"></ion-icon></p>
+                  <p *ngIf="!carowner.payload.val().timeStart && !carowner.payload.val().endTime && carowner.payload.val().status != 'cancelled' && carowner.payload.val().status != 'hoCancelled'" item-end>
+                    <ion-icon name="checkmark-circle" color="success"></ion-icon>
+                    Arrived  
+                  </p>
+                  <ion-icon name="arrow-dropleft-circle" item-end small color="secondary"></ion-icon> 
               </ion-item>
               <ion-item-options>  
                 <button *ngIf="!carowner.payload.val().timeStart && !carowner.payload.val().endTime && carowner.payload.val().status != 'cancelled'" ion-button color="danger"  item-end (tap)="initCancelParked(carowner.payload.val().carowner,carowner.key,carowner.payload.val().carowner.coID)">

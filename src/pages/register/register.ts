@@ -1,9 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
-// import { CoregisterPage } from '../coregister/coregister';
-// import { HoregisterPage } from '../horegister/horegister';
-
 @IonicPage()
 @Component({
   selector: 'page-register',

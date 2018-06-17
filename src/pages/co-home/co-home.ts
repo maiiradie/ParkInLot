@@ -8,7 +8,7 @@ import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-direct
 import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireAuth } from 'angularfire2/auth';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
-
+import { Events } from 'ionic-angular';
 
 @IonicPage()
 @Component({
@@ -17,6 +17,7 @@ import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 })
 
 export class CoHomePage {
+	incurring_charge = 10;
 	LngLat;
 	_watch;
 	_markers;
@@ -36,7 +37,16 @@ export class CoHomePage {
 	userId = this.authProvider.userId;
 	navAddress;
 	transacting;
-	constructor(private afs: AngularFireAuth,		
+	activeCar;
+	btn_parkingListFlag:boolean = true;
+	hoPageFlag:boolean = true;
+	requestNo = 0;
+	_activeCar;
+	requestTimer = false;
+	btns=true;
+
+	constructor(private afs: AngularFireAuth,	
+		private events:Events,	
 		private toastCtrl: ToastController,   
 		public alertCtrl: AlertController,
 		public navParams: NavParams,
@@ -64,28 +74,14 @@ export class CoHomePage {
 						  
 						this.afs.auth.signOut();
 						this.navCtrl.setRoot('LoginPage');
+
 					}
 		});
-
-	}
-	isNotTransacting(){
-		console.log("is not transacting");
-		this.afdb.object('profile/' + this.userId).update({
-		  isTransacting: false
-		});
-	  }
-
-	transactionListener(){
-		let temp = this.afdb.object<any>('profile/' + this.userId).valueChanges().subscribe(data=>{
-			if(data.isTransacting == true){
-				this.checkOnGoingTransaction();
-			}else{
-
-			}
-		})
 	}
 	
 	ionViewDidLoad() {
+		this.navigateToRequests();
+		this.navigateToHO();
 		this.map = this.initMap();
 		this.map.on('load', () => {		
 			this.setDirections();
@@ -93,7 +89,7 @@ export class CoHomePage {
 
 			 this.location = this.getCurrentLocation().take(1).subscribe(location => {
 				 this.initMarkers();
-				 this.centerLocation(this.LngLat);
+				 this.centerLocation(location);
 
 				setTimeout(()=> {	
 					const watch = this.geolocation.watchPosition()
@@ -104,7 +100,7 @@ export class CoHomePage {
 					let temp = {
 						lng: position.coords.longitude,
 						lat: position.coords.latitude
-					}
+					};
 					
 							this.removeCarMarker();
 							this.addCarMarker(temp);	
@@ -113,6 +109,7 @@ export class CoHomePage {
 									if(this.tempLocation){
 										this.setDestination(this.tempLocation);
 										this.setOrigin(temp);
+										this.btn_parkingListFlag = false;
 									}	
 
 								}else if(!this.tempHoID){
@@ -121,18 +118,66 @@ export class CoHomePage {
 									this.removeCarMarker();
 									this.addCarMarker(temp);													
 						});	
-
-					
 					});			
 				 },this.transactionListener());
 				 
 		});
-
+		this.getActiveCar();
 	}
 
+	isNotTransacting(){
+		this.afdb.object('profile/' + this.userId).update({
+		  isTransacting: false
+		});
+	}
+
+	transactionListener(){
+		let temp = this.afdb.object<any>('profile/' + this.userId).valueChanges().subscribe(data=>{
+			if(data.isTransacting == true){
+				this.checkOnGoingTransaction();
+			}else{
+
+			}
+		})
+	}
+
+	navigateToHO(){
+		this.events.subscribe('location', (location) => {
+			this.map.flyTo({
+		        center: [
+		            location.lng,
+		            location.lat
+					]
+		    });
+		});
+		
+	}
+
+	navigateToRequests(){
+		this.afdb.list<any>('requests/' + this.userId + '/requestNode', ref => ref.orderByChild('status').equalTo('pending')).snapshotChanges().subscribe(data2 => {
+			if (data2.length !=0) {
+				let toast = this.toastCtrl.create({
+					message: 'Carowner Request!',
+					duration: 3000,
+					position: 'bottom'
+				});
+
+				toast.onDidDismiss(() => {
+					// this.navCtrl.push("CoHomePage");
+					console.log('did dismiss');
+				});
+				toast.present();
+			}
+			this.requestNo = data2.length;
+		});
+	}
 
 	ionViewWillEnter() {
 		this.getRole();
+	}
+
+	goToCars() {
+		this.navCtrl.push("CoCarPage");
 	}
 
 	hasTransaction(status:String){
@@ -144,20 +189,31 @@ export class CoHomePage {
 		}
 	}
 
+	getActiveCar(){
+		this._activeCar = this.afdb.list<any>('profile/' + this.authProvider.userId + '/cars', ref => ref.orderByChild('isActive').equalTo(true))
+		.snapshotChanges().subscribe( data => {
+		for (let i = 0; i < data.length; i++) {
+				this.activeCar = data[i].payload.val().carmodel + ": " + data[i].payload.val().plateNumber; 
+			}
+			this._activeCar.unsubscribe();
+		});
+	}
+
 	 checkOnGoingTransaction(){		 
-		let query =  this.afdb.list('requests/').snapshotChanges().take(1).subscribe(data=>{						
+		this.afdb.list('requests/').snapshotChanges().take(1).subscribe(data=>{						
 		  for(let i = 0; i < data.length; i++){
 			if(data[i].payload.val().arrivingNode){		
 				this.afdb.list<any>('requests/' + data[i].key + '/arrivingNode').snapshotChanges().take(1).subscribe(dataProf=>{
 					for(let a = 0; a < dataProf.length; a++){
 						if(dataProf[a].payload.val().status != "cancelled"){
 							if(dataProf[a].payload.val().carowner.coID == this.userId){	
-								console.log("arriving")							
-								this.tempHoID = data[i].key	
+								this.tempHoID = data[i].key;	
 								this.removeAllMarker();	
-								//this._markers.unsubscribe();
 								this.hasTransaction("arriving");							
-								this.getTempLocation(this.tempHoID);																
+								this.getTempLocation(this.tempHoID);
+								// this.map.remove();	
+								// this.requestTimer = true;
+								// this.btns = false;															
 							}
 						}
 					}
@@ -169,11 +225,14 @@ export class CoHomePage {
 						this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf=>{
 							for(let a = 0; a < dataProf.length; a++){
 								if(dataProf[0].payload.val().carowner.coID == this.userId){
-									this.tempHoID = data[i].key		
+									this.tempHoID = data[i].key;		
 									this.removeAllMarker();							
-									//this._markers.unsubscribe();
 									this.hasTransaction("parked");									
 									this.getTempLocation(this.tempHoID);
+									// this.map.remove();
+									// this.requestTimer = true;
+									// this.btns = false;	
+
 								}
 							}
 						});	
@@ -184,8 +243,8 @@ export class CoHomePage {
 		  }
 		});
 	  }
+
 	  async getTempLocation(homeowner){		  	
-		console.log('2');
 		let subs = await this.afdb.object<any>('location/' + homeowner).valueChanges().take(1).subscribe(data => {
 			let temp = {
 				lng: data.lng,
@@ -202,8 +261,6 @@ export class CoHomePage {
 	}
 	initListener(){
 		var key;
-		var start;
-		var end;
 		this._init = this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().subscribe(data=>{		
 			for(var i = 0; i < data.length; i++){				
 				if(data[i].payload.val().carowner.coID == this.userId){					
@@ -213,35 +270,53 @@ export class CoHomePage {
 				  }
 			}
 		});
+		this.btn_parkingListFlag = false;
 	}
 
 	arrivingListener(key){
 		this._arriving= this.afdb.object<any>('requests/' + this.tempHoID + '/arrivingNode/' + key).valueChanges().subscribe(data=>{
 			  if(data.status == "arriving"){
-				 this.navAddress = "Navigate to destination follow blue lines";
+				 this.navAddress = "Follow the blue lines to your destination";
 			 }else if (data.status == "hoCancelled"){
-				 this.navAddress = "Transaction was cancelled";				 
+				  let toast = this.toastCtrl.create({
+					  message: 'Transaction Cancelled!',
+					  duration: 3000,
+					  position: 'top'
+				  });
+
+				  toast.onDidDismiss(() => {
+					  console.log('Dismissed toast');
+				  });
+
+				  toast.present().then ( () => {
+					  this.clearTransac();
+					  this.navAddress = undefined;
+				  });		 
 			 }
 		});
 	}
 
 	async clearTransac(){	
 		this.isNotTransacting();
-		let temp1 = await this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().take(1).subscribe(data=>{
+		 await this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().take(1).subscribe(data=>{
 			for(let i = 0 ; i < data.length; i++){
 				if(data[i].payload.val().carowner.coID == this.userId){	
 									
 					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);					
-					  if(this._arriving){
+					if(this._arriving){
 						this._arriving.unsubscribe();
 					}					
 					this.tempHoID = undefined;  
-					this.directions.removeRoutes();					
+					this.directions.removeRoutes();		
+					this.ionViewDidLoad();
+					this.btns = true;
+					this.requestTimer = false;		
+					this.btn_parkingListFlag = true;
 				}
 			}
 		});	
 
-		let temp2 = await this.afdb.list<any>('requests/' + this.tempHoID + '/parkedNode').snapshotChanges().take(1).subscribe(data=>{
+		await this.afdb.list<any>('requests/' + this.tempHoID + '/parkedNode').snapshotChanges().take(1).subscribe(data=>{
 			for(let i = 0 ; i < data.length; i++){
 				if(data[i].payload.val().carowner.coID == this.userId){
 					this.afdb.list('requests/' + this.tempHoID + '/parkedNode').remove(data[i].key);					
@@ -249,7 +324,11 @@ export class CoHomePage {
 						this._arriving.unsubscribe();
 						}
 						this.tempHoID = undefined;
-						this.directions.removeRoutes();	  
+						this.directions.removeRoutes();	 
+						this.ionViewDidLoad();
+						this.btns = true;
+						this.requestTimer = false;
+						this.btn_parkingListFlag = true; 
 				}
 			}
 		});
@@ -305,12 +384,11 @@ export class CoHomePage {
 					this.navAddress = undefined;		
 					this.directions.removeRoutes();
 					this.initMarkers();
-					this.isNotTransacting();
-					
-					
-									
+					this.isNotTransacting();		
 				}
 			}
+		this.btn_parkingListFlag = true;
+
 		});
 	}
 	arrivedTransac(){
@@ -320,16 +398,20 @@ export class CoHomePage {
 					this.initParkedListener();   
 					this._arriving.unsubscribe();       
 					
-					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);
 					this.afdb.list('requests/' + this.tempHoID + '/parkedNode').push({
 						carowner:data[i].payload.val().carowner,
 						timeStart: "",
 						endTime: "",
-						payment: ""
-					  });
-					  this.navAddress = "You have arrived your destination";				 
+						payment: "",
+						timeAccepted: data[i].payload.val().timeAccepted,
+					});
+					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);
+					  this.navAddress = "You have arrived to your destination";				 
 				}
 			}
+			this.map.remove();
+			this.requestTimer = true;
+			this.btns = false;
 		});
 	}
 
@@ -346,44 +428,104 @@ export class CoHomePage {
 		});	
 	}
 
+	timeStart;
+	timeEnd;
+
 	parkedListener(key){
 		var start;
-		var end
-		console.log("parked listener is runing");
+		var end;
+
 		this._parked = this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().subscribe(data=>{
 			if(this._arriving){
 				this._arriving.unsubscribe();
 			}			
 			if(!data.timeStart && !data.endtime && !data.status){
-				this.navAddress = "Wait to start Timer";
+				this.navAddress = "Waiting for homeowner to start timer...";
 			}else if(data.timeStart && !data.endTime){	
 						                
                 var d = new Date(data.timeStart);
-                start = d.toLocaleTimeString([],{hour12:true});
-                this.navAddress = "Timer started at: " + start;
+				var options = {
+					hour: "2-digit",
+					minute: "2-digit"
+				}
+                start = d.toLocaleTimeString("en-us", options);
+				this.navAddress = "Timer started at: " + start;
+				this.timeStart = "Timer started at: " + start;
 
 			}else if(data.endTime){
 				this._parked.unsubscribe();
 				var e = new Date(data.endTime);
 				end = e.toLocaleTimeString([],{hour12:true});
 				this._parked.unsubscribe();
+
+				this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().subscribe(data2 => {
+				var timeStartH = new Date(data.timeStart);
+				var timeStartHour = timeStartH.getHours();
+
+				this.timeEnd = "Timer Stop at: " + end;
+
+				var acceptedTimeH = new Date(data.timeAccepted);
+				// start time for accepted time
+				var acceptedTimeHour = acceptedTimeH.getHours();
+				// calculating the hours between where startHour is the end time of the accepted time 
+					var calculattedInccuredHrs = timeStartHour - acceptedTimeHour;
+				// getting the minutes of the time accepted
+				var acceptedTimeMin = acceptedTimeH.getMinutes();
+				var incurredCharge;
+				
+				if (acceptedTimeMin > timeStartH.getMinutes()) {
+					incurredCharge = (calculattedInccuredHrs - 1) * this.incurring_charge;
+				} else {
+					incurredCharge = calculattedInccuredHrs * this.incurring_charge;
+				}
+
+					var acceptedStartTime = acceptedTimeH.toLocaleTimeString();
+
+   
 					let confirm = this.alertCtrl.create({
 							title: 'Payment',
-					        subTitle: 'Start time: ' + start+ '<br>End time: ' + end + '<br>Amount: P' + data.payment,
+						subTitle: '<b>Arriving</b> <br><br> Rate: P10.00/hr <br> Time started: '
+							+ acceptedStartTime
+							+ '<br>Time ended: ' + start + '<br>Incurred Charges: P' + incurredCharge +'.00'
+							+ '<br><br> <b>Parking</b> <br><br> Time parked: '
+							+ start
+							+ '<br>Time ended: ' + end + '<br>Incurred Charges: P' + (data.payment - incurredCharge)
+							+ '<br><br> <b> TOTAL PAYMENT: </b>'
+							+ (data.payment) +'.00'
+						,
 					        enableBackdropDismiss: false,
 					        buttons: [{
 					       	 text: 'Finish',
 					         	handler: () => {
+									this.btn_parkingListFlag = true;
 						            this.tempHoID = undefined;  	
-									this.directions.removeRoutes();								
+									this.directions.removeRoutes();	
+									this.ionViewDidLoad();
+									this.btns =	 true;
+									this.requestTimer = false;						
 					            }
 					        	},]
 					        });
 					       confirm.present();
+				        });
 				
 			}if(data.status){
 				if(data.status == "cancelled"){
-					this.navAddress ="Transaction was cancelled"
+					// this.navAddress ="Transaction was cancelled";
+					let toast = this.toastCtrl.create({
+						message: 'Transaction Cancelled!',
+						duration: 5000,
+						position: 'top'
+					});
+
+					toast.onDidDismiss(() => {
+						console.log('Dismissed toast');
+					});
+
+					toast.present().then(() => {
+						this.clearTransac();
+					});	
+					this.navAddress = undefined;
 					this._parked.unsubscribe();
 				}
 			}
@@ -408,7 +550,13 @@ export class CoHomePage {
 		}if(this.hoMarkers){
 			this.hoMarkers.unsubscribe();
 		}
-		
+		if(this.listOfHO){
+			this.listOfHO.unsubscribe();
+		}			
+	}
+
+	navigateToReqs(){
+		this.navCtrl.push('CoHomePage');
 	}
 
 	openMenu(evt) {
@@ -442,11 +590,10 @@ export class CoHomePage {
 	}
 
 	destination() {
-		var geocoder = new MapboxGeocoder({
+		this.map.addControl(new MapboxGeocoder({
 			accessToken: 'pk.eyJ1IjoicnlhbjcxMTAiLCJhIjoiY2o5cm50cmw3MDE5cjJ4cGM2aWpud2lkMCJ9.dG-9XfpHOuE6FzQdRfa5Og',
-			country: 'ph',
-		});
-		document.getElementById('geocoder').appendChild(geocoder.onAdd(this.map));
+			country: 'ph'
+		}));
 	}
 
 	async setHomeownerMarker(){
@@ -463,24 +610,24 @@ export class CoHomePage {
 
 					el.addEventListener('click', (e) => {
 					var tmp = e.srcElement.id;
-					let actionSheet = this.actionSheetCtrl.create({
-						title: '',
-						buttons: [
-							{
-								text: 'Request',
-								handler: () => {
+					// let actionSheet = this.actionSheetCtrl.create({
+					// 	title: '',
+					// 	buttons: [
+					// 		{
+					// 			text: 'Request',
+					// 			handler: () => {
 									this.navCtrl.push("ComoredetailsPage", { key: tmp });
-								}
-							},
-							{
-								text: 'Cancel',
-								role: 'cancel',
-								handler: () => {
-								}
-							}
-						]
-					});
-					actionSheet.present();
+					// 			}
+					// 		},
+					// 		{
+					// 			text: 'Cancel',
+					// 			role: 'cancel',
+					// 			handler: () => {
+					// 			}
+					// 		}
+					// 	]
+					// });
+					// actionSheet.present();
 				});
 				}
 				else if(data[i].payload.val().status == "offline"){
@@ -489,6 +636,12 @@ export class CoHomePage {
 			}
 		});
 	}
+	listOfHO;
+
+	showHO(){
+		this.navCtrl.push("CoParkingListPage");
+	}
+
 	setEstablishmentMarker(){
 		this.afdb.list<any>('establishments/').snapshotChanges().subscribe(data=>{
 			for(var i = 0; i < data.length; i ++){
@@ -499,7 +652,7 @@ export class CoHomePage {
 					el.className = "estabMarker";
 				}else if (data[i].payload.val().status == "offline"){
 					el.className = "closed";
-				}					
+				}				
 					var coords = new mapboxgl.LngLat(data[i].payload.val().lng, data[i].payload.val().lat);
 					new mapboxgl.Marker(el, { offset: [-25, -25] })
 					.setLngLat(coords)
@@ -507,24 +660,24 @@ export class CoHomePage {
 
 					el.addEventListener('click', (e) => {
 						var tmp = e.srcElement.id;
-						let actionSheet = this.actionSheetCtrl.create({
-							title: '',
-							buttons: [
-								{
-									text: 'More Details',
-									handler: () => {
+						// let actionSheet = this.actionSheetCtrl.create({
+						// 	title: '',
+						// 	buttons: [
+						// 		{
+						// 			text: 'More Details',
+						// 			handler: () => {
 										this.navCtrl.push("ComoredetailsPage", { key: tmp });
-									}
-								},
-								{
-									text: 'Cancel',
-									role: 'cancel',
-									handler: () => {
-									}
-								}
-							]
-						});
-						actionSheet.present();
+						// 			}
+						// 		},
+						// 		{
+						// 			text: 'Cancel',
+						// 			role: 'cancel',
+						// 			handler: () => {
+						// 			}
+						// 		}
+						// 	]
+						// });
+						// actionSheet.present();
 					});
 				
 			}
@@ -635,25 +788,35 @@ export class CoHomePage {
 
 				}).catch(error => {
 					if(error.code == 1) {
-						alert('Error in getting location. Please allow the application to access your location.');
+						this.showAlert('Error in getting location.', 'Please allow the application to access your location.');
 					} else if (error.code == 2 || error.code == 3 ) {
-						alert('Error in getting location. Please try restarting the application.')
+						this.showAlert('Error in getting location.', 'Please try restarting the application.')
 					} else {
-						alert('Error in getting location. Please try restarting the application.')
+						this.showAlert('Error in getting location.', 'Please try restarting the application.')
 					}
 					loading.dismiss();
+					this.btn_parkingListFlag = false;
 				});
 		});
 		return locationsObs;
 	}
 
+	showAlert(title, subtitle) {
+		let alert = this.alertCtrl.create({
+			title: title,
+			subTitle: subtitle,
+			buttons: ['OK']
+		});
+		alert.present();
+	}
+
 	centerLocation(location) {
 		if (location) {
-			this.map.setZoom(10);
+			this.map.setZoom(15);
 			this.map.panTo(location);
 		} else {
 			this.map.setZoom(15);
-			this.location = this.getCurrentLocation().subscribe(currentLocation => {
+			this.location = this.getCurrentLocation().take(1).subscribe(currentLocation => {
 				this.map.panTo(currentLocation);
 			});
 		}

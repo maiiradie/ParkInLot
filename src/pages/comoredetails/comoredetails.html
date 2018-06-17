@@ -16,8 +16,8 @@
   <div class="main-content" text-wrap text-center>
     <!-- <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="!imgName"> -->
     <div *ngIf="hown == true; else establishment">
-      <img [src]="imgName" class="rec" *ngIf="imgName">
-      <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="!imgName">
+      <img [src]="imgName" class="rec" *ngIf="imgName != null">
+      <img src="./assets/imgs/avatar.jpg" class="rec" *ngIf="imgName == null">
       <h2>{{profileData?.fname}} {{profileData?.lname}}</h2>
       <h2 *ngIf="profileData?.fname==null"> {{profileData?.name}} </h2>
       <hr>
@@ -30,19 +30,19 @@
         </ion-item>
 
         <ion-item>
-          <ion-icon name="paper" color="secondary" item-start></ion-icon>
+          <ion-icon name="car" color="secondary" item-start></ion-icon>
           <p>Capacity</p>
-          <p *ngIf="profileData?.details == null">Address</p>
+          <!-- <p *ngIf="profileData?.details == null">Address</p> -->
           <span>{{garrageDet?.capacity}}</span>
-          <span *ngIf="profileData?.details ==null">{{userData?.address}}</span>
+          <!-- <span *ngIf="profileData?.details == null">{{userData?.address}}</span> -->
         </ion-item>
 
-        <ion-item>
+        <ion-item *ngIf="profileData?.details != null">
             <ion-icon name="paper" color="secondary" item-start></ion-icon>
             <p>Details</p>
-            <p *ngIf="profileData?.details == null">Address</p>
+            <!-- <p *ngIf="profileData?.details == null">Address</p> -->
             <span>{{profileData?.details}}</span>
-            <span *ngIf="profileData?.details ==null">{{userData?.address}}</span>
+            <!-- <span *ngIf="profileData?.details ==null">{{userData?.address}}</span> -->
           </ion-item>
 
         <ion-item>
@@ -65,7 +65,7 @@
       <ion-list no-lines text-wrap>
         <ion-item>
           <ion-icon name="car" color="secondary" item-start></ion-icon>
-          <h3 id = 'available'*ngIf="profileData?.availability == false; else novacant">Available</h3>
+          <h3 id = 'available'*ngIf="profileData?.availability == true; else novacant">Available</h3>
           <ng-template #novacant>
             <h3 id = 'full'>Full</h3>
           </ng-template>
@@ -80,7 +80,7 @@
         <ion-item>
           <ion-icon name="paper" color="secondary" item-start></ion-icon>
           <p>Operating Hours</p>
-          <span>{{profileData?.openingTime}} : {{profileData?.closingTime}}</span>
+          <span>{{profileData?.openingTime}} - {{profileData?.closingTime}}</span>
         </ion-item>
 
         <ion-item>

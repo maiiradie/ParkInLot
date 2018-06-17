@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { AngularFireAuth } from 'angularfire2/auth';
 import 'rxjs/add/operator/take';
 import { AuthProvider } from '../../providers/auth/auth';
 import moment from 'moment';
@@ -18,7 +17,6 @@ export class EstProfilePage {
   userId = this.authProvider.userId;
 
   constructor(private afdb:AngularFireDatabase,
-    private afs:AngularFireAuth,
     public navCtrl: NavController,
     public navParams: NavParams,
     public authProvider:AuthProvider) {

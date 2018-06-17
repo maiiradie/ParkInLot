@@ -8,19 +8,6 @@ import { AuthProvider } from '../providers/auth/auth';
 import firebase from 'firebase';
 import 'rxjs/add/operator/take';
 
-import { Profile } from '../models/profile';
-import { LoginPage } from '../pages/login/login';
-
-import { HoHomePage } from '../pages/ho-home/ho-home';
-import { HoprofilePage } from '../pages/hoprofile/hoprofile';
-import { HoGaragePage } from '../pages/ho-garage/ho-garage';
-import { HoTransacHistoryPage } from '../pages/ho-transac-history/ho-transac-history';
-
-import { CoHomePage } from '../pages/co-home/co-home';
-import { CoEditProfilePage } from '../pages/co-edit-profile/co-edit-profile';
-import { CoCarPage } from '../pages/co-car/co-car';
-import { CoTransacHistoryPage } from '../pages/co-transac-history/co-transac-history';
-
 @Component({
   templateUrl: 'app.html'
 })
@@ -31,8 +18,7 @@ export class MyApp {
 
   profileData;
   imgName;
-  private userId;
-  private loggedIn;
+  cohoRequests;
 
   constructor(private menuCtrl: MenuController,
     private authProvider: AuthProvider,
@@ -52,7 +38,6 @@ export class MyApp {
         this.afdb.object<any>(`profile/` + user.uid).valueChanges().take(1).subscribe(data => {
           this.profileData = data;
           if (data.homeowner && !data.carowner) {
-            console.log('one');
             this.authProvider.updateLocationLog(user.uid, 'online');
             this.authProvider.updateHOOnDisconnect(user.uid);
 
@@ -60,7 +45,6 @@ export class MyApp {
             this.authProvider.updateLogStatus(user.uid, 'online');
 
           } else if (data.carowner && !data.homeowner) {
-            console.log('two');
             this.authProvider.updateLogStatus(user.uid, 'online');
             this.authProvider.updateOnDisconnect(user.uid);
           } else if (data.carowner && data.homeower) {
@@ -71,6 +55,7 @@ export class MyApp {
             });
           }
         });
+        this.getcohoRequests(user);
 
       } else {
         this.profileData = null;
@@ -78,6 +63,14 @@ export class MyApp {
         this.rootPage = "LoginPage";
       }
     });
+
+    
+  }
+
+  getcohoRequests(user){
+    this.afdb.list<any>('requests/' + user.uid + '/requestNode', ref => ref.orderByChild('status').equalTo('pending')).valueChanges().subscribe(data => {
+      this.cohoRequests = data.length;
+    }); 
   }
 
   openPage(page: string, role) {

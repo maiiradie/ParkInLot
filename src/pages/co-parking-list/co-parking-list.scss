@@ -1,0 +1,28 @@
+page-co-parking-list {
+    .header-image {
+        background-image: url("../assets/imgs/TopBck2.png");
+        height: 30vh;
+        background-size: cover;
+        background-position: center center;
+        position: relative;
+        z-index: -1;
+    }
+
+    h2 {
+        font-weight: 1000 !important;
+        color: #424242 !important;
+        white-space: normal;
+    }
+
+    span {
+        color: #424242;
+    }
+
+    p {
+        color:#808080 !important;
+    }
+
+    ion-card {
+        white-space: normal;
+    }
+}

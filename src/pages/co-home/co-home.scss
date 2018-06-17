@@ -1,61 +1,64 @@
 page-co-home {
-	#map{
+	#map {
 		height:100%;
 		width:100%;
 		position: absolute;
-		
 	}
-	.bottom{
+
+	.bottom {
 		top:65vh;
 		right:-7vw;
 		position:absolute;
 		width:100%;
-		
 	}
-	.arrived{
+	
+	.arrived {
 		top:55vh;
 		left:-7vw;
 		position:absolute;
 		width:100%;
 	}
-	#iconArrived{
+	
+	#iconArrived {
 		text-shadow: 1px 0px 10px rgba(2, 2, 2, 1);
 		font-size: 60px;
 		color: #4CAF50;;
 	}
-	.cancel{
+	
+	.cancel {
 		top:65vh;
 		left:-7vw;
 		position:absolute;
 		width:100%;
 	}
-	#iconCancel{
-		text-shadow: 1px 0px 10px rgba(2, 2, 2, 1);
-		font-size: 60px;
-	}
-	#iconLocate{
+
+	#iconCancel {
 		text-shadow: 1px 0px 10px rgba(2, 2, 2, 1);
 		font-size: 60px;
 	}
 
-	.mapmarker{
+	#iconLocate {
+		text-shadow: 1px 0px 10px rgba(2, 2, 2, 1);
+		font-size: 60px;
+	}
+
+	.mapmarker {
 		background-image: url('../assets/imgs/open.png');
-
 		background-size: 35px 48px;
 		width: 35px;
 		height: 48px; 
 		cursor: pointer;
 	}
 
-	.estabMarker{
+	.estabMarker {
 		background-image: url('../assets/imgs/est_open.png');
-
 		background-size: 100%;
 		width: 70px;
 		height: 70px; 
 		cursor: pointer;
 	}
-	.closed{
+
+	.closed {
 		background-image: url('../assets/imgs/est_closed.png');
 		background-size: 100%;
 		width: 70px;
@@ -65,7 +68,6 @@ page-co-home {
 
 	.carmarker{
 		background-image: url('../assets/imgs/car.png');
-
 		background-size: 100%;
 		width: 30px;
 		height: 30px; 
@@ -74,14 +76,14 @@ page-co-home {
 	
     .geocoder {
         position:absolute;
-        width:95%;
-        margin-left:-10%;
-		top:10px;
+        width:80%;
+		margin-left:-25%;
+		left:25%;
+		top:20px;
 		border-radius: 30px;
-		
 	}
-	.status_container{
-		background-color:rgb(47,79,79);
+	.status_container {
+		background-color: #424242;
 		color: white;
 		opacity: .9;
         position:absolute;
@@ -93,17 +95,67 @@ page-co-home {
 		border-radius: 10px 10px 0px 0px;
 		box-shadow: -2px 22px 93px 0px rgba(0,0,0,0.75);
 	}
-	.status_text{
+
+	.status_text {
 		font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 		margin: auto;
 		width: 95%;
 		padding-top: 2px;
-		font-size: 17px;
+		font-size: 1em;
 		text-align: center;
-	}	
+		button {
+			margin: -1em auto 1em;
+			font-size: 1em;
+			color: #424242;
+		}
+	}
+
     .mapboxgl-ctrl-geocoder { 
 		box-shadow: -2px 10px 50px 0px rgba(0,0,0,0.75);
 		border-radius: 30px;
 		min-width:100%; 		
+	}
+	
+	.mapboxgl-ctrl-top-right {
+		top: 0;
+		left: 0;
+	}
+
+	.toolbar-background {
+		background-color: color($colors, secondary, base);
+	}
+	
+	ion-title {
+		ion-icon {
+			color: #424242;
+		}
+	}
+
+	ion-navbar {
+		span {
+			font-size: 0.90em;
+			font-weight: 400;
+		}
+	}
+
+	ion-fab {
+		right: 10%;
+		ion-icon {
+			color: #424242;
+		}
+	}
+
+	.btn-list {
+		bottom: 150%;
+	}
+
+	.btn-cancel {
+		left: 10%;
+		// bottom: 150%;
+	}
+
+	.btn-arrive {
+		left: 10%;
+		bottom: -400%;
 	}
 }

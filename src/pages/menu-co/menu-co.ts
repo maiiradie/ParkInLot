@@ -30,7 +30,6 @@ export class MenuCoPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad MenuCoPage');
   }
 
   openPage(page: PageInterface){
