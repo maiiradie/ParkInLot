@@ -266,7 +266,7 @@ export class ComoredetailsPage {
     var tempCap;
     this.cancel= this.alertCtrl.create({
       title: 'Request',
-      message: 'Requesting...',
+      message: 'Requesting (60s)...',
       enableBackdropDismiss: false,
       buttons: [
         {

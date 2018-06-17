@@ -555,6 +555,10 @@ export class CoHomePage {
 		}			
 	}
 
+	navigateToReqs(){
+		this.navCtrl.push('CoHomePage');
+	}
+
 	openMenu(evt) {
 		if (evt === "coho-Menu") {
 			this.menuCtrl.enable(true, 'coho-Menu');

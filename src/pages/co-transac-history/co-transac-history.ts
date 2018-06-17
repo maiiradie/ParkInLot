@@ -70,7 +70,6 @@ export class CoTransacHistoryPage {
                 var end = dateEnd.toLocaleTimeString();
 
                 var address = locationNode.address;
-                console.log(address);
                 var obj = {
                   data: data[i].payload.val().hoID,
                   name: prof.fname + ' ' +prof.lname,

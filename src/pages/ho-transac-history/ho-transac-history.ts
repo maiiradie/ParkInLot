@@ -63,6 +63,8 @@ export class HoTransacHistoryPage {
   amountss = 0;
   monthNum;
   dateMonth: String;
+  dueDate;
+
   async getDueMonth() {
     let temp = await this.afdb.list<any>('transactions/', ref => ref.orderByChild('timeStart')).snapshotChanges().take(1).subscribe(data => {
       for (var i = 0; i < data.length; i++) {
@@ -70,11 +72,17 @@ export class HoTransacHistoryPage {
           let tempDate = new Date(data[i].payload.val().timeStart)
           this.monthNum = tempDate.getMonth();
           this.dateMonth = this.month[this.monthNum];
+          this.dueDate = this.daysInMonth(this.monthNum+1,2018);
           break
         }
       }
     });
   }
+
+  daysInMonth(month, year) {
+    return new Date(year, month, 0).getDate();
+  }
+
   async getDueAmount() {
     let temp = await this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
       for (let i = 0; i < data.length; i++) {
