@@ -208,8 +208,8 @@ export class ComoredetailsPage {
             
             this.reqButton = true;
             let alert = this.alertCtrl.create({
-              title: 'Request',
-              subTitle: 'Request has been declined' ,
+              title: 'Request declined. :(',
+              subTitle: 'Please try again.' ,
               buttons: [
                 {
                 text: 'Ok',
@@ -239,12 +239,12 @@ export class ComoredetailsPage {
             
             this.reqButton = true;
             let alert = this.alertCtrl.create({
-              title: 'Request',
-              subTitle: 'Request has been accepted!' ,
+              title: ' Request Accepted!',
+              subTitle: 'Return to map and follow the blue lines to your destination.' ,
               enableBackdropDismiss: false	,
               buttons: [
                 {
-                text: 'Continue',
+                text: 'Ok',
                 handler: () => {
                   this.navCtrl.setRoot("CoHomePage", 
                   { 
@@ -265,8 +265,7 @@ export class ComoredetailsPage {
   showConfirm(i) {
     var tempCap;
     this.cancel= this.alertCtrl.create({
-      title: 'Request',
-      message: 'Requesting (60s)...',
+      title: 'Requesting... (60s)',
       enableBackdropDismiss: false,
       buttons: [
         {

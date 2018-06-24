@@ -31,7 +31,14 @@
           <p>Details</p>
           <span>{{userData?.details}}</span>
         </ion-item>
-      </ion-list>
+
+        <ion-item *ngIf="userData?.details">
+          <ion-icon name="paper" color="secondary" item-start></ion-icon>
+          <p>Parking Rate</p>
+          <span>P{{userData?.parkingRate}}/hr</span>
+        </ion-item>
+        </ion-list>
+
   
       <button ion-button block color="secondary" (click)="editGarage()">
         Edit Garage

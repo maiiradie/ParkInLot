@@ -29,6 +29,7 @@ export class HoEditGaragePage {
   private imgPath;
   private userId;
   profile$: AngularFireObject<any>;
+  parkingRate;
 
   constructor(private afdb: AngularFireDatabase,
     public navCtrl: NavController,
@@ -44,7 +45,8 @@ export class HoEditGaragePage {
     this.garageForm = this.fb.group({
       'address': [null, Validators.compose([Validators.required])],
       'details': [''],
-      'capacity': [null, Validators.compose([Validators.required, Validators.pattern('^[1-9][0-9]*$')])]
+      'capacity': [null, Validators.compose([Validators.required, Validators.pattern('^[1-9][0-9]*$')])],
+      'parkingRate': [null, Validators.compose([Validators.required, Validators.pattern('^[1-9][0-9]*$')])]
     });
     this.userId = this.authProvider.userId;
     this.choices = [
@@ -59,6 +61,7 @@ export class HoEditGaragePage {
       this.userData = data;
       this.retrieveImg();
       this.details = this.userData.details;
+      this.parkingRate = this.userData.parkingRate;
       this.choices.forEach(choice => {
         var index = this.details.indexOf(choice.description);
         // console.log(index);
@@ -169,7 +172,7 @@ export class HoEditGaragePage {
 
     loading.present(loading);
 
-    this.afdb.object(`/profile/` + this.userId).update({ details: this.details }).then(d => {
+    this.afdb.object(`/profile/` + this.userId).update({ details: this.details, parkingRate: this.garageForm.value['parkingRate'] }).then(d => {
       this.afdb.object(`/location/` + this.userId).update({ address: this.garageForm.value['address'] }).then(d => {
         this.afdb.object(`/requests/` + this.userId).update({ capacity: this.garageForm.value['capacity'] }).then(d => {
           this.afdb.object(`/requests/` + this.userId).update({ available: this.garageForm.value['capacity'] }).then(async d => {
@@ -178,12 +181,12 @@ export class HoEditGaragePage {
               await this.upload(this.imgPath, this.imgName).then(() => {
                 loading.dismiss();
                 this.showToast();
-                this.navCtrl.setRoot('HoGaragePage');
+                this.navCtrl.popToRoot();
               })
             } else {
               loading.dismiss();
               this.showToast();
-              this.navCtrl.pop();
+              this.navCtrl.popToRoot();
             }
           });
         });
@@ -205,6 +208,14 @@ export class HoEditGaragePage {
   showTransactingToast() {
     let toast = this.toastCtrl.create({
       message: 'Garage capacity may not be edited while there are ongoing transactions.',
+      duration: 3000
+    })
+    toast.present();
+  }
+
+  showNoEditingOfPRToast() {
+    let toast = this.toastCtrl.create({
+      message: 'Parking rate may not be edited while there are ongoing transactions.',
       duration: 3000
     })
     toast.present();

@@ -23,6 +23,7 @@ export class HoHomePage {
   parked: boolean = false;
   unfiltered;
   filtered;
+  parkingRate;
 
   items: Array<any> = [];
   itemRef: firebase.database.Reference = firebase.database().ref('/transac');
@@ -33,6 +34,7 @@ export class HoHomePage {
   hoProfile;
   request;
   parkingRates = [];
+  profileData;
 
   //for toggle of availability
   toggleValue;
@@ -371,6 +373,9 @@ export class HoHomePage {
     //query to database
     this.afdb.list('requests/' + this.userId + '/parkedNode').snapshotChanges().take(1).subscribe(data => {
 
+      this.afdb.object<any>(`/profile/` + this.userId).valueChanges().take(1).subscribe(data2 => {
+        this.profileData = data2;
+        this.parkingRate = this.profileData.parkingRate;
       for (var i = 0; i < data.length; i++) {
         if (data[i].payload.val().carowner.coID == carowner.payload.val().carowner.coID) {
           startDate = data[i].payload.val().timeStart;
@@ -386,12 +391,12 @@ export class HoHomePage {
           var endMin = endDateH.getMinutes();
           // compute for payment
           if (computedHours < 2) {
-            payment = 20;
+            payment = this.parkingRate;
           } else {
             if (startMin > endMin) {
-              payment = (computedHours - 1) * 20;
+              payment = (computedHours - 1) * parseInt(this.parkingRate);
             } else {
-              payment = computedHours * 20;
+              payment = computedHours * parseInt(this.parkingRate);
             }
           }
 
@@ -420,7 +425,7 @@ export class HoHomePage {
       var startTimeF = startDateH.toLocaleTimeString();
       var endTimeF = endDateH.toLocaleTimeString();
       var acceptedStartTime = acceptedTimeH.toLocaleTimeString();
-      var total_payment = incurredCharge + payment;
+        var total_payment = parseInt(incurredCharge) + parseInt(payment);
       this.updateRequests(key, endDate, total_payment, carowner.payload.val().carowner.coID);
       this.showPayment(startTimeF, endTimeF, payment, key, incurredCharge, acceptedStartTime);
 
@@ -431,6 +436,7 @@ export class HoHomePage {
         tempCap++;
         this.afdb.object('requests/' + this.userId).update({
           available: tempCap
+        });
         });
       });
 
@@ -467,7 +473,7 @@ export class HoHomePage {
         + start
         + '<br>Time ended: ' + end + '<br>Incurred Charges: P' + payment
         + '<br><br> <b> TOTAL PAYMENT: </b>'
-        + (incurredCharge + payment) +'.00'
+        + (parseInt(incurredCharge) + parseInt(payment)) +'.00'
       ,
       enableBackdropDismiss: false,
       buttons: [{

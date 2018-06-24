@@ -38,11 +38,17 @@
         </ion-item>
 
         <ion-item *ngIf="profileData?.details != null">
-            <ion-icon name="paper" color="secondary" item-start></ion-icon>
-            <p>Details</p>
-            <!-- <p *ngIf="profileData?.details == null">Address</p> -->
-            <span>{{profileData?.details}}</span>
-            <!-- <span *ngIf="profileData?.details ==null">{{userData?.address}}</span> -->
+          <ion-icon name="paper" color="secondary" item-start></ion-icon>
+          <p>Details</p>
+          <!-- <p *ngIf="profileData?.details == null">Address</p> -->
+          <span>{{profileData?.details}}</span>
+          <!-- <span *ngIf="profileData?.details ==null">{{userData?.address}}</span> -->
+        </ion-item>
+
+          <ion-item>
+            <ion-icon name="call" color="secondary" item-start></ion-icon>
+            <p>Parking Rate</p>
+            <span>None pa :3 </span>
           </ion-item>
 
         <ion-item>
@@ -51,9 +57,9 @@
           <span>{{profileData?.mobile}}</span>
         </ion-item>
       </ion-list>
-          <button ion-button block color="secondary" [disabled]="!reqButton" (click)="sendRequest(profileData?.token)">
-            Request
-          </button>
+      <button ion-button block color="secondary" [disabled]="!reqButton" (click)="sendRequest(profileData?.token)">
+        Request
+      </button>
     </div>
 
     <ng-template #establishment>
@@ -65,9 +71,9 @@
       <ion-list no-lines text-wrap>
         <ion-item>
           <ion-icon name="car" color="secondary" item-start></ion-icon>
-          <h3 id = 'available'*ngIf="profileData?.availability == true; else novacant">Available</h3>
+          <h3 id='available' *ngIf="profileData?.availability == true; else novacant">Available</h3>
           <ng-template #novacant>
-            <h3 id = 'full'>Full</h3>
+            <h3 id='full'>Full</h3>
           </ng-template>
         </ion-item>
 
@@ -88,9 +94,10 @@
           <p>Capacity</p>
           <span>{{profileData?.capacity}}</span>
         </ion-item>
+
       </ion-list>
     </ng-template>
 
-    
+
   </div>
 </ion-content>
