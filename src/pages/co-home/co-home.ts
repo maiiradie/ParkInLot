@@ -439,8 +439,11 @@ export class CoHomePage {
 			if(this._arriving){
 				this._arriving.unsubscribe();
 			}			
-			if(!data.timeStart && !data.endtime && !data.status){
-				this.navAddress = "Waiting for homeowner to start timer...";
+			if((!data.timeStart || data.timeStart == null) && !data.endtime && !data.status ){
+				// this.navAddress = "Waiting for homeowner to start timer...";
+				this.map.remove();	
+				this.requestTimer = true;
+				this.btns = false;
 			}else if(data.timeStart && !data.endTime){	
 						                
                 var d = new Date(data.timeStart);
@@ -449,16 +452,19 @@ export class CoHomePage {
 					minute: "2-digit"
 				}
                 start = d.toLocaleTimeString("en-us", options);
-				this.navAddress = "Timer started at: " + start;
+				// this.navAddress = "Timer started at: " + start;
 				this.timeStart = "Timer started at: " + start;
+				
+				this.map.remove();
+				this.requestTimer = true;
+				this.btns = false;
 
 			}else if(data.endTime){
 				this._parked.unsubscribe();
 				var e = new Date(data.endTime);
 				end = e.toLocaleTimeString([],{hour12:true});
-				this._parked.unsubscribe();
 
-				this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().subscribe(data2 => {
+				this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().take(1).subscribe(data2 => {
 				var timeStartH = new Date(data.timeStart);
 				var timeStartHour = timeStartH.getHours();
 
@@ -479,7 +485,7 @@ export class CoHomePage {
 					incurredCharge = calculattedInccuredHrs * this.incurring_charge;
 				}
 
-					var acceptedStartTime = acceptedTimeH.toLocaleTimeString();
+				var acceptedStartTime = acceptedTimeH.toLocaleTimeString();
 
    
 					let confirm = this.alertCtrl.create({
@@ -508,6 +514,7 @@ export class CoHomePage {
 					        });
 					       confirm.present();
 				        });
+				
 				
 			}if(data.status){
 				if(data.status == "cancelled"){

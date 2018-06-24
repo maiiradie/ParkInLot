@@ -347,7 +347,7 @@ export class HoHomePage {
     var options = {
       hour: "2-digit",
       minute: "2-digit"
-    }
+    };
     
     this.start = tempD.toLocaleTimeString("en-us", options);
     this.afdb.list('requests/' + this.userId + '/parkedNode').update(key, {
