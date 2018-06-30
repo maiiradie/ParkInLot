@@ -92,7 +92,7 @@
               <p>Date: {{item?.date}}</p>
               <p>Start Time: {{item?.start}}</p>
               <p>End Time: {{item?.end}}</p>
-              <p> Amount: Php{{item?.payment}}</p>
+              <p> Amount: Php{{item?.payment}}.00</p>
             </ion-card-content>
           </ion-card>
         </ion-list>
@@ -116,7 +116,7 @@
             <p>Date: {{item?.date}}</p>
             <p>Time Parked: {{item?.start}}</p>
             <p>Time Finished: {{item?.end}}</p>
-            <p>Total Amount: Php{{item?.payment}}</p>
+            <p>Total Amount: Php{{item?.payment}}.00</p>
           </ion-card-content>
         </ion-card>
       </ion-list>
@@ -125,7 +125,8 @@
 
   <ng-template #homeowner>
     <ion-list-header>
-      Due Amount For {{dateMonth}} {{dueDate}}: Php{{amount}}
+        Due Amount For {{dateMonth}} {{dueDate}}: Php{{paymentData}}
+
     </ion-list-header>
   
     <ion-list>
@@ -149,7 +150,7 @@
           <p>Date: {{item?.date}}</p>
           <p>Time Parked: {{item?.start}}</p>
           <p>Time Finished: {{item?.end}}</p>
-          <p>Total Amount: Php{{item?.payment}}</p>
+          <p>Total Amount: Php{{item?.payment}}.00</p>
         </ion-card-content>
       </ion-card>
     </ion-list>

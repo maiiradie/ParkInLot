@@ -27,6 +27,13 @@ export class HoTransacHistoryPage {
   garages: string[];
   selected_car;
   transactionOption = "cars";
+  now = new Date(Date.now());
+  year = this.now.getFullYear();  
+  mo = this.now.getMonth();
+  storedAmount;
+  isError = false;
+  paymentData;
+  millisNow = Date.now();
 
   constructor(
     
@@ -50,8 +57,7 @@ export class HoTransacHistoryPage {
   ionViewDidLoad() {
     this.retrieveCars();
     this.getTransactions(this.selected_month, this.selected_car, this.selected_year);
-    this.getDueMonth()
-    this.getDueAmount();
+    this.savePayments().catch;
   }
 
   ionViewWillEnter() {
@@ -66,39 +72,48 @@ export class HoTransacHistoryPage {
   dueDate;
 
   async getDueMonth() {
-    let temp = await this.afdb.list<any>('transactions/', ref => ref.orderByChild('timeStart')).snapshotChanges().take(1).subscribe(data => {
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].payload.val().hoID == this.userId && data[i].payload.val().status == "pending") {
-          let tempDate = new Date(data[i].payload.val().timeStart)
-          this.monthNum = tempDate.getMonth();
-          this.dateMonth = this.month[this.monthNum];
-          this.dueDate = this.daysInMonth(this.monthNum+1,2018);
-          break
+    await new Promise(resolve => {
+      this.afdb.list<any>('transactions/', ref => ref.orderByChild('timeStart')).snapshotChanges().take(1).subscribe(data => {
+        for (var i = 0; i < data.length; i++) {
+          if (data[i].payload.val().hoID == this.userId && data[i].payload.val().status == "pending") {
+            let tempDate = new Date(data[i].payload.val().timeStart)
+            this.monthNum = tempDate.getMonth();
+            this.dateMonth = this.month[this.monthNum];
+            this.dueDate = this.daysInMonth(this.monthNum+1,2018);
+            break
+          }
         }
-      }
-    });
+        resolve();
+      });
+    }).catch(error => {})
   }
 
   daysInMonth(month, year) {
     return new Date(year, month, 0).getDate();
   }
 
+
+
   async getDueAmount() {
-    let temp = await this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].payload.val().carowner) {
-          if (data[i].payload.val().hoID == this.userId && data[i].payload.val().status == "pending") {
-            var tempDate = new Date(data[i].payload.val().timeStart);
-            var tempMonth = tempDate.getMonth()
-            if (tempMonth == this.monthNum) {
-              this.amounts += data[i].payload.val().payment;
-              this.amountss = this.amounts;
-              this.amount = this.amountss * .20;
+    await new Promise(resolve =>{
+      this.afdb.list<any>('transactions/').snapshotChanges().take(1).subscribe(data => {
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].payload.val().carowner) {
+            if (data[i].payload.val().hoID == this.userId && data[i].payload.val().status == "pending") {
+              var tempDate = new Date(data[i].payload.val().timeStart);
+              var tempMonth = tempDate.getMonth()
+              if (tempMonth == this.monthNum) {
+                this.amounts += data[i].payload.val().payment;
+                this.amountss = this.amounts;
+                this.amount = this.amountss * .20;
+                this.updateTransac(data[i].key);
+              }
             }
           }
         }
-      }
-    });
+        resolve();
+      });
+    }).catch(error => {})
   }
 
   async getTransactions(selected_month, selected_car, selected_year) {
@@ -190,4 +205,66 @@ export class HoTransacHistoryPage {
           this.selected_car = this.plateNumbers[0];
     });
   }
+
+  async savePayments() {
+    await this.getDueMonth();
+    await this.getDueAmount();
+    await this. getStoredAmount();
+    console.log("storedAmount: "+this.storedAmount);
+    console.log('month: ' + this.dateMonth);
+    console.log("amount: "+ this.amount)
+    console.log('error: ' + this.isError);
+    
+    if(this.dateMonth != undefined && this.isError == true){
+      this.afdb.object('payments/'+ this.userId + '/' +this.year +'/'+this.mo).set({
+        payment: this.amount,
+        month: this.dateMonth,
+        status: 'pending',
+        dateCreated: this.millisNow
+      }); 
+    } else if (this.dateMonth != undefined && this.isError == false){
+      this.afdb.object('payments/'+ this.userId + '/' +this.year +'/'+this.mo).update({
+        payment: this.amount + this.storedAmount,
+        dateUpdated: this.millisNow
+      });
+    }
+
+    await this.getPayments();
+    
+    
+  }
+
+  updateTransac(id){
+    this.afdb.object('transactions/'+ id).update({
+      status: 'counted'
+    });
+  }
+
+async getStoredAmount(){
+    await new Promise(resolve =>{
+      this.afdb.object('payments/'+ this.userId + '/' +this.year +'/'+this.mo).snapshotChanges().subscribe(data => {
+        try{
+        
+            this.storedAmount = data.payload.val().payment;
+          
+        }catch(error){
+          console.log(error);
+          this.isError = true;
+          console.log(this.isError);
+        }
+        resolve();
+      });
+    })
+  }
+async getPayments(){
+  await new Promise(resolve => {
+    this.afdb.object('payments/'+ this.userId + '/' + this.year + '/' + this.mo).snapshotChanges().subscribe(data =>{
+      if(data.payload.val().status == "pending"){
+        this.paymentData = data.payload.val().payment + ".00";
+      }
+    resolve();
+    });
+  })
+}
+
 }
