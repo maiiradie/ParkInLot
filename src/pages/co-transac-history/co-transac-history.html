@@ -6,43 +6,50 @@
 -->
 <ion-header>
   <ion-navbar>
-      <ion-buttons start left>
-          <button ion-button icon-only menuToggle>
-            <ion-icon name='menu'></ion-icon>
-          </button>
-        </ion-buttons> 
+    <ion-buttons start left>
+      <button ion-button icon-only menuToggle>
+        <ion-icon name='menu'></ion-icon>
+      </button>
+    </ion-buttons> 
     <ion-title>Transactions</ion-title>
   </ion-navbar>
 </ion-header>
+
 <ion-tabs>
   <ion-tab [root]="tab1Root"></ion-tab>
   <ion-tab [root]="tab2Root"></ion-tab>
   <ion-tab [root]="tab3Root"></ion-tab>
 </ion-tabs>
+
 <ion-content padding>
+  <div class="trans-content">
     <ion-list>
       <ion-item>
-        <ion-label>Month</ion-label>
+        <ion-label>Month & Year</ion-label>
         <ion-select [(ngModel)]="selected_month" interface="popover" placeholder="March" (ionChange)="getTransactions(selected_month)">
           <ion-option *ngFor="let m of months" value="{{m}}" [selected]="selected_month == m">{{ m }}</ion-option>
         </ion-select>
-      </ion-item>
-      <ion-item>
-        <ion-label>Year</ion-label>
         <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
           <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
         </ion-select>
       </ion-item>
-      <ion-list-header>
-        Transactions for the month of {{ selected_month }}
-      </ion-list-header>
-    <ion-item *ngFor="let item of transactions">
-        <h5>{{item?.name}}</h5>
-        <h6>Address: {{item?.address}}</h6>
-        <p>Date: {{item?.date}}</p>
-        <p>Time Parked: {{item?.start}}</p>
-        <p>Time Finished:  {{item?.end}}</p>
-        <p>Total Amount: P{{item?.payment}}.00</p>
-    </ion-item> 
-  </ion-list>
+
+      <div class="list">
+        <ion-list-header>
+          Transactions for {{ selected_month }} {{ selected_year }}
+        </ion-list-header>
+
+        <ion-card *ngFor="let item of transactions">
+          <ion-card-header>{{item?.name}}</ion-card-header>
+          <ion-card-content>
+            <h6>Address: {{item?.address}}</h6>
+            <p>Date: {{item?.date}}</p>
+            <p>Time Parked: {{item?.start}}</p>
+            <p>Time Finished:  {{item?.end}}</p>
+            <p>Total Amount: P{{item?.payment}}.00</p>
+          </ion-card-content>
+        </ion-card> 
+      </div>
+    </ion-list>
+  </div>
 </ion-content>

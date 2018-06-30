@@ -20,7 +20,7 @@ import { IonicStorageModule } from '@ionic/storage';
 
 @NgModule({
   declarations: [
-    MyApp,
+    MyApp
   ],
   imports: [
     BrowserModule,

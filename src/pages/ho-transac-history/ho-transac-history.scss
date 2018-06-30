@@ -1,3 +1,25 @@
 page-ho-transac-history {
+    // .item .item-content {
+    //     background-color: transparent !important;
+    // }
+    
+    .toolbar-background {
+		background-color: color($colors, secondary, base);
+    }
+    
+    ion-segment-button {
+        font-weight: 1000 !important;
+    }
 
+    ion-label {
+        font-size: 0.9em;
+    }
+
+    ion-select {
+        font-size: 0.9em;
+    }
+
+    ion-card-header {
+        color: color($colors, primary, base) !important;
+    }
 }

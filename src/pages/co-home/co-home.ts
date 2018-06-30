@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { ViewChild } from '@angular/core';
 import { NavController, AlertController, ToastController, LoadingController, NavParams, ActionSheetController, IonicPage, Platform, MenuController } from 'ionic-angular';
 import * as mapboxgl from 'mapbox-gl';
 import { Geolocation } from '@ionic-native/geolocation';
@@ -9,6 +10,7 @@ import { AuthProvider } from '../../providers/auth/auth';
 import { AngularFireAuth } from 'angularfire2/auth';
 import MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 import { Events } from 'ionic-angular';
+import firebase from 'firebase';
 
 @IonicPage()
 @Component({
@@ -45,6 +47,11 @@ export class CoHomePage {
 	requestTimer = false;
 	btns = true;
 	incurredCharge;
+	timeStart;
+	timeEnd;
+	hoData;
+	hoLocation;
+	garagePic;
 
 	constructor(private afs: AngularFireAuth,
 		private events: Events,
@@ -75,7 +82,6 @@ export class CoHomePage {
 
 				this.afs.auth.signOut();
 				this.navCtrl.setRoot('LoginPage');
-
 			}
 		});
 	}
@@ -96,8 +102,6 @@ export class CoHomePage {
 					const watch = this.geolocation.watchPosition()
 						.filter((p) => p.coords !== undefined)
 						.subscribe(position => {
-
-
 							let temp = {
 								lng: position.coords.longitude,
 								lat: position.coords.latitude
@@ -107,12 +111,12 @@ export class CoHomePage {
 							this.addCarMarker(temp);
 							if (this.tempHoID) {
 								this.removeAllMarker();
+								
 								if (this.tempLocation) {
 									this.setDestination(this.tempLocation);
 									this.setOrigin(temp);
 									this.btn_parkingListFlag = false;
 								}
-
 							} else if (!this.tempHoID) {
 								this.initMarkers();
 							}
@@ -121,7 +125,6 @@ export class CoHomePage {
 						});
 				});
 			}, this.transactionListener());
-
 		});
 		this.getActiveCar();
 	}
@@ -151,14 +154,13 @@ export class CoHomePage {
 				]
 			});
 		});
-
 	}
 
 	navigateToRequests() {
 		this.afdb.list<any>('requests/' + this.userId + '/requestNode', ref => ref.orderByChild('status').equalTo('pending')).snapshotChanges().subscribe(data2 => {
 			if (data2.length != 0) {
 				let toast = this.toastCtrl.create({
-					message: 'Carowner Request!',
+					message: 'A carowner  has requested!',
 					duration: 3000,
 					position: 'bottom'
 				});
@@ -181,10 +183,13 @@ export class CoHomePage {
 		this.navCtrl.push("CoCarPage");
 	}
 
+	goToRequests() {
+		this.navCtrl.push("HoHomePage");
+	}
+
 	hasTransaction(status: String) {
 		if (this.tempHoID && status == "arriving") {
 			this.initListener();
-
 		} else if (this.tempHoID && status == "parked") {
 			this.initParkedListener();
 		}
@@ -209,6 +214,7 @@ export class CoHomePage {
 							if (dataProf[a].payload.val().status != "cancelled") {
 								if (dataProf[a].payload.val().carowner.coID == this.userId) {
 									this.tempHoID = data[i].key;
+									this.getHO();
 									this.removeAllMarker();
 									this.hasTransaction("arriving");
 									this.getTempLocation(this.tempHoID);
@@ -218,7 +224,6 @@ export class CoHomePage {
 								}
 							}
 						}
-
 					});
 				} else if (data[i].payload.val().parkedNode) {
 					this.afdb.list<any>('requests/' + data[i].key + '/parkedNode').snapshotChanges().take(1).subscribe(dataProf => {
@@ -227,20 +232,19 @@ export class CoHomePage {
 								for (let a = 0; a < dataProf.length; a++) {
 									if (dataProf[0].payload.val().carowner.coID == this.userId) {
 										this.tempHoID = data[i].key;
+										this.getHO();
 										this.removeAllMarker();
 										this.hasTransaction("parked");
 										this.getTempLocation(this.tempHoID);
 										// this.map.remove();
 										// this.requestTimer = true;
 										// this.btns = false;	
-
 									}
 								}
 							});
 						}
 					});
 				}
-
 			}
 		});
 	}
@@ -255,11 +259,12 @@ export class CoHomePage {
 			this.addTempHo(temp);
 		});
 	}
+
 	initMarkers() {
 		this.setHomeownerMarker();
 		this.setEstablishmentMarker();
-
 	}
+
 	initListener() {
 		var key;
 		this._init = this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().subscribe(data => {
@@ -302,11 +307,12 @@ export class CoHomePage {
 		await this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').snapshotChanges().take(1).subscribe(data => {
 			for (let i = 0; i < data.length; i++) {
 				if (data[i].payload.val().carowner.coID == this.userId) {
-
 					this.afdb.list('requests/' + this.tempHoID + '/arrivingNode').remove(data[i].key);
+					
 					if (this._arriving) {
 						this._arriving.unsubscribe();
 					}
+
 					this.tempHoID = undefined;
 					this.directions.removeRoutes();
 					this.ionViewDidLoad();
@@ -321,9 +327,11 @@ export class CoHomePage {
 			for (let i = 0; i < data.length; i++) {
 				if (data[i].payload.val().carowner.coID == this.userId) {
 					this.afdb.list('requests/' + this.tempHoID + '/parkedNode').remove(data[i].key);
+					
 					if (this._arriving) {
 						this._arriving.unsubscribe();
 					}
+					
 					this.tempHoID = undefined;
 					this.directions.removeRoutes();
 					this.ionViewDidLoad();
@@ -341,9 +349,11 @@ export class CoHomePage {
 			tempCap = data.available
 			temp.unsubscribe();
 			tempCap++;
+			
 			this.afdb.object('requests/' + this.tempHoID).update({
 				available: tempCap
 			});
+			
 			this.tempHoID = undefined;
 			this.removeAllMarker();
 			this.directions.removeRoutes();
@@ -353,7 +363,7 @@ export class CoHomePage {
 	initCancelWholeTransac() {
 		let alert = this.alertCtrl.create({
 			title: 'Cancel Transaction',
-			subTitle: 'Do you want to cancel the transaction?',
+			subTitle: 'Are you sure you want to cancel the transaction?',
 			buttons: [
 				{
 					text: 'No',
@@ -371,6 +381,7 @@ export class CoHomePage {
 		});
 		alert.present();
 	}
+
 	cancelWholeTransac() {
 		let query = this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode', ref => ref.orderByChild("carowner")).snapshotChanges().take(1).subscribe(data => {
 			for (let i = 0; i < data.length; i++) {
@@ -378,9 +389,11 @@ export class CoHomePage {
 					this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode').update(data[i].key, {
 						status: "cancelled"
 					});
+					
 					if (this._arriving) {
 						this._arriving.unsubscribe();
 					}
+					
 					this.returnCap();
 					this.navAddress = undefined;
 					this.directions.removeRoutes();
@@ -389,9 +402,9 @@ export class CoHomePage {
 				}
 			}
 			this.btn_parkingListFlag = true;
-
 		});
 	}
+
 	arrivedTransac() {
 		let query = this.afdb.list<any>('requests/' + this.tempHoID + '/arrivingNode', ref => ref.orderByChild("carowner")).snapshotChanges().take(1).subscribe(data => {
 			for (let i = 0; i < data.length; i++) {
@@ -410,6 +423,7 @@ export class CoHomePage {
 					this.navAddress = "You have arrived to your destination";
 				}
 			}
+
 			this.map.remove();
 			this.requestTimer = true;
 			this.btns = false;
@@ -429,14 +443,11 @@ export class CoHomePage {
 		});
 	}
 
-	timeStart;
-	timeEnd;
-
 	parkedListener(key) {
 		var start;
 		var end;
 
-		this._parked = this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().subscribe(data => {
+		this._parked = this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().subscribe(async data => {
 			if (this._arriving) {
 				this._arriving.unsubscribe();
 			}
@@ -446,24 +457,27 @@ export class CoHomePage {
 				this.requestTimer = true;
 				this.btns = false;
 			} else if (data.timeStart && !data.endTime) {
-
-				                var d = new Date(data.timeStart);
+				var d = new Date(data.timeStart);
 				var options = {
 					hour: "2-digit",
 					minute: "2-digit"
 				}
-				                start = d.toLocaleTimeString("en-us", options);
+				start = d.toLocaleTimeString("en-us", options);
 				// this.navAddress = "Timer started at: " + start;
-				this.timeStart = "Timer started at: " + start;
+				this.timeStart = start;
 
 				this.map.remove();
 				this.requestTimer = true;
 				this.btns = false;
-
 			} else if (data.endTime) {
 				this._parked.unsubscribe();
 				var e = new Date(data.endTime);
-				end = e.toLocaleTimeString([], { hour12: true });
+				// end = e.toLocaleTimeString([], { hour12: true });
+				var options = {
+					hour: "2-digit",
+					minute: "2-digit"
+				}
+				end = e.toLocaleTimeString("en-us", options);
 
 				this.afdb.object<any>('requests/' + this.tempHoID + '/parkedNode/' + key).valueChanges().take(1).subscribe(data2 => {
 					var timeStartH = new Date(data.timeStart);
@@ -490,7 +504,6 @@ export class CoHomePage {
 					}
 
 					var acceptedStartTime = acceptedTimeH.toLocaleTimeString();
-
 
 					let confirm = this.alertCtrl.create({
 						title: 'Payment',
@@ -519,7 +532,6 @@ export class CoHomePage {
 					confirm.present();
 				});
 
-
 			} if (data.status) {
 				if (data.status == "cancelled") {
 					let toast = this.toastCtrl.create({
@@ -542,6 +554,21 @@ export class CoHomePage {
 		});
 	}
 
+	async getHO() {
+		await this.afdb.object('location/' + this.tempHoID).valueChanges().subscribe(data => {
+			this.hoLocation = data;
+		});
+
+		await this.afdb.object('profile/' + this.tempHoID).valueChanges().subscribe(async data => {
+			this.hoData = data;
+
+			await firebase.storage().ref().child("images/" + this.tempHoID + "/" + this.hoData.garagePic).getDownloadURL().then(d => {
+				this.garagePic = d;
+			}).catch((error)=>{
+				console.log("There was an error in retrieving the image.", "");
+			});
+		});
+	}
 
 	ngOnDestroy() {
 		if (this._watch) {
@@ -797,12 +824,14 @@ export class CoHomePage {
 			});
 		}
 	}
+	
 	removeCarMarker() {
 		if (this.marker) {
 			this.marker.remove();
 		}
 
 	}
+	
 	addCarMarker(location) {
 		var el = document.createElement('div');
 		el.className = "carmarker";
@@ -812,6 +841,7 @@ export class CoHomePage {
 			.remove()
 			.addTo(this.map);
 	}
+	
 	addMarker(location) {
 
 		var el = document.createElement('div');
@@ -823,5 +853,4 @@ export class CoHomePage {
 			.addTo(this.map);
 
 	}
-
 }

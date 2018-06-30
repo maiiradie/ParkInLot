@@ -84,6 +84,11 @@ export class MyApp {
     else {
       this.nav.push(page);
     }
+    // if (this.nav.getActive().name != page) {
+    //   this.nav.setRoot(page);
+    // } else {
+    //   this.menuCtrl.close();
+    // }
   }
 
   isActive(page: string) {

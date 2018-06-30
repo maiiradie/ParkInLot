@@ -10,34 +10,75 @@
         </button>
       </ng-template>
     </ion-buttons>
-
+  
     <ion-title>
       ParkInLot
-      <ion-item *ngIf="role == 'both'">
-        <ion-icon name="notifications" item-start></ion-icon>
-        <ion-badge item-end>{{requestNo}}</ion-badge>
-      </ion-item>
-      
     </ion-title>
+  
+    <ion-buttons end>
+      <button type="button" ion-button icon-only clear *ngIf="role == 'both'" (click)="goToRequests()">
+        <ion-icon name="notifications" item-start></ion-icon>
+        <ion-badge item-end color="danger" *ngIf="requestNo > 0">{{requestNo}}</ion-badge>
+      </button>
+    </ion-buttons>
+  
     <button type="button" ion-button round small color="primary" outline (click)="goToCars()">
       <ion-icon name="car" item-start></ion-icon>
       <span>{{activeCar}}</span>
     </button>
   </ion-navbar>
 </ion-header>
-
+  
 <ion-content no-bounce>
   <div id="map" class="map">
     <div class="geocoder" id="geocoder"></div>
   </div>
+  
+  <div *ngIf='requestTimer' class="no-map">
+    <div *ngIf="!timeStart">
+      <img src="./assets/imgs/load-trans.svg">
+      <h1>Waiting for homeowner to start the timer...</h1>
+    </div>
 
-  <div *ngIf='requestTimer'>
-    <h1>Transaction</h1>
-    <p>Waiting for homeowner to start timer...</p>
-    <p *ngIf="timeStart">{{timeStart}}</p>
-    <p *ngIf="timeEnd">{{timeStart}}</p>
+    <div *ngIf="timeStart" class="ho-info">
+      <div class="header-image">
+        <ion-icon name="time" item-start></ion-icon>
+        <span>Time Parked: {{timeStart}}</span>
+      </div>
+  
+      <div class="main-content" text-wrap text-center>
+        <img [src]="garagePic" class="rec">
+        <h2>Currently Parked</h2>
+        <hr>
+        <ion-list no-lines text-wrap>
+          <ion-item>
+            <ion-icon name="contact" color="secondary" item-start></ion-icon>
+            <p>Homeowner</p>
+            <span>{{hoData.fname}} {{hoData.lname}}</span>
+          </ion-item>
+
+          <ion-item>
+            <ion-icon name="pin" color="secondary" item-start></ion-icon>
+            <p>Address</p>
+            <span>{{hoLocation.address}}</span>
+          </ion-item>
+
+          <ion-item *ngIf="hoData.parkingRate">
+            <ion-icon name="cash" color="secondary" item-start></ion-icon>
+            <p>Parking Rate</p>
+            <span>P{{hoData.parkingRate}}/hr</span>
+          </ion-item>
+    
+          <ion-item>
+            <ion-icon name="call" color="secondary" item-start></ion-icon>
+            <p>Mobile</p>
+            <span>{{hoData.mobile}}</span>
+          </ion-item>
+        </ion-list>
+      </div>
+    </div>
   </div>
-
+  
   <div class="bottom" *ngIf='btns'>
     <ion-row>
       <ion-col>
@@ -46,6 +87,7 @@
             <ion-icon name="list-box"></ion-icon>
           </button>
         </ion-fab>
+        
         <ion-fab class="btn-locate">
           <button id="locate" ion-fab color="light" (click)='centerLocation()'>
             <ion-icon name="locate"></ion-icon>
@@ -54,7 +96,7 @@
       </ion-col>        
     </ion-row>
   </div>
-
+  
   <div *ngIf="navAddress == 'Follow the blue lines to your destination'" class="cancel">
     <ion-row>
       <ion-col>
@@ -66,7 +108,7 @@
       </ion-col>        
     </ion-row>
   </div>
-
+  
   <div *ngIf="navAddress == 'Follow the blue lines to your destination'" class="arrived">
     <ion-row>
       <ion-col>
@@ -78,7 +120,7 @@
       </ion-col>        
     </ion-row>
   </div>
-
+  
   <div *ngIf="tempHoID && !requestTimer">
     <div class="status_container">
       <div class="status_text">

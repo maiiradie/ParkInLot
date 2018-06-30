@@ -26,7 +26,7 @@ export class HoTransacHistoryPage {
   plateNumbers = [];
   garages: string[];
   selected_car;
-
+  transactionOption = "cars";
 
   constructor(
     
@@ -95,7 +95,6 @@ export class HoTransacHistoryPage {
               this.amountss = this.amounts;
               this.amount = this.amountss * .20;
             }
-
           }
         }
       }

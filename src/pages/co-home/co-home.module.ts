@@ -7,7 +7,7 @@ import { CoHomePage } from './co-home';
     CoHomePage,
   ],
   imports: [
-    IonicPageModule.forChild(CoHomePage),
+    IonicPageModule.forChild(CoHomePage)
   ],
 })
 export class CoHomePageModule {}

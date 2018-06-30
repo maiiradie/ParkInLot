@@ -9,32 +9,30 @@
     <ion-buttons start left>
       <button ion-button menuToggle>
         <ion-icon name="menu"></ion-icon>
-      </button>
+        </button>
     </ion-buttons>
     <ion-title>Transactions</ion-title>
   </ion-navbar>
 </ion-header>
 
-
 <ion-content padding>
-  <div *ngIf="role == 'both'; else homeowner">
+  <div *ngIf="role == 'both'; else homeowner" class="trans-both">
     <ion-segment [(ngModel)]="transactionOption">
       <ion-segment-button value="cars">
         Cars
       </ion-segment-button>
+      
       <ion-segment-button value="garages">
         Garages
       </ion-segment-button>
+      
       <ion-segment-button value="company">
         Company
       </ion-segment-button>
     </ion-segment>
 
-
     <div [ngSwitch]="transactionOption">
-
       <ion-list *ngSwitchCase="'cars'" class="margin-bottom-0">
-
         <ion-list>
           <ion-item>
             <ion-label>Car</ion-label>
@@ -42,91 +40,86 @@
               <ion-option *ngFor="let p of plateNumbers" value="{{p}}" [selected]="selected_car == p">{{ p }}</ion-option>
             </ion-select>
           </ion-item> 
+          
           <ion-item>
-            <ion-label>Month</ion-label>
+            <ion-label>Month & Year</ion-label>
             <ion-select [(ngModel)]="selected_month" interface="popover" placeholder="March" (ionChange)="getTransactions(selected_month, selected_car, selected_year)">
               <ion-option *ngFor="let m of months" value="{{m}}" [selected]="selected_month == m">{{ m }}</ion-option>
             </ion-select>
-          </ion-item>
-          <ion-item>
-            <ion-label>Year</ion-label>
             <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
               <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
             </ion-select>
           </ion-item>
+          
           <ion-list-header>
-            Transactions for {{ selected_month }}
+            Transactions for {{ selected_month }} {{selected_year}}
           </ion-list-header>
-          <ion-item *ngFor="let item of transactions">
-            <div>
-              <h5>{{item?.name}}</h5>
+          
+          <ion-card *ngFor="let item of transactions" class="list">
+            <ion-card-header>{{item?.name}}</ion-card-header>
+            <ion-card-content>
               <h6>Address: {{item?.address}}</h6>
               <p>Date: {{item?.date}}</p>
               <p>Time Parked: {{item?.start}}</p>
               <p>Time Finished: {{item?.end}}</p>
               <p>Total Amount: P{{item?.payment}}.00</p>
-            </div>
-          </ion-item>
+            </ion-card-content>
+          </ion-card>
         </ion-list>
-
       </ion-list>
 
       <ion-list *ngSwitchCase="'garages'" class="margin-bottom-0">
-
         <ion-list>
           <ion-item>
-            <ion-label>Month</ion-label>
+            <ion-label>Month & Year</ion-label>
             <ion-select [(ngModel)]="selected_month" interface="popover" placeholder="March" (ionChange)="getTransactions(selected_month)">
               <ion-option *ngFor="let m of months" value="{{m}}" [selected]="selected_month == m">{{ m }}</ion-option>
             </ion-select>
-          </ion-item>
-          <ion-item>
-            <ion-label>Year</ion-label>
+
             <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
               <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
             </ion-select>
           </ion-item>
+
           <ion-list-header>
-            Transactions for the month of {{ selected_month }}
+            Transactions for {{ selected_month }} {{selected_year}}
           </ion-list-header>
-          <ion-item *ngFor="let item of transactions">
-            <div>
-              <h5>{{item?.name}}</h5>
+
+          <ion-card *ngFor="let item of transactions">
+            <ion-card-header>{{item?.name}}</ion-card-header>
+            <ion-card-content>
               <h6>Address: {{item?.address}}</h6>
               <p>Date: {{item?.date}}</p>
               <p>Start Time: {{item?.start}}</p>
               <p>End Time: {{item?.end}}</p>
               <p> Amount: Php{{item?.payment}}</p>
-            </div>
-          </ion-item>
+            </ion-card-content>
+          </ion-card>
         </ion-list>
-
       </ion-list>
 
       <ion-list *ngSwitchCase="'company'" class="margin-bottom-0">
+        <ion-item>
+          <ion-label>Year</ion-label>
+          <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
+            <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
+          </ion-select>
+        </ion-item>
 
-          <ion-item>
-            <ion-label>Year</ion-label>
-            <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
-              <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
-            </ion-select>
-          </ion-item>
-          <ion-list-header>
-            Transactions for the year {{ selected_year}}
-          </ion-list-header>
-          <ion-item *ngFor="let item of transactions">
-            <div>
-              <h6>{{item?.name}}</h6>
-              <p>Date: {{item?.date}}</p>
-              <p>Time Parked: {{item?.start}}</p>
-              <p>Time Finished: {{item?.end}}</p>
-              <p>Total Amount: Php{{item?.payment}}</p>
-            </div>
-          </ion-item>
-        </ion-list>
-
-
-
+        <ion-list-header>
+          Transactions for the year {{ selected_year}}
+        </ion-list-header>
+          
+        <ion-card *ngFor="let item of transactions">
+          <ion-card-header>{{item?.name}}</ion-card-header>
+          <ion-card-content>
+            <p>Date: {{item?.date}}</p>
+            <p>Time Parked: {{item?.start}}</p>
+            <p>Time Finished: {{item?.end}}</p>
+            <p>Total Amount: Php{{item?.payment}}</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-list>
     </div>
   </div>
 
@@ -134,31 +127,31 @@
     <ion-list-header>
       Due Amount For {{dateMonth}} {{dueDate}}: Php{{amount}}
     </ion-list-header>
+  
     <ion-list>
       <ion-item>
-        <ion-label>Month</ion-label>
+        <ion-label>Month & Year</ion-label>
         <ion-select [(ngModel)]="selected_month" interface="popover" placeholder="March" (ionChange)="getTransactions(selected_month)">
           <ion-option *ngFor="let m of months" value="{{m}}" [selected]="selected_month == m">{{ m }}</ion-option>
         </ion-select>
-      </ion-item>
-      <ion-item>
-        <ion-label>Year</ion-label>
         <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
-          <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
-        </ion-select>
+            <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
+          </ion-select>
       </ion-item>
+      
       <ion-list-header>
         Transactions for {{ selected_month }}
       </ion-list-header>
-      <ion-item *ngFor="let item of transactions">
-        <div>
-          <h6>{{item?.name}}</h6>
+      
+      <ion-card *ngFor="let item of transactions">
+        <ion-card-header>{{item?.name}}</ion-card-header>
+        <ion-card-content>
           <p>Date: {{item?.date}}</p>
           <p>Time Parked: {{item?.start}}</p>
           <p>Time Finished: {{item?.end}}</p>
           <p>Total Amount: Php{{item?.payment}}</p>
-        </div>
-      </ion-item>
+        </ion-card-content>
+      </ion-card>
     </ion-list>
   </ng-template>
 </ion-content>

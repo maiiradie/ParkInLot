@@ -146,7 +146,7 @@ export class ComoredetailsPage {
           temp.unsubscribe();
         } else if(locData.status === "offline"){
           let alert2 = this.alertCtrl.create({
-            title: 'Homeowner is Offline',
+            title: 'Homeowner is offline',
             buttons: ['Dismiss']
           });
           alert2.present();
@@ -208,8 +208,8 @@ export class ComoredetailsPage {
             
             this.reqButton = true;
             let alert = this.alertCtrl.create({
-              title: 'Request declined. :(',
-              subTitle: 'Please try again.' ,
+              title: 'Request Declined',
+              subTitle: 'Your request has been declined by the homeowner.' ,
               buttons: [
                 {
                 text: 'Ok',
@@ -339,8 +339,8 @@ export class ComoredetailsPage {
               });
     
             let alert = this.alertCtrl.create({	
-               title: 'Request',
-               subTitle: 'Request Timeout',
+               title: 'Request Timeout',
+               subTitle: 'Your request has timed out.',
                 buttons: [
                   {	
                  text: 'Ok',
