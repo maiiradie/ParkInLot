@@ -98,44 +98,57 @@
         </ion-list>
       </ion-list>
 
-      <ion-list *ngSwitchCase="'company'" class="margin-bottom-0">
-        <ion-item>
-          <ion-label>Year</ion-label>
-          <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
-            <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
-          </ion-select>
-        </ion-item>
+  <ion-list *ngSwitchCase="'company'" class="margin-bottom-0">
+    <ion-item>
+      <ion-label>Year</ion-label>
+      <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
+        <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
+      </ion-select>
+    </ion-item>
+  
+    <ion-list-header>
+      Transactions for the year {{ selected_year}}
+    </ion-list-header>
+  
+    <ion-card *ngFor="let x of paymentsArray">
+      <ion-card-content>
+        <p>Month: {{x?.monthdue}}</p>
+        <p>Amount Due: Php{{x?.dueamount}}.00</p>
+        <p>Status: {{x?.status}}</p>
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
 
-        <ion-list-header>
-          Transactions for the year {{ selected_year}}
-        </ion-list-header>
-          
-        <ion-card *ngFor="let item of transactions">
-          <ion-card-header>{{item?.name}}</ion-card-header>
-          <ion-card-content>
-            <p>Date: {{item?.date}}</p>
-            <p>Time Parked: {{item?.start}}</p>
-            <p>Time Finished: {{item?.end}}</p>
-            <p>Total Amount: Php{{item?.payment}}.00</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-list>
     </div>
   </div>
 
-  <ng-template #homeowner>
-    <ion-list-header>
-        Due Amount For {{dateMonth}} {{dueDate}}: Php{{paymentData}}
 
+  <!-- ########################################################################### -->
+  <ng-template #homeowner>
+    
+    <ion-segment [(ngModel)]="hoOption">
+      
+      <ion-segment-button value="garages">
+        Garages
+      </ion-segment-button>
+      
+      <ion-segment-button value="company">
+        Company
+      </ion-segment-button>
+    </ion-segment>
+    <ion-list-header>
+      Due Amount For {{dateMonth}} {{dueDate}}: Php{{paymentData}}
+      
     </ion-list-header>
-  
-    <ion-list>
-      <ion-item>
-        <ion-label>Month & Year</ion-label>
-        <ion-select [(ngModel)]="selected_month" interface="popover" placeholder="March" (ionChange)="getTransactions(selected_month)">
-          <ion-option *ngFor="let m of months" value="{{m}}" [selected]="selected_month == m">{{ m }}</ion-option>
-        </ion-select>
-        <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
+    <div [ngSwitch]="hoOption">
+    <ion-list *ngSwitchCase="'garages'" class="margin-bottom-0">
+      <ion-list>
+        <ion-item>
+          <ion-label>Month & Year</ion-label>
+          <ion-select [(ngModel)]="selected_month" interface="popover" placeholder="March" (ionChange)="getTransactions(selected_month)">
+            <ion-option *ngFor="let m of months" value="{{m}}" [selected]="selected_month == m">{{ m }}</ion-option>
+          </ion-select>
+          <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
             <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
           </ion-select>
       </ion-item>
@@ -154,5 +167,36 @@
         </ion-card-content>
       </ion-card>
     </ion-list>
+    </ion-list>
+
+
+
+<ion-list *ngSwitchCase="'company'" class="margin-bottom-0">
+  <ion-item>
+    <ion-label>Year</ion-label>
+    <ion-select [(ngModel)]="selected_year" interface="popover" placeholder="2018">
+      <ion-option *ngFor="let y of years" value="{{y}}" [selected]="selected_year == y">{{ y }}</ion-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-list-header>
+    Transactions for the year {{ selected_year}}
+  </ion-list-header>
+
+  <ion-card *ngFor="let x of paymentsArray">
+    <ion-card-content>
+      <p>Month: {{x?.monthdue}}</p>
+      <p>Amount Due: Php{{x?.dueamount}}.00</p>
+      <p>Status: {{x?.status}}</p>
+    </ion-card-content>
+  </ion-card>
+</ion-list>
+
+
+
+
+
+    
+    </div>
   </ng-template>
 </ion-content>
